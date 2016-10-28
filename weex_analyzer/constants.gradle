@@ -1,0 +1,11 @@
+ext {
+    projectName = 'weex-analyzer'
+    projectDesc = 'weex analyzer'
+
+    siteUrl = 'https://github.com/Rowandjj/weex-analyzer-android'
+    gitUrl = 'git@github.com:Rowandjj/weex-analyzer-android.git'
+
+    mavenGroup = 'com.taobao.android'
+    mavenArtifactId = 'weex_analyzer'
+    mavenVersion = '0.0.1.0'
+}
