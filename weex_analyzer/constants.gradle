@@ -1,5 +1,5 @@
 ext {
-    projectName = 'weex-analyzer'
+    projectName = 'maven'
     projectDesc = 'weex analyzer'
 
     siteUrl = 'https://github.com/Rowandjj/weex-analyzer-android'
