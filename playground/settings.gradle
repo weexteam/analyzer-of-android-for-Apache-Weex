@@ -1,0 +1,9 @@
+include ':app'
+
+
+include ":commons"
+project(":commons").projectDir=new File("../commons")
+
+
+include ":weex_analyzer"
+project(":weex_analyzer").projectDir=new File("../weex_analyzer")

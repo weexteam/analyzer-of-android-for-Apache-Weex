@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#77000000">
+
+    <LinearLayout
+        android:id="@+id/overlay_view_content_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="50dp"
+        android:background="#fff"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="15dp"
+            android:background="#03A9F4"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/close"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:includeFontPadding="false"
+                    android:text="@string/wxt_close"
+                    android:padding="5dp"
+                    android:textColor="#fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:layout_below="@id/close"
+                    android:layout_centerHorizontal="true"
+                    android:includeFontPadding="false"
+                    android:text="@string/wxt_perf_statistics"
+                    android:textColor="#fff"
+                    android:textSize="15sp"/>
+
+            </RelativeLayout>
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="#fff"/>
+
+
+            <TextView
+                android:id="@+id/text_version_sdk"
+                android:paddingLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical|left"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                tools:text="weex sdk version:???"/>
+
+            <TextView
+                android:id="@+id/text_sdk_init_time"
+                android:paddingLeft="15dp"
+                android:gravity="center_vertical|left"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                tools:text="sdk init time:?ms"/>
+
+
+            <TextView
+                android:id="@+id/text_total_time"
+                android:paddingLeft="15dp"
+                android:gravity="center_vertical|left"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                tools:text="totalTime:?ms"/>
+
+            <TextView
+                android:id="@+id/text_screen_render_time"
+                android:paddingLeft="15dp"
+                android:gravity="center_vertical|left"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                tools:text="firstScreenRenderTime:?ms"/>
+
+            <TextView
+                android:id="@+id/text_network_time"
+                android:paddingLeft="15dp"
+                android:gravity="center_vertical|left"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                tools:text="networktime:?ms"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/overlay_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="10dp"
+            android:scrollbars="none"
+            />
+
+    </LinearLayout>
+
+</FrameLayout>
