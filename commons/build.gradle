@@ -46,7 +46,7 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.10.0'
     provided 'com.taobao.android:weex_sdk:0.8.0'
 
-    debugCompile project(':weex_analyzer')
+    provided project(':weex_analyzer')
 
 
     testCompile 'junit:junit:4.12'

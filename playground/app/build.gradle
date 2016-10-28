@@ -73,6 +73,7 @@ dependencies {
     //compile 'com.taobao.android:weex_sdk:0.4.+'
     /*source dependency*/
     compile project(':commons')
+    debugCompile project(':weex_analyzer')
     compile 'com.taobao.android:weex_sdk:0.8.0'
     compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
