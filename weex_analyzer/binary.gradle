@@ -27,6 +27,7 @@ bintray {
     pkg {
         repo = projectName
         name = mavenArtifactId
+        userOrg = orgName
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
