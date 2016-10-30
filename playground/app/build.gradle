@@ -32,13 +32,20 @@ android {
             keyAlias "weex"
             keyPassword "123456"
         }
+
+        release {
+            storeFile file("tools/weex.jks")
+            storePassword "123456"
+            keyAlias "weex"
+            keyPassword "123456"
+        }
     }
     buildTypes {
-//        release {
-//            signingConfig signingConfigs.release
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         debug {
             testCoverageEnabled false
         }
@@ -73,7 +80,9 @@ dependencies {
     //compile 'com.taobao.android:weex_sdk:0.4.+'
     /*source dependency*/
     compile project(':commons')
-    debugCompile project(':weex_analyzer')
+//    debugCompile project(':weex_analyzer')
+    debugCompile 'com.taobao.android:weex_analyzer:0.0.1.0'
+
     compile 'com.taobao.android:weex_sdk:0.8.0'
     compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
