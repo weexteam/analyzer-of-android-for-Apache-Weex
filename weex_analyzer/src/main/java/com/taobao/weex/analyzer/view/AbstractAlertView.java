@@ -51,7 +51,7 @@ public abstract class AbstractAlertView extends Dialog implements IAlertView{
             window.setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
         }
 
-        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         onInitView(window);

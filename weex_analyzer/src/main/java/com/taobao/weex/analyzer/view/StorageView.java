@@ -33,6 +33,8 @@ public class StorageView extends AbstractAlertView {
     private PerformanceViewAdapter mAdapter;
     private StorageHacker mStorageHacker;
 
+    private RecyclerView mStorageList;
+
     public StorageView(Context context, StorageHacker storageHacker) {
         super(context);
         this.mStorageHacker = storageHacker;
@@ -43,6 +45,12 @@ public class StorageView extends AbstractAlertView {
     protected void onShown() {
         if (mStorageHacker == null) {
             return;
+        }
+
+        if(mAdapter == null){
+            List<StorageHacker.StorageInfo> data = new ArrayList<>();
+            mAdapter = new PerformanceViewAdapter(getContext(), data);
+            mStorageList.setAdapter(mAdapter);
         }
 
         mStorageHacker.fetch(new StorageHacker.OnLoadListener() {
@@ -64,11 +72,8 @@ public class StorageView extends AbstractAlertView {
                 dismiss();
             }
         });
-        List<StorageHacker.StorageInfo> data = new ArrayList<>();
-        RecyclerView storageList = (RecyclerView) window.findViewById(R.id.list);
-        storageList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new PerformanceViewAdapter(getContext(), data);
-        storageList.setAdapter(mAdapter);
+        mStorageList = (RecyclerView) window.findViewById(R.id.list);
+        mStorageList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
