@@ -1,2 +1,0 @@
--keep class com.taobao.weex.analyzer.** { *; }
--dontwarn com.taobao.weex.analyzer.**
