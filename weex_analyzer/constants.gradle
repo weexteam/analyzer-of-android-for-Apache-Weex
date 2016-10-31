@@ -2,12 +2,12 @@ ext {
     projectName = 'maven'
     projectDesc = 'weex analyzer'
 
-    siteUrl = 'https://github.com/Rowandjj/weex-analyzer-android'
-    gitUrl = 'git@github.com:Rowandjj/weex-analyzer-android.git'
+    siteUrl = 'https://github.com/weexteam/weex-analyzer-android'
+    gitUrl = 'git@github.com:weexteam/weex-analyzer-android.git'
 
     mavenGroup = 'com.taobao.android'
     mavenArtifactId = 'weex_analyzer'
-    mavenVersion = '0.0.1.0'
+    mavenVersion = '0.0.1.1'
 
     orgName = 'chuyi'
 }
