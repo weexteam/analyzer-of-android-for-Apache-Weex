@@ -44,6 +44,3 @@ proguard.cfg
 
 #Android
 **/project.properties
-
-#publish
-tb-release.gradle
