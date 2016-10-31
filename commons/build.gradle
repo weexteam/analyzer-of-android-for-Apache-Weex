@@ -47,7 +47,7 @@ dependencies {
     provided 'com.taobao.android:weex_sdk:0.8.0'
 
 //    provided project(':weex_analyzer')
-    provided 'com.taobao.android:weex_analyzer:0.0.1.1'
+    provided 'com.taobao.android:weex_analyzer:0.0.1.2'
 
 
     testCompile 'junit:junit:4.12'
