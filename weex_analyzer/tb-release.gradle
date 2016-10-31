@@ -1,11 +1,11 @@
 /**
- *./gradlew clean assemble publish -b tb-release.gradle -PdeployVersion=0.0.1.11-SNAPSHOT
+ *
  * */
 apply from: 'http://mirrors.taobao.net/mirror/gradle/android-parent.gradle'
 apply from: 'constants.gradle'
 
 group = mavenGroup
-version = mavenVersion
+version = mavenVersion+'-SNAPSHOT'
 
 description = projectDesc
 
@@ -47,6 +47,17 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java']
+            }
+            resources.srcDirs = ['src/main/java']
+            manifest.srcFile projectDir.path+'/src/main/AndroidManifest.xml'
+            res.srcDirs = ['src/main/res']
+        }
     }
     tBuildConfig {
         libraryType 'aar'
