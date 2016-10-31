@@ -70,7 +70,7 @@ public abstract class AbstractAlertView extends Dialog implements IAlertView{
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.copyFrom(window.getAttributes());
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
         lp.horizontalMargin = 0;
         lp.verticalMargin = 0;
         window.setAttributes(lp);
