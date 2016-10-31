@@ -11,7 +11,7 @@ ext {
 
     mavenGroup = 'com.taobao.android'
     mavenArtifactId = 'weex_analyzer'
-    mavenVersion = '0.0.1.2'
+    mavenVersion = '0.0.1.3'
 
     orgName = 'chuyi'
 }
