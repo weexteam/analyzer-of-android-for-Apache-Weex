@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.StorageHacker;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,16 +46,13 @@ public class StorageView extends AbstractAlertView {
             return;
         }
 
-        if(mAdapter == null){
-            List<StorageHacker.StorageInfo> data = new ArrayList<>();
-            mAdapter = new PerformanceViewAdapter(getContext(), data);
-            mStorageList.setAdapter(mAdapter);
-        }
-
         mStorageHacker.fetch(new StorageHacker.OnLoadListener() {
             @Override
             public void onLoad(List<StorageHacker.StorageInfo> list) {
-                if (mAdapter != null) {
+                if(mAdapter == null){
+                    mAdapter = new PerformanceViewAdapter(getContext(), list);
+                    mStorageList.setAdapter(mAdapter);
+                }else{
                     mAdapter.refreshData(list);
                 }
             }
