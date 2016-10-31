@@ -1,7 +1,57 @@
-/build
+#Android generated
+bin
+gen
+gen-external-apklibs
+build
+**/bin
+**/gen
+**/gen-external-apklibs
+**/build
 
-# Local configuration file (sdk path, etc)
-local.properties
+#Eclipse
+.project
+.classpath
+.settings
+**/.project
+**/.classpath
+**/.settings
 
-# Intellij
+#IntelliJ IDEA
+.idea
 *.iml
+*.ipr
+*.iws
+out
+**/*.iml
+
+
+#Maven
+target
+release.properties
+pom.xml.*
+
+#Ant
+build.xml
+local.properties
+proguard.cfg
+
+#OSX
+.DS_Store
+
+#gradle
+/.gradle
+**/.gradle
+
+#Android
+**/project.properties
+
+#Auction
+auction-app\1.txt
+auction-app\2.txt
+auction-app\3.txt
+auction-base\1.txt
+auction-base\2.txt
+auction-base\3.txt
+1.txt
+2.txt
+3.txt
