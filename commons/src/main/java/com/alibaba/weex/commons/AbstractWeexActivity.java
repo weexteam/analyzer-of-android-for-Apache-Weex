@@ -274,7 +274,7 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
     Map<String, Object> options = new HashMap<>();
     options.put(WXSDKInstance.BUNDLE_URL, source);
     mInstance.render(
-      getPageName(),
+      source,
       template,
       options,
       jsonInitData,

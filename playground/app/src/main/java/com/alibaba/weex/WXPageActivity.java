@@ -188,7 +188,7 @@ public class WXPageActivity extends AbstractWeexActivity implements Handler.Call
         ctx.getWindow().getDecorView().getWindowVisibleDisplayFrame(outRect);
         mConfigMap.put("bundleUrl", mUri.toString());
         String path = mUri.getScheme().equals("file") ? assembleFilePath(mUri) : mUri.toString();
-        mInstance.render(TAG, WXFileUtils.loadAsset(path, WXPageActivity.this),
+        mInstance.render(mUri.toString(), WXFileUtils.loadAsset(path, WXPageActivity.this),
                 mConfigMap, null,
                 ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil
                         .getDisplayHeight(WXPageActivity.this),
@@ -239,7 +239,7 @@ public class WXPageActivity extends AbstractWeexActivity implements Handler.Call
         Log.e(TAG, "into--[http:onSuccess] url:" + url);
         try {
           mConfigMap.put("bundleUrl", url);
-          mInstance.render(TAG, new String(task.response.data, "utf-8"), mConfigMap, null, ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil.getDisplayHeight(WXPageActivity.this), WXRenderStrategy.APPEND_ASYNC);
+          mInstance.render(url, new String(task.response.data, "utf-8"), mConfigMap, null, ScreenUtil.getDisplayWidth(WXPageActivity.this), ScreenUtil.getDisplayHeight(WXPageActivity.this), WXRenderStrategy.APPEND_ASYNC);
         } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
         }
