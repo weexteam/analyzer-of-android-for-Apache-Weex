@@ -117,10 +117,6 @@
                 android:textColor="#fff"
                 android:textSize="13sp"/>
 
-
-
-
-
         </LinearLayout>
 
 
@@ -147,43 +143,47 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:paddingBottom="5dp"
             android:gravity="center"
             android:orientation="horizontal">
 
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/height_small"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="small"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/height_medium"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="medium"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
 
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/height_large"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="large"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
         </RadioGroup>
 
@@ -207,61 +207,67 @@
         <RadioGroup
             android:id="@+id/level_group"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:paddingBottom="5dp"
             android:gravity="center"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/level_v"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="V"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/level_i"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="I"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/level_d"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="D"
                 android:textColor="#fff"
+                style="@style/WXTRadioButton"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/level_w"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="W"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/level_e"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="E"
+                style="@style/WXTRadioButton"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
         </RadioGroup>
 
@@ -271,7 +277,6 @@
             android:layout_marginBottom="2dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginTop="4dp"
             android:background="#fff"/>
 
         <TextView
@@ -287,54 +292,67 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:paddingBottom="5dp"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/rule_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="all"
+                style="@style/WXTRadioButton"
+                android:layout_marginRight="10dp"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/rule_callnative"
+                style="@style/WXTRadioButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
 
+                android:layout_height="wrap_content"
                 android:text="callNative"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
 
-            <android.support.v7.widget.AppCompatRadioButton
+            <RadioButton
                 android:id="@+id/rule_calljs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="callJS"
                 android:textColor="#fff"
-                android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                android:layout_marginRight="10dp"
 
-            <android.support.v7.widget.AppCompatRadioButton
+                style="@style/WXTRadioButton"
+                android:textSize="12sp"
+                />
+
+            <RadioButton
                 android:id="@+id/rule_jslog"
+                style="@style/WXTRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="js log"
                 android:textColor="#fff"
-                android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                android:layout_marginRight="10dp"
 
-            <android.support.v7.widget.AppCompatRadioButton
+                android:textSize="12sp"
+                />
+
+            <RadioButton
                 android:id="@+id/rule_exception"
+                style="@style/WXTRadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:text="js exception"
                 android:textColor="#fff"
                 android:textSize="12sp"
-                app:buttonTint="#CDDC39"/>
+                />
 
         </RadioGroup>
 

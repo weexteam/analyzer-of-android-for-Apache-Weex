@@ -43,7 +43,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.1.1'
     provided 'com.taobao.android:weex_sdk:0.8.0'
     provided 'com.android.support:recyclerview-v7:23.1.1'
 }

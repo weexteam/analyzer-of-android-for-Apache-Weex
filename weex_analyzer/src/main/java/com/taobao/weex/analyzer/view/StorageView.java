@@ -1,10 +1,10 @@
 package com.taobao.weex.analyzer.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,8 +14,8 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.taobao.weex.analyzer.core.StorageHacker;
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.core.StorageHacker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +96,7 @@ public class StorageView extends AbstractAlertView {
             holder.setOnItemLongClickListener(new ViewHolder.OnItemLongClickListener() {
                 @Override
                 public void onItemClick(final int position, final String key) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(mContext);
                     builder.setTitle("Alert");
                     builder.setMessage("remove key ("+key+") from weex storage ?");
                     builder.setPositiveButton("yes", new OnClickListener() {
@@ -131,7 +131,7 @@ public class StorageView extends AbstractAlertView {
                             dialog.dismiss();
                         }
                     });
-                    builder.show();
+                    builder.create().show();
                 }
             });
             return holder;

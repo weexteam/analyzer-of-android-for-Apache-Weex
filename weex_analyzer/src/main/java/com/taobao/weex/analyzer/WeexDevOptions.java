@@ -1,11 +1,11 @@
 package com.taobao.weex.analyzer;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,6 +22,7 @@ import com.taobao.weex.analyzer.core.ShakeDetector;
 import com.taobao.weex.analyzer.core.StorageHacker;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
 import com.taobao.weex.analyzer.view.FpsChartView;
 import com.taobao.weex.analyzer.view.IOverlayView;
 import com.taobao.weex.analyzer.view.LogView;
@@ -449,7 +450,7 @@ public final class WeexDevOptions implements IWXDevOptions{
 
 
         final DevOptionsConfig.OptionSelectListener[] listeners = options.values().toArray(new DevOptionsConfig.OptionSelectListener[0]);
-        mDevOptionsDialog = new AlertDialog.Builder(context)
+        mDevOptionsDialog = new CompatibleAlertDialogBuilder(context)
                 .setItems(options.keySet().toArray(new String[0]), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -465,9 +466,6 @@ public final class WeexDevOptions implements IWXDevOptions{
                 })
                 .setTitle(DevOptionsConfig.DEV_OPTIONS)
                 .create();
-//        if (mDevOptionsDialog.getWindow() != null) {
-////            mDevOptionsDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-//        }
 
         mDevOptionsDialog.show();
 

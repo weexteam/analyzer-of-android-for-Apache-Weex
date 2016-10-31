@@ -1,12 +1,13 @@
 package com.taobao.weex.analyzer.core;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
 
 import java.util.Locale;
 
@@ -34,7 +35,7 @@ public class JSExceptionCatcher {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(context);
         builder.setTitle("JS Exception");
         builder.setMessage(String.format(Locale.CHINA,"errorCode : %s\nerrorMsg : %s\n",TextUtils.isEmpty(errCode) ? "unknown" : errCode, TextUtils.isEmpty(msg) ? "unknown" : msg));
         builder.setPositiveButton("okay", new DialogInterface.OnClickListener() {
@@ -43,7 +44,7 @@ public class JSExceptionCatcher {
                 dialog.dismiss();
             }
         });
-        builder.show();
+        builder.create().show();
     }
 
 

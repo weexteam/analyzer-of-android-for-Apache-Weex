@@ -1,8 +1,8 @@
 package com.taobao.weex.analyzer.core;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -10,6 +10,7 @@ import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
 
 import java.util.Locale;
 
@@ -61,7 +62,7 @@ public class RemoteDebugManager {
     }
 
     public void requestDebugServer(final Context context, final boolean autoStart) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(context);
         final EditText editText = new EditText(context);
 
         if (mServerIP != null) {
@@ -89,7 +90,7 @@ public class RemoteDebugManager {
                 dialog.dismiss();
             }
         });
-        builder.show();
+        builder.create().show();
     }
 
     private void startRemoteJSDebug(Context context) {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="WXTRadioButton"
+           parent="android:Widget.Holo.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/wxt_radio_btn_style</item>
+    </style>
+</resources>
