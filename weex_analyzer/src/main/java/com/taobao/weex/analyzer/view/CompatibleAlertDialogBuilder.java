@@ -23,13 +23,12 @@ public class CompatibleAlertDialogBuilder extends AlertDialog.Builder {
         AlertDialog dialog = super.create();
         try {
             if (dialog.getWindow() != null) {
-                int type = WindowManager.LayoutParams.TYPE_TOAST;
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                    type = WindowManager.LayoutParams.TYPE_PHONE;
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                    int type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
+                    dialog.getWindow().setType(type);
                 }
-                dialog.getWindow().setType(type);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return dialog;

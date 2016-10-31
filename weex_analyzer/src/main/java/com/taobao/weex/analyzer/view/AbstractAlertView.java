@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,6 +46,10 @@ public abstract class AbstractAlertView extends Dialog implements IAlertView{
 
         setCancelable(true);
         setCanceledOnTouchOutside(true);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            window.setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
+        }
 
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
