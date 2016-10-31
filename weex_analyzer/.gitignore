@@ -45,13 +45,5 @@ proguard.cfg
 #Android
 **/project.properties
 
-#Auction
-auction-app\1.txt
-auction-app\2.txt
-auction-app\3.txt
-auction-base\1.txt
-auction-base\2.txt
-auction-base\3.txt
-1.txt
-2.txt
-3.txt
+#publish
+tb-release.gradle
