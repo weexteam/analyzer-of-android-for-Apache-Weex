@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,6 +63,13 @@ public class WXHistoryChartView extends AbstractAlertView implements OnDataPoint
         labelRenderer.setHorizontalAxisTitleColor(Color.BLACK);
         labelRenderer.setVerticalAxisTitleColor(Color.BLACK);
         mGraphView.setTitleColor(Color.BLACK);
+
+        window.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
     }
 
     @Override
