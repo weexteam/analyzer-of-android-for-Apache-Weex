@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.LogcatDumpBuilder;
 import com.taobao.weex.analyzer.core.LogcatDumper;
+import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 
 import java.lang.annotation.Retention;
@@ -551,13 +552,29 @@ public class LogView extends DragSupportOverlayView {
     private static class LogViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mText;
+        private LogcatDumper.LogInfo mCurLog;
 
         LogViewHolder(View itemView) {
             super(itemView);
             mText = (TextView) itemView.findViewById(R.id.text_log);
+
+            mText.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if(mCurLog != null){
+                        try {
+                            SDKUtils.copyToClipboard(v.getContext(),mCurLog.message,true);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    return true;
+                }
+            });
         }
 
         void bind(LogcatDumper.LogInfo log) {
+            mCurLog = log;
             switch (log.level) {
                 case Log.VERBOSE:
                     mText.setTextColor(Color.parseColor("#FFFFFF"));

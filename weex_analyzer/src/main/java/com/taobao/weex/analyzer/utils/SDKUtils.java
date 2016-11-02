@@ -1,6 +1,13 @@
 package com.taobao.weex.analyzer.utils;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.taobao.weex.WXSDKEngine;
 
@@ -31,6 +38,18 @@ public class SDKUtils {
                 || Build.MANUFACTURER.contains("Genymotion")
                 || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                 || "google_sdk".equals(Build.PRODUCT);
+    }
+
+    public static void copyToClipboard(@NonNull Context context, @Nullable String text, boolean allowNotification){
+        if(TextUtils.isEmpty(text)){
+            return;
+        }
+        ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("copied text", text);
+        manager.setPrimaryClip(clip);
+        if(allowNotification){
+            Toast.makeText(context,"copied to clipboard success",Toast.LENGTH_SHORT).show();
+        }
     }
 
 
