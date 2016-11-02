@@ -36,7 +36,7 @@ public class LogView extends DragSupportOverlayView {
 
     private OnCloseListener mOnCloseListener;
     private OnLogConfigChangedListener mConfigChangeListener;
-    private onStatusChangedListener mCollapseListener;
+    private onStatusChangedListener mStatusChangedListener;
 
     private SimpleOverlayView mCollapsedView;
 
@@ -102,8 +102,8 @@ public class LogView extends DragSupportOverlayView {
         this.mConfigChangeListener = listener;
     }
 
-    public void setOnCollapseListener(@Nullable onStatusChangedListener listener) {
-        this.mCollapseListener = listener;
+    public void setOnStatusChangedListener(@Nullable onStatusChangedListener listener) {
+        this.mStatusChangedListener = listener;
     }
 
     public void setLogLevel(int level) {
@@ -416,8 +416,8 @@ public class LogView extends DragSupportOverlayView {
 
     private void performCollapse() {
         //callback
-        if (mCollapseListener != null) {
-            mCollapseListener.onCollapsed();
+        if (mStatusChangedListener != null) {
+            mStatusChangedListener.onCollapsed();
         }
 
         //dismiss current view
@@ -430,8 +430,8 @@ public class LogView extends DragSupportOverlayView {
                 @Override
                 public void onClick(@NonNull IOverlayView view) {
                     mCollapsedView.dismiss();
-                    if (mCollapseListener != null) {
-                        mCollapseListener.onExpanded();
+                    if (mStatusChangedListener != null) {
+                        mStatusChangedListener.onExpanded();
                     }
                     LogView.this.show();
                 }
