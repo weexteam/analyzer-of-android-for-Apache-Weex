@@ -2,24 +2,22 @@ package com.taobao.weex.analyzer.view;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.view.View;
-import android.view.Window;
+import android.util.AttributeSet;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.utils.ViewUtils;
+import com.taobao.weex.analyzer.view.chart.ChartView;
 import com.taobao.weex.analyzer.view.chart.DataPoint;
 import com.taobao.weex.analyzer.view.chart.DataPointInterface;
 import com.taobao.weex.analyzer.view.chart.GridLabelRenderer;
 import com.taobao.weex.analyzer.view.chart.LegendRenderer;
 import com.taobao.weex.analyzer.view.chart.LineGraphSeries;
 import com.taobao.weex.analyzer.view.chart.OnDataPointTapListener;
-import com.taobao.weex.analyzer.view.chart.Viewport;
-import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.view.chart.ChartView;
 import com.taobao.weex.analyzer.view.chart.Series;
+import com.taobao.weex.analyzer.view.chart.Viewport;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,24 +26,31 @@ import java.util.Locale;
  * Description:
  * <p>
  * Created by rowandjj(chuyi)<br/>
- * Date: 16/10/19<br/>
- * Time: 上午11:28<br/>
+ * Date: 2016/11/3<br/>
+ * Time: 下午5:31<br/>
  */
-public class WXHistoryChartView extends AbstractAlertView implements OnDataPointTapListener {
+
+public class WXPerfHistoryItemView extends AbstractBizItemView<List<Performance>> implements OnDataPointTapListener {
 
     private ChartView mGraphView;
     private TextView mAverageVal;
-    private List<Performance> mPerformanceList;
 
-    public WXHistoryChartView(Context context, @NonNull List<Performance> performanceList) {
+    public WXPerfHistoryItemView(Context context) {
         super(context);
-        this.mPerformanceList = performanceList;
+    }
+
+    public WXPerfHistoryItemView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public WXPerfHistoryItemView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
     @Override
-    protected void onInitView(@NonNull Window window) {
-        mGraphView = (ChartView) window.findViewById(R.id.chart);
-        mAverageVal = (TextView) window.findViewById(R.id.average);
+    protected void prepareView() {
+        mGraphView = (ChartView) findViewById(R.id.chart);
+        mAverageVal = (TextView) findViewById(R.id.average);
 
         GridLabelRenderer labelRenderer = mGraphView.getGridLabelRenderer();
         Viewport viewport = mGraphView.getViewport();
@@ -63,18 +68,16 @@ public class WXHistoryChartView extends AbstractAlertView implements OnDataPoint
         labelRenderer.setHorizontalAxisTitleColor(Color.BLACK);
         labelRenderer.setVerticalAxisTitleColor(Color.BLACK);
         mGraphView.setTitleColor(Color.BLACK);
-
-        window.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
     }
 
     @Override
-    protected void onShown() {
-        int sampleSize = mPerformanceList.size();
+    protected int getLayoutResId() {
+        return R.layout.wxt_panel_history_perf_view;
+    }
+
+    @Override
+    protected void inflateData(List<Performance> data) {
+        int sampleSize = data.size();
         if (sampleSize == 0) {
             return;
         }
@@ -89,7 +92,7 @@ public class WXHistoryChartView extends AbstractAlertView implements OnDataPoint
         long fsrTotal = 0,ttTotal = 0,nwTotal = 0;
 
         for (int i = 0; i < sampleSize; i++) {
-            Performance p = mPerformanceList.get(i);
+            Performance p = data.get(i);
             ctPoints[i] = new DataPoint(i,p.communicateTime);
             ttPoints[i] = new DataPoint(i,p.totalTime);
             nwtPoints[i] = new DataPoint(i,p.networkTime);
@@ -160,13 +163,7 @@ public class WXHistoryChartView extends AbstractAlertView implements OnDataPoint
                 (ttTotal/(float)sampleSize),
                 (nwTotal/(float)sampleSize)
         ));
-    }
 
-
-
-    @Override
-    protected int getLayoutResId() {
-        return R.layout.wxt_history_view;
     }
 
     @Override

@@ -127,7 +127,6 @@ public class DevOptionsConfig {
     public static final String TOGGLE_LOG_OUTPUT = "显示/关闭日志悬浮窗";
     public static final String TOGGLE_MEMORY_CHART = "显示/关闭内存占用折线图";
     public static final String TOGGLE_FPS_CHART = "显示/关闭fps折线图";
-    public static final String SHOW_HISTORY_PERF_STATISTICS = "页面历史性能统计";
     public static final String TOGGLE_3D_LAYER = "显示/关闭3d视图";
     public static final String TOGGLE_SHOWN_JS_EXCEPTION = "允许/禁止js异常弹框";
     public static final String TOGGLE_JS_REMOTE_DEBUG = "js远程调试";

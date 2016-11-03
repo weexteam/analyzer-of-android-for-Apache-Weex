@@ -3,19 +3,18 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.List;
@@ -24,12 +23,11 @@ import java.util.List;
  * Description:
  * <p>
  * Created by rowandjj(chuyi)<br/>
- * Date: 16/10/2<br/>
- * Time: 上午10:06<br/>
+ * Date: 2016/11/3<br/>
+ * Time: 下午5:05<br/>
  */
 
-public class WXPerformanceView extends AbstractAlertView implements View.OnLongClickListener{
-    private Performance mPerformance;
+public class WXPerfItemView extends AbstractBizItemView<Performance> implements View.OnLongClickListener{
 
     private TextView totalTimeView;
     private TextView sdkVersionView;
@@ -39,29 +37,25 @@ public class WXPerformanceView extends AbstractAlertView implements View.OnLongC
 
     private RecyclerView mPerformanceList;
 
-    public WXPerformanceView(Context context, @Nullable Performance performance) {
+    public WXPerfItemView(Context context) {
         super(context);
-        this.mPerformance = performance;
+    }
+
+    public WXPerfItemView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public WXPerfItemView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
     }
 
     @Override
-    protected void onShown() {
-        totalTimeView.setText("totalTime : " + mPerformance.totalTime + "ms");
-        sdkVersionView.setText("weex sdk version : " + mPerformance.WXSDKVersion + "");
-        renderTimeView.setText("firstScreenRenderTime : " + mPerformance.screenRenderTime + "ms");
-        sdkInitTime.setText("sdk init time : " + mPerformance.sdkInitTime + "ms(only once)");
-        networkTime.setText("networkTime : "+ mPerformance.networkTime + "ms");
-        PerformanceViewAdapter adapter = new PerformanceViewAdapter(getContext(), mPerformance);
-        mPerformanceList.setAdapter(adapter);
-    }
-
-    @Override
-    protected void onInitView(@NonNull Window window) {
-        totalTimeView = (TextView) window.findViewById(R.id.text_total_time);
-        sdkVersionView = (TextView) window.findViewById(R.id.text_version_sdk);
-        renderTimeView = (TextView) window.findViewById(R.id.text_screen_render_time);
-        sdkInitTime = (TextView) window.findViewById(R.id.text_sdk_init_time);
-        networkTime = (TextView) window.findViewById(R.id.text_network_time);
+    protected void prepareView() {
+        totalTimeView = (TextView) findViewById(R.id.text_total_time);
+        sdkVersionView = (TextView) findViewById(R.id.text_version_sdk);
+        renderTimeView = (TextView) findViewById(R.id.text_screen_render_time);
+        sdkInitTime = (TextView) findViewById(R.id.text_sdk_init_time);
+        networkTime = (TextView) findViewById(R.id.text_network_time);
 
         totalTimeView.setOnLongClickListener(this);
         renderTimeView.setOnLongClickListener(this);
@@ -69,20 +63,24 @@ public class WXPerformanceView extends AbstractAlertView implements View.OnLongC
         sdkInitTime.setOnLongClickListener(this);
         networkTime.setOnLongClickListener(this);
 
-
-        window.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-        mPerformanceList = (RecyclerView) window.findViewById(R.id.overlay_list);
+        mPerformanceList = (RecyclerView) findViewById(R.id.overlay_list);
         mPerformanceList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.wxt_performance_view;
+        return R.layout.wxt_panel_cur_perf_view;
+    }
+
+    @Override
+    protected void inflateData(Performance data) {
+        totalTimeView.setText("totalTime : " + data.totalTime + "ms");
+        sdkVersionView.setText("weex sdk version : " + data.WXSDKVersion + "");
+        renderTimeView.setText("firstScreenRenderTime : " + data.screenRenderTime + "ms");
+        sdkInitTime.setText("sdk init time : " + data.sdkInitTime + "ms(only once)");
+        networkTime.setText("networkTime : "+ data.networkTime + "ms");
+        PerformanceViewAdapter adapter = new PerformanceViewAdapter(getContext(), data);
+        mPerformanceList.setAdapter(adapter);
     }
 
     @Override
@@ -104,7 +102,6 @@ public class WXPerformanceView extends AbstractAlertView implements View.OnLongC
         }else if(id == R.id.text_network_time){
             Toast.makeText(context,context.getString(R.string.wxt_explain_network_time),Toast.LENGTH_LONG).show();
         }
-
 
         return true;
     }
@@ -170,6 +167,4 @@ public class WXPerformanceView extends AbstractAlertView implements View.OnLongC
             mValueText.setText(value);
         }
     }
-
 }
-

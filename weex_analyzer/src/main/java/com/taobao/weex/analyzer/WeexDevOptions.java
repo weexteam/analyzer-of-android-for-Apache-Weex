@@ -30,8 +30,7 @@ import com.taobao.weex.analyzer.view.MemoryChartView;
 import com.taobao.weex.analyzer.view.PerfCommonOverlayView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.StorageView;
-import com.taobao.weex.analyzer.view.WXHistoryChartView;
-import com.taobao.weex.analyzer.view.WXPerformanceView;
+import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -308,32 +307,18 @@ public final class WeexDevOptions implements IWXDevOptions{
         options.put(SHOW_PERF_WEEX_ONLY, new DevOptionsConfig.OptionSelectListener() {
             @Override
             public void onSelectOption() {
-//                if (mConfig.isPerfWeexOnlyEnabled()) {
-//                    mConfig.setPerfWeexOnlyEnabled(false);
-//
-//                } else {
-//                    mConfig.setPerfWeexOnlyEnabled(true);
-//                }
                 if (mCurPageName == null) {
                     Toast.makeText(mContext, "internal error", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
-                WXPerformanceView performanceView = new WXPerformanceView(mContext, performance);
-                performanceView.show();
-            }
-        });
+                List<Performance> list = WXPerfStorage.getInstance().getPerformanceList(mCurPageName);
 
-        options.put(DevOptionsConfig.SHOW_HISTORY_PERF_STATISTICS, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (mCurPageName == null) {
-                    Toast.makeText(mContext, "no history data", Toast.LENGTH_SHORT).show();
+                if(performance == null){
                     return;
                 }
 
-                List<Performance> list = WXPerfStorage.getInstance().getPerformanceList(mCurPageName);
-                WXHistoryChartView view = new WXHistoryChartView(mContext, list);
+                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext,performance,list);
                 view.show();
             }
         });
