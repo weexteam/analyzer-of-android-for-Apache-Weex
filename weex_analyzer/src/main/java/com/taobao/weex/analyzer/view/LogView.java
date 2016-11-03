@@ -151,32 +151,26 @@ public class LogView extends DragSupportOverlayView {
         final TextView sizeBtn = (TextView) wholeView.findViewById(R.id.size);
         final ViewGroup sizeContent = (ViewGroup) wholeView.findViewById(R.id.size_content);
 
-        sizeBtn.setText(String.format(Locale.CHINA,mContext.getString(R.string.wxt_size),"(off)"));
         sizeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isSizeMenuOpened = !isSizeMenuOpened;
                 if(isSizeMenuOpened){
                     sizeContent.setVisibility(View.VISIBLE);
-                    sizeBtn.setText(String.format(Locale.CHINA,mContext.getString(R.string.wxt_size),"(on)"));
                 }else{
                     sizeContent.setVisibility(View.GONE);
-                    sizeBtn.setText(String.format(Locale.CHINA,mContext.getString(R.string.wxt_size),"(off)"));
                 }
             }
         });
 
         //setting init
-        settings.setText(String.format(Locale.CHINA, mContext.getString(R.string.wxt_settings), "(off)"));
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isSettingOpened = !isSettingOpened;
                 if (isSettingOpened) {
-                    settings.setText(String.format(Locale.CHINA, mContext.getString(R.string.wxt_settings), "(on)"));
                     settingContent.setVisibility(View.VISIBLE);
                 } else {
-                    settings.setText(String.format(Locale.CHINA, mContext.getString(R.string.wxt_settings), "(off)"));
                     settingContent.setVisibility(View.GONE);
                 }
             }
