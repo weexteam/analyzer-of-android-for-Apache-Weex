@@ -55,7 +55,7 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
                 mCurrentX = (int) (event.getRawX() + mDx);
                 mCurrentY = (int) (event.getRawY() + mDy);
                 if (isValidMove(mContext, event.getX() - downX) || isValidMove(mContext, event.getY() - downY)) {
-                    updateViewLayout(mCurrentX,mCurrentY);
+                    updateViewPosition(mCurrentX,mCurrentY);
                     hasMoved = true;
                 }
                 break;
@@ -68,7 +68,7 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
         return hasMoved || ViewConfiguration.get(context).getScaledTouchSlop() < Math.abs(distance);
     }
 
-    protected void updateViewLayout(int x, int y) {
+    protected void updateViewPosition(int x, int y) {
         if(mWholeView == null || mWindowManager == null){
             return;
         }

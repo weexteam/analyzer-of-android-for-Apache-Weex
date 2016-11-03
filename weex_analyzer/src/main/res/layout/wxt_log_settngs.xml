@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical">
@@ -27,8 +26,8 @@
             android:layout_height="1dp"
             android:layout_below="@id/title"
             android:layout_marginBottom="2dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginTop="2dp"
             android:background="#fff"
             />
@@ -38,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/line_1"
-            android:layout_marginLeft="40dp"
+            android:layout_marginLeft="10dp"
             android:gravity="center"
             android:padding="2dp"
             android:text="@string/wxt_settings"
@@ -47,12 +46,24 @@
             />
 
         <TextView
-            android:id="@+id/clear"
-            android:layout_toRightOf="@id/settings"
+            android:id="@+id/size"
+            android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="2dp"
-            android:layout_marginLeft="25dp"
+            android:layout_toRightOf="@id/settings"
+            android:layout_below="@id/line_1"
+            android:text="@string/wxt_size"
+            android:textColor="#fff"
+            android:textSize="13sp"/>
+
+        <TextView
+            android:id="@+id/clear"
+            android:layout_toRightOf="@id/size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:layout_marginLeft="20dp"
             android:layout_below="@id/line_1"
             android:text="@string/wxt_clear"
             android:textColor="#fff"
@@ -60,7 +71,7 @@
 
         <TextView
             android:id="@+id/close"
-            android:layout_marginLeft="25dp"
+            android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="2dp"
@@ -70,13 +81,14 @@
             android:textColor="#fff"
             android:textSize="13sp"/>
 
+
         <TextView
             android:id="@+id/collapse"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/line_1"
             android:layout_toRightOf="@id/close"
-            android:layout_marginLeft="25dp"
+            android:layout_marginLeft="20dp"
             android:padding="2dp"
             android:text="@string/wxt_collapse"
             android:textColor="#fff"
@@ -87,39 +99,12 @@
 
 
     <LinearLayout
-        android:id="@+id/setting_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#8e000000"
+        android:id="@+id/size_content"
         android:orientation="vertical"
-        android:visibility="visible">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="#fff"
-            />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/hold"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="hold(off)"
-                android:textColor="#fff"
-                android:textSize="13sp"/>
-
-        </LinearLayout>
-
-
+        android:layout_width="match_parent"
+        android:background="#8e000000"
+        android:visibility="gone"
+        android:layout_height="wrap_content">
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -128,16 +113,8 @@
             android:background="#fff"/>
 
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:gravity="center"
-            android:text="view size"
-            android:textColor="#fff"
-            android:textSize="13sp"/>
-
-
         <RadioGroup
+            android:layout_marginTop="5dp"
             android:id="@+id/height_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -186,6 +163,44 @@
                 />
 
         </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/setting_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#8e000000"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:background="#fff"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/hold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="hold(off)"
+                android:textColor="#fff"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+
+
 
 
         <View
