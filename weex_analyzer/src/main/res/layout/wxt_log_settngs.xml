@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:background="#8e000000"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <View
             android:layout_width="match_parent"
@@ -355,6 +355,61 @@
                 />
 
         </RadioGroup>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:background="#fff"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:gravity="center"
+            android:text="search"
+            android:textColor="#fff"
+            android:textSize="13sp"/>
+
+        <RelativeLayout
+            android:paddingBottom="5dp"
+            android:orientation="horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:id="@+id/text_cur_keyword"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:text="@string/wxt_current_keyword"
+                android:textColor="#fff"
+                android:layout_below="@+id/btn_input_keyword"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/btn_input_keyword"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:text="@string/wxt_input_keyword"
+                android:layout_marginLeft="50dp"
+                android:textColor="#fff"
+                android:textSize="13sp"/>
+
+
+            <TextView
+                android:id="@+id/btn_clear_keyword"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_height="20dp"
+                android:text="@string/wxt_clear_keyword"
+                android:textColor="#fff"
+                android:textSize="13sp"/>
+
+        </RelativeLayout>
 
     </LinearLayout>
 </LinearLayout>

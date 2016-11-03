@@ -42,7 +42,7 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int action = event.getAction();
-        switch (action){
+        switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mDx = mCurrentX - event.getRawX();
                 mDy = mCurrentY - event.getRawY();
@@ -55,12 +55,7 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
                 mCurrentX = (int) (event.getRawX() + mDx);
                 mCurrentY = (int) (event.getRawY() + mDy);
                 if (isValidMove(mContext, event.getX() - downX) || isValidMove(mContext, event.getY() - downY)) {
-                    if(mWindowManager != null && mWholeView != null){
-                        WindowManager.LayoutParams newParams = (WindowManager.LayoutParams) mWholeView.getLayoutParams();
-                        newParams.x = mCurrentX;
-                        newParams.y = mCurrentY;
-                        mWindowManager.updateViewLayout(mWholeView,newParams);
-                    }
+                    updateViewLayout(mCurrentX,mCurrentY);
                     hasMoved = true;
                 }
                 break;
@@ -71,6 +66,19 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
 
     private static boolean isValidMove(Context context, float distance) {
         return hasMoved || ViewConfiguration.get(context).getScaledTouchSlop() < Math.abs(distance);
+    }
+
+    protected void updateViewLayout(int x, int y) {
+        if(mWholeView == null || mWindowManager == null){
+            return;
+        }
+        WindowManager.LayoutParams newParams = (WindowManager.LayoutParams) mWholeView.getLayoutParams();
+        newParams.x = x;
+        newParams.y = y;
+
+        mWindowManager.updateViewLayout(mWholeView, newParams);
+        mCurrentX = x;
+        mCurrentY = y;
     }
 
 }

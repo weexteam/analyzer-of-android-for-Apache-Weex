@@ -71,11 +71,19 @@ public class LogcatDumper implements Handler.Callback {
         this.mLevel = level;
     }
 
-    public void removeRule(@Nullable Rule rule) {
+    public boolean removeRule(@Nullable Rule rule) {
         if (rule == null) {
-            return;
+            return false;
         }
-        mRules.remove(rule);
+        return mRules.remove(rule);
+    }
+
+    public boolean removeRule(@Nullable String ruleName){
+        if(TextUtils.isEmpty(ruleName)){
+            return false;
+        }
+        Rule r = new Rule(ruleName,"");
+        return mRules.remove(r);
     }
 
     public void removeAllRule() {
@@ -221,12 +229,13 @@ public class LogcatDumper implements Handler.Callback {
             return true;
         }
 
+        //must accept all rules
         for (Rule rule : mRules) {
-            if (rule.accept(log)) {
-                return true;
+            if (!rule.accept(log)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private boolean checkLevel(int level) {
@@ -375,6 +384,7 @@ public class LogcatDumper implements Handler.Callback {
             return filter;
         }
 
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -382,16 +392,13 @@ public class LogcatDumper implements Handler.Callback {
 
             Rule rule = (Rule) o;
 
-            if (name != null ? !name.equals(rule.name) : rule.name != null) return false;
-            return filter != null ? filter.equals(rule.filter) : rule.filter == null;
+            return name != null ? name.equals(rule.name) : rule.name == null;
 
         }
 
         @Override
         public int hashCode() {
-            int result = name != null ? name.hashCode() : 0;
-            result = 31 * result + (filter != null ? filter.hashCode() : 0);
-            return result;
+            return name != null ? name.hashCode() : 0;
         }
     }
 

@@ -1,17 +1,20 @@
 package com.taobao.weex.analyzer.view;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -48,6 +51,7 @@ public class LogView extends DragSupportOverlayView {
     private static final String FILTER_CALL_JS = "callJS";
     private static final String FILTER_ALL = "all";
     private static final String FILTER_EXCEPTION = "reportJSException";
+    private static final String FILTER_CUSTOM = "custom";
 
     @IntDef({Size.SMALL, Size.MEDIUM, Size.LARGE})
     @Retention(RetentionPolicy.SOURCE)
@@ -61,9 +65,11 @@ public class LogView extends DragSupportOverlayView {
     private String mFilterName;
     private int mViewSize = Size.MEDIUM;
 
-    private LogListAdapter adapter;
+    private LogListAdapter mLogAdapter;
 
     private boolean isSettingOpend;
+
+    private String mCurKeyword;
 
 
     static {
@@ -128,7 +134,9 @@ public class LogView extends DragSupportOverlayView {
         final View hold = wholeView.findViewById(R.id.hold);
         View clear = wholeView.findViewById(R.id.clear);
         View close = wholeView.findViewById(R.id.close);
-//        View search = wholeView.findViewById(R.id.search);
+        View inputKeyword = wholeView.findViewById(R.id.btn_input_keyword);
+        final View clearKeyword = wholeView.findViewById(R.id.btn_clear_keyword);
+        final TextView curKeyword = (TextView) wholeView.findViewById(R.id.text_cur_keyword);
 
         RadioGroup levelGroup = (RadioGroup) wholeView.findViewById(R.id.level_group);
         RadioGroup ruleGroup = (RadioGroup) wholeView.findViewById(R.id.rule_group);
@@ -136,11 +144,8 @@ public class LogView extends DragSupportOverlayView {
 
         final TextView settings = (TextView) wholeView.findViewById(R.id.settings);
         View collapse = wholeView.findViewById(R.id.collapse);
-
         final ViewGroup settingContent = (ViewGroup) wholeView.findViewById(R.id.setting_content);
-
         final RecyclerView logList = (RecyclerView) wholeView.findViewById(R.id.list);
-
 
         //setting init
         settings.setText(String.format(Locale.CHINA, mContext.getString(R.string.wxt_settings), "(off)"));
@@ -195,16 +200,62 @@ public class LogView extends DragSupportOverlayView {
             }
         });
 
-//        search.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//            }
-//        });
+        inputKeyword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final EditText editText = new EditText(v.getContext());
+                editText.setTextColor(Color.BLACK);
+                mWholeView.setVisibility(View.GONE);
+                new CompatibleAlertDialogBuilder(v.getContext())
+                        .setTitle("input keyword")
+                        .setView(editText)
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mWholeView.setVisibility(View.VISIBLE);
+                                String text = editText.getText().toString();
+                                if(TextUtils.isEmpty(text)){
+                                   return;
+                                }
+                                mCurKeyword = text;
+                                performSearch(mCurKeyword);
+                                curKeyword.setText(String.format(Locale.CHINA,v.getContext().getString(R.string.wxt_current_keyword_format),mCurKeyword));
+
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                mWholeView.setVisibility(View.VISIBLE);
+                                dialog.dismiss();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create()
+                        .show();
+
+            }
+        });
+
+        clearKeyword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurKeyword = null;
+                curKeyword.setText(String.format(Locale.CHINA,v.getContext().getString(R.string.wxt_current_keyword_format),""));
+                if(mLogcatDumper != null){
+                    if(mLogcatDumper.removeRule(FILTER_CUSTOM)){
+                        mLogcatDumper.findCachedLogByNewFilters();
+                    }
+                }
+            }
+        });
+
 
         //init recyclerView
         logList.setLayoutManager(new LinearLayoutManager(mContext));
-        adapter = new LogListAdapter(mContext, logList);
-        logList.setAdapter(adapter);
+        mLogAdapter = new LogListAdapter(mContext, logList);
+        logList.setAdapter(mLogAdapter);
 
 
         switch (mLogLevel) {
@@ -255,8 +306,8 @@ public class LogView extends DragSupportOverlayView {
                     return;
                 }
 
-                if (adapter != null) {
-                    adapter.clear();
+                if (mLogAdapter != null) {
+                    mLogAdapter.clear();
                 }
 
                 int level = mLogLevel;
@@ -272,7 +323,7 @@ public class LogView extends DragSupportOverlayView {
                     level = Log.WARN;
                 }
 
-                if(level != mLogLevel){
+                if (level != mLogLevel) {
                     mLogLevel = level;
                     mLogcatDumper.setLevel(mLogLevel);
                     if (mConfigChangeListener != null) {
@@ -293,11 +344,15 @@ public class LogView extends DragSupportOverlayView {
                     return;
                 }
 
-                if (adapter != null) {
-                    adapter.clear();
+                if (mLogAdapter != null) {
+                    mLogAdapter.clear();
                 }
 
                 mLogcatDumper.removeAllRule();
+                mCurKeyword = null;
+                if(curKeyword != null){
+                    curKeyword.setText(String.format(Locale.CHINA,mContext.getString(R.string.wxt_current_keyword_format),""));
+                }
                 String filterName = mFilterName;
                 if (checkedId == R.id.rule_all) {
                     filterName = FILTER_ALL;
@@ -315,7 +370,7 @@ public class LogView extends DragSupportOverlayView {
                     mLogcatDumper.addRule(sDefaultRules.get(FILTER_EXCEPTION));
                 }
 
-                if(!filterName.equals(mFilterName)){
+                if (!filterName.equals(mFilterName)) {
                     mFilterName = filterName;
                     if (mConfigChangeListener != null) {
                         mConfigChangeListener.onLogFilterChanged(mFilterName);
@@ -330,16 +385,16 @@ public class LogView extends DragSupportOverlayView {
         hold.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (adapter == null) {
+                if (mLogAdapter == null) {
                     return;
                 }
 
                 if (isViewAttached) {
-                    if (adapter.isHoldModeEnabled()) {
-                        adapter.setHoldModeEnabled(false);
+                    if (mLogAdapter.isHoldModeEnabled()) {
+                        mLogAdapter.setHoldModeEnabled(false);
                         ((TextView) hold).setText("hold(off)");
                     } else {
-                        adapter.setHoldModeEnabled(true);
+                        mLogAdapter.setHoldModeEnabled(true);
                         ((TextView) hold).setText("hold(on)");
                     }
                 }
@@ -349,8 +404,8 @@ public class LogView extends DragSupportOverlayView {
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isViewAttached && adapter != null) {
-                    adapter.clear();
+                if (isViewAttached && mLogAdapter != null) {
+                    mLogAdapter.clear();
                     //maybe we need clear cache here
                     if (mLogcatDumper != null) {
                         mLogcatDumper.clearCachedLog();
@@ -377,8 +432,8 @@ public class LogView extends DragSupportOverlayView {
                 .listener(new LogcatDumper.OnLogReceivedListener() {
                     @Override
                     public void onReceived(@NonNull List<LogcatDumper.LogInfo> logList) {
-                        if (adapter != null) {
-                            adapter.addLog(logList);
+                        if (mLogAdapter != null) {
+                            mLogAdapter.addLog(logList);
                         }
                     }
                 })
@@ -401,7 +456,7 @@ public class LogView extends DragSupportOverlayView {
 
     @Override
     protected void onDismiss() {
-        if(mLogcatDumper != null){
+        if (mLogcatDumper != null) {
             mLogcatDumper.destroy();
             mLogcatDumper = null;
         }
@@ -409,10 +464,20 @@ public class LogView extends DragSupportOverlayView {
 
     @Override
     protected void onDestroy() {
-        if(mCollapsedView != null){
+        if (mCollapsedView != null) {
             mCollapsedView.dismiss();
 //            mCollapsedView = null;
         }
+    }
+
+    private void performSearch(@Nullable String keyword) {
+        if(TextUtils.isEmpty(keyword) || mLogcatDumper == null || mLogAdapter == null){
+            return;
+        }
+        mLogAdapter.clear();
+        mLogcatDumper.removeRule(FILTER_CUSTOM);
+        mLogcatDumper.addRule(new LogcatDumper.Rule(FILTER_CUSTOM,keyword));
+        mLogcatDumper.findCachedLogByNewFilters();
     }
 
     private void performCollapse() {
@@ -425,7 +490,7 @@ public class LogView extends DragSupportOverlayView {
         dismiss();
 
         //show collapse view
-        if(mCollapsedView == null){
+        if (mCollapsedView == null) {
             mCollapsedView = new SimpleOverlayView(mContext, "Log");
             mCollapsedView.setOnClickListener(new SimpleOverlayView.OnClickListener() {
                 @Override
@@ -561,10 +626,10 @@ public class LogView extends DragSupportOverlayView {
             mText.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if(mCurLog != null){
+                    if (mCurLog != null) {
                         try {
-                            SDKUtils.copyToClipboard(v.getContext(),mCurLog.message,true);
-                        }catch (Exception e){
+                            SDKUtils.copyToClipboard(v.getContext(), mCurLog.message, true);
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }

@@ -19,5 +19,9 @@
     <string name="wxt_explain_comm_time">communicateTime:jsframework执行createInstance时间</string>
     <string name="wxt_explain_wx_sdk_ver">weex sdk version:weex sdk 版本</string>
     <string name="wxt_explain_sdk_init">sdk init time:weex sdk初始化时间</string>
+    <string name="wxt_clear_keyword">clear keyword</string>
+    <string name="wxt_input_keyword">input keyword</string>
+    <string name="wxt_current_keyword">current keyword:</string>
+    <string name="wxt_current_keyword_format">current keyword:%s</string>
 
 </resources>
