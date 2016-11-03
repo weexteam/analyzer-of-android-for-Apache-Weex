@@ -166,7 +166,7 @@ public class WXHistoryChartView extends AbstractAlertView implements OnDataPoint
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.wx_history_view;
+        return R.layout.wxt_history_view;
     }
 
     @Override

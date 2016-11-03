@@ -36,7 +36,7 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
     @NonNull
     @Override
     protected View onCreateView() {
-        View hostView = View.inflate(mContext, R.layout.perf_overlay_view, null);
+        View hostView = View.inflate(mContext, R.layout.wxt_perf_overlay_view, null);
 
         mX = (int) (mContext.getResources().getDisplayMetrics().widthPixels - ViewUtils.dp2px(mContext, 120));
         mY = (int) (mContext.getResources().getDisplayMetrics().heightPixels - ViewUtils.dp2px(mContext, 64));

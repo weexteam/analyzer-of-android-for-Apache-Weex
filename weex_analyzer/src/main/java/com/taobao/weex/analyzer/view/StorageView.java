@@ -74,7 +74,7 @@ public class StorageView extends AbstractAlertView {
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.storage_view;
+        return R.layout.wxt_storage_view;
     }
 
     //-------
@@ -92,7 +92,7 @@ public class StorageView extends AbstractAlertView {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.item_storage, parent, false);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.wxt_item_storage, parent, false);
             ViewHolder holder = new ViewHolder(view);
             holder.setOnItemLongClickListener(new ViewHolder.OnItemLongClickListener() {
                 @Override

@@ -17,7 +17,7 @@
         android:layout_marginTop="48dp"
         />
 
-    <include layout="@layout/log_settngs"/>
+    <include layout="@layout/wxt_log_settngs"/>
 
 
 </FrameLayout>

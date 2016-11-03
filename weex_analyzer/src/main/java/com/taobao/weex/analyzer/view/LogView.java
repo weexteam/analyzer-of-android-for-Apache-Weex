@@ -123,7 +123,7 @@ public class LogView extends DragSupportOverlayView {
     @NonNull
     @Override
     protected View onCreateView() {
-        View wholeView = View.inflate(mContext, R.layout.log_view, null);
+        View wholeView = View.inflate(mContext, R.layout.wxt_log_view, null);
 
         final View hold = wholeView.findViewById(R.id.hold);
         View clear = wholeView.findViewById(R.id.clear);
@@ -495,7 +495,7 @@ public class LogView extends DragSupportOverlayView {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_log, parent, false);
+            View itemView = LayoutInflater.from(mContext).inflate(R.layout.wxt_item_log, parent, false);
             return new LogViewHolder(itemView);
         }
 

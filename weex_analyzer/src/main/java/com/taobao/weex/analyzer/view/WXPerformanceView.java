@@ -82,7 +82,7 @@ public class WXPerformanceView extends AbstractAlertView implements View.OnLongC
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.performance_view;
+        return R.layout.wxt_performance_view;
     }
 
     @Override
