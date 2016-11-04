@@ -1,9 +1,15 @@
 package com.taobao.weex.analyzer.core;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.View;
 
+import com.taobao.weex.analyzer.utils.ViewUtils;
+import com.taobao.weex.analyzer.view.IOverlayView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
+import com.taobao.weex.analyzer.view.SimpleOverlayView;
 
 /**
  * Description:
@@ -24,32 +30,49 @@ public class ScalpelViewController {
     private boolean isDrawId = false;
     private boolean isDrawViewName = false;
 
+    private SimpleOverlayView mSwitchView;
+
     private ScalpelFrameLayout mScalpelLayout;
 
     private OnToggleListener mOnToggleListener;
 
     private ScalpelFrameLayout.OnDrawViewNameListener mOnDrawViewNameListener;
 
-    public ScalpelViewController() {
-        this(false,false,true);
+    private Context mContext;
+
+    public ScalpelViewController(Context context) {
+        this(false, false, true, context);
     }
 
     /**
-     * @param enabled whether display 3d layer or not by default.
-     * @param isDrawId whether display view id or not.
+     * @param enabled        whether display 3d layer or not by default.
+     * @param isDrawId       whether display view id or not.
      * @param isDrawViewName whether display view name or not.
      */
-    public ScalpelViewController(boolean enabled,boolean isDrawId, boolean isDrawViewName) {
+    public ScalpelViewController(boolean enabled, boolean isDrawId, boolean isDrawViewName, Context context) {
         this.isScalpelEnabled = enabled;
         this.isDrawId = isDrawId;
         this.isDrawViewName = isDrawViewName;
+        this.mContext = context;
+
+        mSwitchView = new SimpleOverlayView.Builder(mContext, "close")
+                .enableDrag(false)
+                .listener(new SimpleOverlayView.OnClickListener() {
+                    @Override
+                    public void onClick(@NonNull IOverlayView view) {
+                        setScalpelEnabled(false);
+                    }
+                })
+                .gravity(Gravity.RIGHT | Gravity.TOP)
+                .y((int) ViewUtils.dp2px(mContext, 60))
+                .build();
     }
 
-    public void setOnToggleListener(OnToggleListener listener){
+    public void setOnToggleListener(OnToggleListener listener) {
         this.mOnToggleListener = listener;
     }
 
-    public void setOnDrawViewNameListener(ScalpelFrameLayout.OnDrawViewNameListener listener){
+    public void setOnDrawViewNameListener(ScalpelFrameLayout.OnDrawViewNameListener listener) {
         this.mOnDrawViewNameListener = listener;
     }
 
@@ -61,7 +84,7 @@ public class ScalpelViewController {
         mScalpelLayout.setDrawIds(isDrawId);
         mScalpelLayout.setDrawViewNames(isDrawViewName);
 
-        if(mOnDrawViewNameListener != null){
+        if (mOnDrawViewNameListener != null) {
             mScalpelLayout.setOnDrawViewNameListener(mOnDrawViewNameListener);
         }
 
@@ -78,42 +101,60 @@ public class ScalpelViewController {
         this.isScalpelEnabled = enabled;
         if (mScalpelLayout != null) {
             mScalpelLayout.setLayerInteractionEnabled(isScalpelEnabled);
-            if(mOnToggleListener != null){
+            if (enabled) {
+                //show
+                mSwitchView.show();
+            } else {
+                //dismiss
+                mSwitchView.dismiss();
+            }
+            if (mOnToggleListener != null) {
                 mOnToggleListener.onToggle(mScalpelLayout, isScalpelEnabled);
             }
         }
     }
 
 
-    public boolean isDrawIdEnabled(){
+    public boolean isDrawIdEnabled() {
         return isDrawId;
     }
 
-    public void setDrawId(boolean enabled){
+    public void setDrawId(boolean enabled) {
         this.isDrawId = enabled;
-        if(mScalpelLayout != null){
+        if (mScalpelLayout != null) {
             mScalpelLayout.setDrawIds(isDrawId);
         }
     }
 
-    public boolean isDrawViewNameEnabled(){
+    public boolean isDrawViewNameEnabled() {
         return isDrawViewName;
     }
 
-    public void setDrawViewName(boolean enabled){
+    public void setDrawViewName(boolean enabled) {
         this.isDrawViewName = enabled;
-        if(mScalpelLayout != null){
+        if (mScalpelLayout != null) {
             mScalpelLayout.setDrawViewNames(isDrawViewName);
         }
     }
 
-
     public void toggleScalpelEnabled() {
         this.isScalpelEnabled = !isScalpelEnabled;
-        if(mScalpelLayout == null){
+        if (mScalpelLayout == null) {
             return;
         }
         setScalpelEnabled(isScalpelEnabled);
+    }
+
+    public void pause() {
+        if(mSwitchView != null && isScalpelEnabled){
+            mSwitchView.dismiss();
+        }
+    }
+
+    public void resume(){
+        if(mSwitchView != null && isScalpelEnabled){
+            mSwitchView.show();
+        }
     }
 
     public interface OnToggleListener {

@@ -504,17 +504,18 @@ public class LogView extends DragSupportOverlayView {
 
         //show collapse view
         if (mCollapsedView == null) {
-            mCollapsedView = new SimpleOverlayView(mContext, "Log");
-            mCollapsedView.setOnClickListener(new SimpleOverlayView.OnClickListener() {
-                @Override
-                public void onClick(@NonNull IOverlayView view) {
-                    mCollapsedView.dismiss();
-                    if (mStatusChangedListener != null) {
-                        mStatusChangedListener.onExpanded();
-                    }
-                    LogView.this.show();
-                }
-            });
+            mCollapsedView = new SimpleOverlayView.Builder(mContext,"Log")
+                    .listener(new SimpleOverlayView.OnClickListener() {
+                        @Override
+                        public void onClick(@NonNull IOverlayView view) {
+                            mCollapsedView.dismiss();
+                            if (mStatusChangedListener != null) {
+                                mStatusChangedListener.onExpanded();
+                            }
+                            LogView.this.show();
+                        }
+                    })
+                    .build();
         }
         mCollapsedView.show();
     }

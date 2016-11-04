@@ -187,6 +187,10 @@ public final class WeexDevOptions implements IWXDevOptions{
         } else {
             mFpsChartView.dismiss();
         }
+
+        if(mScalpelViewController != null){
+            mScalpelViewController.resume();
+        }
     }
 
     @Override
@@ -208,6 +212,10 @@ public final class WeexDevOptions implements IWXDevOptions{
 
         if (mConfig.isFpsChartEnabled()) {
             mFpsChartView.dismiss();
+        }
+
+        if(mScalpelViewController != null){
+            mScalpelViewController.pause();
         }
     }
 
@@ -240,7 +248,7 @@ public final class WeexDevOptions implements IWXDevOptions{
             return view;
         }
 
-        mScalpelViewController = new ScalpelViewController();
+        mScalpelViewController = new ScalpelViewController(mContext);
         mScalpelViewController.setOnToggleListener(new ScalpelViewController.OnToggleListener() {
             @Override
             public void onToggle(View view, boolean isScalpelEnabled) {

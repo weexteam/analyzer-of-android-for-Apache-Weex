@@ -21,11 +21,16 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
 
     private float mDx, mDy, downX, downY;
     private static boolean hasMoved = false;
+    private boolean isDragEnabled = true;
 
     public DragSupportOverlayView(Context application) {
         super(application);
     }
 
+    public DragSupportOverlayView(Context application,boolean enableDrag){
+        this(application);
+        this.isDragEnabled = enableDrag;
+    }
 
     @Override
     protected void onViewCreated(@NonNull View hostView) {
@@ -41,6 +46,9 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        if(!isDragEnabled){
+            return false;
+        }
         int action = event.getAction();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -79,6 +87,10 @@ public abstract class DragSupportOverlayView extends AbstractOverlayView impleme
         mWindowManager.updateViewLayout(mWholeView, newParams);
         mCurrentX = x;
         mCurrentY = y;
+    }
+
+    public void setDragEnabled(boolean enabled){
+        this.isDragEnabled = enabled;
     }
 
 }
