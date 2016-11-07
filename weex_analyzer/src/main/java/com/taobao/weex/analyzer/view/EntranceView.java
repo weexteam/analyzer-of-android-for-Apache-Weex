@@ -48,6 +48,13 @@ public class EntranceView extends AbstractAlertView {
         GridLayoutManager layoutManager = new GridLayoutManager(context, 3, LinearLayoutManager.VERTICAL, false);
         mList.setLayoutManager(layoutManager);
         mList.addItemDecoration(new Decoration(Color.parseColor("#e0e0e0"), (int) ViewUtils.dp2px(context, 1), 3));
+
+        findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
     }
 
     @Override

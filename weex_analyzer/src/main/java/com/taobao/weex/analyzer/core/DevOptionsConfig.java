@@ -119,25 +119,7 @@ public class DevOptionsConfig {
     }
 
 
-    public static final String DEV_OPTIONS = "weex开发者选项";
-
-    public static final String TOGGLE_PERF_COMMON = "显示/关闭性能悬浮窗";
-    public static final String SHOW_PERF_WEEX_ONLY = "显示weex性能指标";
-    public static final String SHOW_STORAGE_INFO = "weex storage查看";
-    public static final String TOGGLE_LOG_OUTPUT = "显示/关闭日志悬浮窗";
-    public static final String TOGGLE_MEMORY_CHART = "显示/关闭内存占用折线图";
-    public static final String TOGGLE_FPS_CHART = "显示/关闭fps折线图";
-    public static final String TOGGLE_3D_LAYER = "显示/关闭3d视图";
-    public static final String TOGGLE_SHOWN_JS_EXCEPTION = "允许/禁止js异常弹框";
-    public static final String TOGGLE_JS_REMOTE_DEBUG = "js远程调试";
-    public static final String CONFIG_REMOTE_SERVER = "远程调试服务器ip配置";
-
-
-
     public static final List<String> WHITE_SCALPEL_VIEW_NAMES = Arrays.asList("WXRecyclerView", "WXScrollView", "WXFrameLayout");
 
-    public interface OptionSelectListener {
-        void onSelectOption();
-    }
 
 }
