@@ -432,6 +432,7 @@ public class LogView extends DragSupportOverlayView {
             public void onClick(View v) {
                 if (isViewAttached && mOnCloseListener != null) {
                     mOnCloseListener.close(LogView.this);
+                    dismiss();
                 }
             }
         });

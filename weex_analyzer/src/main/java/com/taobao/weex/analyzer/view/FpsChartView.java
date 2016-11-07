@@ -80,6 +80,7 @@ public class FpsChartView extends DragSupportOverlayView {
             public void onClick(View v) {
                 if (mOnCloseListener != null && isViewAttached) {
                     mOnCloseListener.close(FpsChartView.this);
+                    dismiss();
                 }
             }
         });

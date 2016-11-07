@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,9 +7,6 @@ import android.view.Gravity;
 import android.view.View;
 
 import com.taobao.weex.analyzer.utils.ViewUtils;
-import com.taobao.weex.analyzer.view.IOverlayView;
-import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
-import com.taobao.weex.analyzer.view.SimpleOverlayView;
 
 /**
  * Description:

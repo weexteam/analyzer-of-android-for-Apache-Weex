@@ -1,12 +1,11 @@
 package com.taobao.weex.analyzer;
 
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -17,51 +16,39 @@ import com.taobao.weex.analyzer.core.FPSChecker;
 import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
-import com.taobao.weex.analyzer.core.ScalpelViewController;
 import com.taobao.weex.analyzer.core.ShakeDetector;
 import com.taobao.weex.analyzer.core.StorageHacker;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
-import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
+import com.taobao.weex.analyzer.view.DevOption;
+import com.taobao.weex.analyzer.view.EntranceView;
 import com.taobao.weex.analyzer.view.FpsChartView;
 import com.taobao.weex.analyzer.view.IOverlayView;
 import com.taobao.weex.analyzer.view.LogView;
 import com.taobao.weex.analyzer.view.MemoryChartView;
 import com.taobao.weex.analyzer.view.PerfCommonOverlayView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
+import com.taobao.weex.analyzer.view.ScalpelViewController;
+import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.CONFIG_REMOTE_SERVER;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.SHOW_PERF_WEEX_ONLY;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.SHOW_STORAGE_INFO;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.TOGGLE_FPS_CHART;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.TOGGLE_JS_REMOTE_DEBUG;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.TOGGLE_LOG_OUTPUT;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.TOGGLE_MEMORY_CHART;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.TOGGLE_PERF_COMMON;
-import static com.taobao.weex.analyzer.core.DevOptionsConfig.TOGGLE_SHOWN_JS_EXCEPTION;
 
 /**
  * Description:
  * <p>
  * Created by rowandjj(chuyi)<br/>
- * Date: 16/9/30<br/>
- * Time: 下午12:26<br/>
+ * Date: 2016/11/5<br/>
+ * Time: 下午3:25<br/>
  */
 
-/**
- * will be create in every weex activity
- */
-public final class WeexDevOptions implements IWXDevOptions{
-    private ShakeDetector mShakeDetector;
-    private AlertDialog mDevOptionsDialog;
-    private PerfCommonOverlayView mPerfMonitorOverlayView;
-    private DevOptionsConfig mConfig;
+public class WeexDevOptions implements IWXDevOptions {
     private Context mContext;
+
+    private ShakeDetector mShakeDetector;
+    private DevOptionsConfig mConfig;
 
     private LogView mLogView;
 
@@ -71,11 +58,13 @@ public final class WeexDevOptions implements IWXDevOptions{
     private String mCurPageName;
 
     private ScalpelViewController mScalpelViewController;
+    private PerfCommonOverlayView mPerfMonitorOverlayView;
 
-    private static final String TAG = "WeexDevOptions";
 
-    public WeexDevOptions(@NonNull Context context) {
+    public WeexDevOptions(@NonNull Context context){
+
         this.mContext = context;
+
         mConfig = new DevOptionsConfig(context);
         mPerfMonitorOverlayView = new PerfCommonOverlayView(context);
 
@@ -84,7 +73,6 @@ public final class WeexDevOptions implements IWXDevOptions{
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    host.dismiss();
                     mConfig.setLogOutputEnabled(false);
                 }
             }
@@ -113,7 +101,6 @@ public final class WeexDevOptions implements IWXDevOptions{
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    host.dismiss();
                     mConfig.setMemoryChartEnabled(false);
                 }
             }
@@ -124,7 +111,6 @@ public final class WeexDevOptions implements IWXDevOptions{
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    host.dismiss();
                     mConfig.setFpsChartEnabled(false);
                 }
             }
@@ -134,13 +120,160 @@ public final class WeexDevOptions implements IWXDevOptions{
         mShakeDetector = new ShakeDetector(new ShakeDetector.ShakeListener() {
             @Override
             public void onShake() {
-                showDevDialog(mContext);
+                showDevOptions();
             }
         });
     }
 
+
+    private List<DevOption> registerDefaultOptions() {
+
+        List<DevOption> options = new ArrayList<>();
+
+        options.add(new DevOption("weex性能指标", R.drawable.wxt_icon_performance, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                if (mCurPageName == null) {
+                    Toast.makeText(mContext, "internal error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
+                List<Performance> list = WXPerfStorage.getInstance().getPerformanceList(mCurPageName);
+
+                if(performance == null){
+                    return;
+                }
+
+                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext,performance,list);
+                view.show();
+            }
+        }));
+        options.add(new DevOption("weex storage", R.drawable.wxt_icon_storage, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                StorageView mStorageView = new StorageView(mContext,new StorageHacker(mContext));
+                mStorageView.show();
+            }
+        }));
+        options.add(new DevOption("3d视图", R.drawable.wxt_icon_3d_rotation, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                if (mScalpelViewController != null) {
+                    mScalpelViewController.toggleScalpelEnabled();
+                }
+            }
+        }));
+        options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                if (mConfig.isLogOutputEnabled()) {
+                    mConfig.setLogOutputEnabled(false);
+                    mLogView.dismiss();
+                } else {
+                    mConfig.setLogOutputEnabled(true);
+                    mLogView.setLogLevel(mConfig.getLogLevel());
+                    mLogView.setFilterName(mConfig.getLogFilter());
+                    mLogView.setViewSize(mConfig.getLogViewSize());
+                    mLogView.show();
+                }
+            }
+        }));
+        options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                if (mConfig.isMemoryChartEnabled()) {
+                    mConfig.setMemoryChartEnabled(false);
+                    mMemoryChartView.dismiss();
+                } else {
+                    mConfig.setMemoryChartEnabled(true);
+                    mMemoryChartView.show();
+                }
+            }
+        }));
+        options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                Toast.makeText(mContext,"not implement yet..",Toast.LENGTH_SHORT).show();
+
+            }
+        }));
+        options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                if (!FPSChecker.isSupported()) {
+                    Toast.makeText(mContext, "your device is not support.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (mConfig.isFpsChartEnabled()) {
+                    mConfig.setFpsChartEnabled(false);
+                    mFpsChartView.dismiss();
+                } else {
+                    mConfig.setFpsChartEnabled(true);
+                    mFpsChartView.show();
+                }
+            }
+        }));
+        options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                RemoteDebugManager.getInstance().toggle(mContext);
+            }
+        }));
+
+        options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                if (mConfig.isPerfCommonEnabled()) {
+                    mConfig.setPerfCommonEnabled(false);
+                    mPerfMonitorOverlayView.dismiss();
+                } else {
+                    mConfig.setPerfCommonEnabled(true);
+                    mPerfMonitorOverlayView.show();
+                }
+            }
+        }));
+
+        options.add(new DevOption("配置", R.drawable.wxt_icon_settings, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                SettingsActivity.launch(mContext);
+            }
+        }));
+        return options;
+    }
+
+    private boolean shown = false;
+    private void showDevOptions(){
+        if(shown){
+            return;
+        }
+
+        if(mContext == null){
+            return;
+        }
+
+        if(((Activity)mContext).isFinishing()){
+            return;
+        }
+
+        EntranceView e = new EntranceView.Creator(mContext)
+                .injectOptions(registerDefaultOptions())
+                .create();
+        e.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                shown = false;
+            }
+        });
+        e.show();
+        shown = true;
+    }
+
+
     @Override
     public void onCreate() {
+
     }
 
     @Override
@@ -148,17 +281,9 @@ public final class WeexDevOptions implements IWXDevOptions{
 
     }
 
-    /**
-     * todo:
-     * 1. 菜单可配置
-     * 2. 支持悬浮窗显示在整个应用可见期间
-     */
     @Override
     public void onResume() {
-        //允许摇一摇
         mShakeDetector.start((SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE));
-
-        //性能悬浮窗
 
         if (mConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.show();
@@ -195,8 +320,8 @@ public final class WeexDevOptions implements IWXDevOptions{
 
     @Override
     public void onPause() {
-        //关闭摇一摇
         mShakeDetector.stop();
+
         //关闭悬浮窗
         if (mConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.dismiss();
@@ -221,13 +346,13 @@ public final class WeexDevOptions implements IWXDevOptions{
 
     @Override
     public void onStop() {
-
     }
 
     @Override
     public void onDestroy() {
 
     }
+
 
     @Override
     public void onWeexRenderSuccess(@Nullable WXSDKInstance instance) {
@@ -238,13 +363,12 @@ public final class WeexDevOptions implements IWXDevOptions{
     }
 
     @Override
-    public @Nullable View onWeexViewCreated(WXSDKInstance instance, View view) {
+    public View onWeexViewCreated(WXSDKInstance instance, View view) {
         if (instance == null || view == null || view.getContext() == null) {
             return null;
         }
 
         if (view.getParent() != null) {
-            Log.d(TAG, "can not replace wx root view to scalpelLayout because it had a parent already.");
             return view;
         }
 
@@ -253,13 +377,6 @@ public final class WeexDevOptions implements IWXDevOptions{
             @Override
             public void onToggle(View view, boolean isScalpelEnabled) {
                 Toast.makeText(mContext, "3d layer is " + (isScalpelEnabled ? "enabled" : "disabled"), Toast.LENGTH_SHORT).show();
-
-                if (isScalpelEnabled) {
-                    // clear other overlay view
-
-
-                }
-
             }
         });
 
@@ -267,10 +384,6 @@ public final class WeexDevOptions implements IWXDevOptions{
             @Nullable
             @Override
             public String onDrawViewName(@NonNull View view, @NonNull String rawClazzName) {
-//                if(rawClazzName.equalsIgnoreCase("WXRecyclerView")){
-////                    view.setBackgroundColor(Color.RED);
-//                }
-
                 //custom filter
                 for (String name : DevOptionsConfig.WHITE_SCALPEL_VIEW_NAMES) {
                     if (rawClazzName.equalsIgnoreCase(name)) {
@@ -291,7 +404,7 @@ public final class WeexDevOptions implements IWXDevOptions{
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            showDevDialog(mContext);
+            showDevOptions();
             return true;
         }
 
@@ -305,163 +418,5 @@ public final class WeexDevOptions implements IWXDevOptions{
         }
     }
 
-    private void showDevDialog(Context context) {
-        if (mDevOptionsDialog != null) {
-            return;
-        }
-
-        LinkedHashMap<String, DevOptionsConfig.OptionSelectListener> options = new LinkedHashMap<>();
-
-        options.put(SHOW_PERF_WEEX_ONLY, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (mCurPageName == null) {
-                    Toast.makeText(mContext, "internal error", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
-                List<Performance> list = WXPerfStorage.getInstance().getPerformanceList(mCurPageName);
-
-                if(performance == null){
-                    return;
-                }
-
-                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext,performance,list);
-                view.show();
-            }
-        });
-
-        options.put(DevOptionsConfig.TOGGLE_3D_LAYER, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                //todo close others overlay
-                if (mScalpelViewController != null) {
-                    mScalpelViewController.toggleScalpelEnabled();
-                }
-            }
-        });
-
-        options.put(SHOW_STORAGE_INFO, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                StorageView mStorageView = new StorageView(mContext,new StorageHacker(mContext));
-                mStorageView.show();
-            }
-        });
-
-        options.put(TOGGLE_LOG_OUTPUT, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (mConfig.isLogOutputEnabled()) {
-                    mConfig.setLogOutputEnabled(false);
-                    mLogView.dismiss();
-                } else {
-                    mConfig.setLogOutputEnabled(true);
-                    mLogView.setLogLevel(mConfig.getLogLevel());
-                    mLogView.setFilterName(mConfig.getLogFilter());
-                    mLogView.setViewSize(mConfig.getLogViewSize());
-                    mLogView.show();
-                }
-            }
-        });
-
-        options.put(TOGGLE_PERF_COMMON, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (mConfig.isPerfCommonEnabled()) {
-                    mConfig.setPerfCommonEnabled(false);
-                    mPerfMonitorOverlayView.dismiss();
-                } else {
-                    mConfig.setPerfCommonEnabled(true);
-                    mPerfMonitorOverlayView.show();
-
-                }
-
-            }
-        });
-
-
-        options.put(TOGGLE_MEMORY_CHART, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (mConfig.isMemoryChartEnabled()) {
-                    mConfig.setMemoryChartEnabled(false);
-                    mMemoryChartView.dismiss();
-                } else {
-                    mConfig.setMemoryChartEnabled(true);
-                    mMemoryChartView.show();
-                }
-            }
-        });
-
-
-        options.put(TOGGLE_FPS_CHART, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (!FPSChecker.isSupported()) {
-                    Toast.makeText(mContext, "your device is not support.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (mConfig.isFpsChartEnabled()) {
-                    mConfig.setFpsChartEnabled(false);
-                    mFpsChartView.dismiss();
-                } else {
-                    mConfig.setFpsChartEnabled(true);
-                    mFpsChartView.show();
-                }
-            }
-        });
-
-        options.put(TOGGLE_SHOWN_JS_EXCEPTION, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                if (mConfig.isShownJSException()) {
-                    mConfig.setShownJSException(false);
-                    Toast.makeText(mContext, mContext.getString(R.string.wxt_closed), Toast.LENGTH_SHORT).show();
-                } else {
-                    mConfig.setShownJSException(true);
-                    Toast.makeText(mContext, mContext.getString(R.string.wxt_opened), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        options.put(TOGGLE_JS_REMOTE_DEBUG, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                RemoteDebugManager.getInstance().toggle(mContext);
-            }
-        });
-
-        options.put(CONFIG_REMOTE_SERVER, new DevOptionsConfig.OptionSelectListener() {
-            @Override
-            public void onSelectOption() {
-                RemoteDebugManager.getInstance().requestDebugServer(mContext, false);
-            }
-        });
-
-
-        final DevOptionsConfig.OptionSelectListener[] listeners = options.values().toArray(new DevOptionsConfig.OptionSelectListener[0]);
-        mDevOptionsDialog = new CompatibleAlertDialogBuilder(context)
-                .setItems(options.keySet().toArray(new String[0]), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        listeners[which].onSelectOption();
-                        mDevOptionsDialog = null;
-                    }
-                })
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        mDevOptionsDialog = null;
-                    }
-                })
-                .setTitle(DevOptionsConfig.DEV_OPTIONS)
-                .create();
-
-        mDevOptionsDialog.show();
-
-    }
 
 }

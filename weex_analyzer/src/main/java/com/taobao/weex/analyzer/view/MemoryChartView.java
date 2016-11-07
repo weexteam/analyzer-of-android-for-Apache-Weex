@@ -80,6 +80,7 @@ public class MemoryChartView extends DragSupportOverlayView {
             public void onClick(View v) {
                 if(mOnCloseListener != null && isViewAttached){
                     mOnCloseListener.close(MemoryChartView.this);
+                    dismiss();
                 }
             }
         });
