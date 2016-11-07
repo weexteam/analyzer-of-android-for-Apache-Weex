@@ -7,8 +7,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
-import com.taobao.weex.analyzer.core.FPSChecker;
-import com.taobao.weex.analyzer.core.MemoryChecker;
+import com.taobao.weex.analyzer.core.FPSSampler;
+import com.taobao.weex.analyzer.core.MemorySampler;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.R;
 
@@ -64,7 +64,7 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
     private static class InvalidateUITask extends AbstractLoopTask {
 
         private TextView mMemoryText, mFpsValueText, mFrameSkippedText;
-        private FPSChecker mFpsChecker;
+        private FPSSampler mFpsChecker;
 
         private int mTotalFrameDropped = 0;
 
@@ -72,7 +72,7 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
         InvalidateUITask(@NonNull View hostView) {
             super(hostView);
             mDelayMillis = 1000;
-            this.mFpsChecker = new FPSChecker();
+            this.mFpsChecker = new FPSSampler();
             this.mMemoryText = (TextView) hostView.findViewById(R.id.memory_usage);
             this.mFpsValueText = (TextView) hostView.findViewById(R.id.fps_value);
             this.mFrameSkippedText = (TextView) hostView.findViewById(R.id.frame_skiped);
@@ -82,7 +82,7 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
         protected void onStart() {
             super.onStart();
             if (mFpsChecker == null) {
-                mFpsChecker = new FPSChecker();
+                mFpsChecker = new FPSSampler();
             }
             mFpsChecker.reset();
             mFpsChecker.start();
@@ -91,7 +91,7 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
         @Override
         protected void onRun() {
             //check memory
-            double usedMemInMB = MemoryChecker.checkMemoryUsage();
+            double usedMemInMB = MemorySampler.checkMemoryUsage();
             mMemoryText.setText(String.format(Locale.CHINA, "memory : %.2fMB", usedMemInMB));
 
             if (Build.VERSION.SDK_INT >= 16) {

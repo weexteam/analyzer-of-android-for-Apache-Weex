@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.core.FPSChecker;
+import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
 
@@ -110,21 +110,21 @@ public class FpsChartView extends DragSupportOverlayView {
 
     private static class FPSCheckTask extends AbstractLoopTask {
         private DynamicChartViewController mController;
-        private FPSChecker mFpsChecker;
+        private FPSSampler mFpsChecker;
         private int mAxisXValue = -1;
 
         FPSCheckTask(@NonNull View hostView, @NonNull DynamicChartViewController controller) {
             super(hostView);
             mDelayMillis = 1000;
             this.mController = controller;
-            this.mFpsChecker = new FPSChecker();
+            this.mFpsChecker = new FPSSampler();
         }
 
         @Override
         protected void onStart() {
             super.onStart();
             if (mFpsChecker == null) {
-                mFpsChecker = new FPSChecker();
+                mFpsChecker = new FPSSampler();
             }
             mFpsChecker.reset();
             mFpsChecker.start();

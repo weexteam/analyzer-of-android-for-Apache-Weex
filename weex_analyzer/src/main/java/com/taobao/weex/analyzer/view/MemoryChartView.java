@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
-import com.taobao.weex.analyzer.core.MemoryChecker;
+import com.taobao.weex.analyzer.core.MemorySampler;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
 import com.taobao.weex.analyzer.R;
@@ -45,8 +45,8 @@ public class MemoryChartView extends DragSupportOverlayView {
     @Override
     protected View onCreateView() {
         //prepare chart view
-        double maxMemory = MemoryChecker.maxMemory();
-        double totalMemory = MemoryChecker.totalMemory();
+        double maxMemory = MemorySampler.maxMemory();
+        double totalMemory = MemorySampler.totalMemory();
         double maxY = Math.min(totalMemory * 2, maxMemory);
         mChartViewController = new DynamicChartViewController.Builder(mContext)
                 .title(mContext.getResources().getString(R.string.wxt_memory))
@@ -126,7 +126,7 @@ public class MemoryChartView extends DragSupportOverlayView {
                 return;
             }
             mAxisXValue++;
-            double memoryUsed = MemoryChecker.checkMemoryUsage();
+            double memoryUsed = MemorySampler.checkMemoryUsage();
 
             if (checkIfNeedUpdateYAxis(memoryUsed)) {
                 mController.updateAxisY(0, (mController.getMaxY() - mController.getMinY()) * 2, 0);

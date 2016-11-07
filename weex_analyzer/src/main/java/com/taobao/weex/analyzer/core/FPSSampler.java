@@ -13,7 +13,7 @@ import android.view.Choreographer;
  */
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-public class FPSChecker implements Choreographer.FrameCallback {
+public class FPSSampler implements Choreographer.FrameCallback {
     private Choreographer mChoreographer;
 
     private long mFirstFrameTime = -1;
@@ -25,7 +25,7 @@ public class FPSChecker implements Choreographer.FrameCallback {
 
     private static final float DEVICE_REFRESH_RATE_IN_MS = 16.67F;
 
-    public FPSChecker() {
+    public FPSSampler() {
         mChoreographer = Choreographer.getInstance();
     }
 

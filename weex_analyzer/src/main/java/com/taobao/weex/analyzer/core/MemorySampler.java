@@ -8,8 +8,8 @@ package com.taobao.weex.analyzer.core;
  * Time: 下午4:22<br/>
  */
 
-public class MemoryChecker {
-    private MemoryChecker() {
+public class MemorySampler {
+    private MemorySampler() {
     }
 
     /**

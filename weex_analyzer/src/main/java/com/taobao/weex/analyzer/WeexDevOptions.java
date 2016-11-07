@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.core.DevOptionsConfig;
-import com.taobao.weex.analyzer.core.FPSChecker;
+import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
@@ -200,7 +200,7 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick(@NonNull String optionName) {
-                if (!FPSChecker.isSupported()) {
+                if (!FPSSampler.isSupported()) {
                     Toast.makeText(mContext, "your device is not support.", Toast.LENGTH_SHORT).show();
                     return;
                 }
