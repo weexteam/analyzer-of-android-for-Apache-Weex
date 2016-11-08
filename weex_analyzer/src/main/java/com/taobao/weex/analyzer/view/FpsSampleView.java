@@ -25,14 +25,14 @@ import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
  * Time: 下午3:29<br/>
  */
 
-public class FpsChartView extends DragSupportOverlayView {
+public class FpsSampleView extends DragSupportOverlayView {
 
-    private FPSCheckTask mTask;
+    private SampleFPSTask mTask;
     private DynamicChartViewController mChartViewController;
 
     private OnCloseListener mOnCloseListener;
 
-    public FpsChartView(Context application) {
+    public FpsSampleView(Context application) {
         super(application);
 
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
@@ -79,7 +79,7 @@ public class FpsChartView extends DragSupportOverlayView {
             @Override
             public void onClick(View v) {
                 if (mOnCloseListener != null && isViewAttached) {
-                    mOnCloseListener.close(FpsChartView.this);
+                    mOnCloseListener.close(FpsSampleView.this);
                     dismiss();
                 }
             }
@@ -93,10 +93,12 @@ public class FpsChartView extends DragSupportOverlayView {
 
     @Override
     protected void onShown() {
-        if (mTask == null) {
-            mTask = new FPSCheckTask(mWholeView, mChartViewController);
-            mTask.start();
+        if(mTask != null){
+            mTask.stop();
+            mTask = null;
         }
+        mTask = new SampleFPSTask(mChartViewController);
+        mTask.start();
     }
 
     @Override
@@ -108,14 +110,13 @@ public class FpsChartView extends DragSupportOverlayView {
     }
 
 
-    private static class FPSCheckTask extends AbstractLoopTask {
+    private static class SampleFPSTask extends AbstractLoopTask {
         private DynamicChartViewController mController;
         private FPSSampler mFpsChecker;
         private int mAxisXValue = -1;
 
-        FPSCheckTask(@NonNull View hostView, @NonNull DynamicChartViewController controller) {
-            super(hostView);
-            mDelayMillis = 1000;
+        SampleFPSTask(@NonNull DynamicChartViewController controller) {
+            super(false,1000);
             this.mController = controller;
             this.mFpsChecker = new FPSSampler();
         }
@@ -138,16 +139,21 @@ public class FpsChartView extends DragSupportOverlayView {
             if (Build.VERSION.SDK_INT >= 16) {
                 //check fps
                 mAxisXValue++;
-                double fps = mFpsChecker.getFPS();
-                mController.appendPointAndInvalidate(mAxisXValue, fps);
-                mFpsChecker.reset();
+                final double fps = mFpsChecker.getFPS();
+
+                runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mController.appendPointAndInvalidate(mAxisXValue, fps);
+                        mFpsChecker.reset();
+                    }
+                });
             }
         }
 
         @Override
         protected void onStop() {
             mController = null;
-            mHostView = null;
             mFpsChecker.stop();
             mFpsChecker = null;
         }

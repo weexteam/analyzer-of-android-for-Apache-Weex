@@ -20,13 +20,14 @@ import com.taobao.weex.analyzer.core.ShakeDetector;
 import com.taobao.weex.analyzer.core.StorageHacker;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.analyzer.view.CpuSampleView;
 import com.taobao.weex.analyzer.view.DevOption;
 import com.taobao.weex.analyzer.view.EntranceView;
-import com.taobao.weex.analyzer.view.FpsChartView;
+import com.taobao.weex.analyzer.view.FpsSampleView;
 import com.taobao.weex.analyzer.view.IOverlayView;
 import com.taobao.weex.analyzer.view.LogView;
-import com.taobao.weex.analyzer.view.MemoryChartView;
-import com.taobao.weex.analyzer.view.PerfCommonOverlayView;
+import com.taobao.weex.analyzer.view.MemorySampleView;
+import com.taobao.weex.analyzer.view.PerfSampleOverlayView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
@@ -52,13 +53,14 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private LogView mLogView;
 
-    private MemoryChartView mMemoryChartView;
-    private FpsChartView mFpsChartView;
+    private MemorySampleView mMemoryChartView;
+    private CpuSampleView mCpuSampleView;
+    private FpsSampleView mFpsChartView;
 
     private String mCurPageName;
 
     private ScalpelViewController mScalpelViewController;
-    private PerfCommonOverlayView mPerfMonitorOverlayView;
+    private PerfSampleOverlayView mPerfMonitorOverlayView;
 
 
     public WeexDevOptions(@NonNull Context context){
@@ -66,7 +68,7 @@ public class WeexDevOptions implements IWXDevOptions {
         this.mContext = context;
 
         mConfig = new DevOptionsConfig(context);
-        mPerfMonitorOverlayView = new PerfCommonOverlayView(context);
+        mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
 
         mLogView = new LogView(context);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {
@@ -96,7 +98,7 @@ public class WeexDevOptions implements IWXDevOptions {
         });
 
 
-        mMemoryChartView = new MemoryChartView(context);
+        mMemoryChartView = new MemorySampleView(context);
         mMemoryChartView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -106,7 +108,17 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mFpsChartView = new FpsChartView(context);
+        mCpuSampleView = new CpuSampleView(context);
+        mCpuSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if(host != null){
+                    mConfig.setCpuChartEnabled(false);
+                }
+            }
+        });
+
+        mFpsChartView = new FpsSampleView(context);
         mFpsChartView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -193,8 +205,13 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick(@NonNull String optionName) {
-                Toast.makeText(mContext,"not implement yet..",Toast.LENGTH_SHORT).show();
-
+                if (mConfig.isCPUChartEnabled()) {
+                    mConfig.setCpuChartEnabled(false);
+                    mCpuSampleView.dismiss();
+                } else {
+                    mConfig.setCpuChartEnabled(true);
+                    mCpuSampleView.show();
+                }
             }
         }));
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
@@ -291,7 +308,6 @@ public class WeexDevOptions implements IWXDevOptions {
             mPerfMonitorOverlayView.dismiss();
         }
 
-        //log悬浮窗
         if (mConfig.isLogOutputEnabled()) {
             mLogView.setLogLevel(mConfig.getLogLevel());
             mLogView.setFilterName(mConfig.getLogFilter());
@@ -305,6 +321,12 @@ public class WeexDevOptions implements IWXDevOptions {
             mMemoryChartView.show();
         } else {
             mMemoryChartView.dismiss();
+        }
+
+        if(mConfig.isCPUChartEnabled()){
+            mCpuSampleView.show();
+        }else{
+            mCpuSampleView.dismiss();
         }
 
         if (mConfig.isFpsChartEnabled()) {
@@ -322,7 +344,6 @@ public class WeexDevOptions implements IWXDevOptions {
     public void onPause() {
         mShakeDetector.stop();
 
-        //关闭悬浮窗
         if (mConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.dismiss();
         }
@@ -336,6 +357,10 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (mConfig.isFpsChartEnabled()) {
+            mFpsChartView.dismiss();
+        }
+
+        if (mConfig.isCPUChartEnabled()) {
             mFpsChartView.dismiss();
         }
 

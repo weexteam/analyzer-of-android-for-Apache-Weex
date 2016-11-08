@@ -24,14 +24,14 @@ import com.taobao.weex.analyzer.R;
  * Time: 下午3:45<br/>
  */
 
-public class MemoryChartView extends DragSupportOverlayView {
+public class MemorySampleView extends DragSupportOverlayView {
 
     private DynamicChartViewController mChartViewController;
-    private CheckMemoryTask mTask;
+    private SampleMemoryTask mTask;
 
     private OnCloseListener mOnCloseListener;
 
-    public MemoryChartView(Context application) {
+    public MemorySampleView(Context application) {
         super(application);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
         mHeight = (int) ViewUtils.dp2px(application, 150);
@@ -79,7 +79,7 @@ public class MemoryChartView extends DragSupportOverlayView {
             @Override
             public void onClick(View v) {
                 if(mOnCloseListener != null && isViewAttached){
-                    mOnCloseListener.close(MemoryChartView.this);
+                    mOnCloseListener.close(MemorySampleView.this);
                     dismiss();
                 }
             }
@@ -94,7 +94,11 @@ public class MemoryChartView extends DragSupportOverlayView {
 
     @Override
     protected void onShown() {
-        mTask = new CheckMemoryTask(mWholeView, mChartViewController);
+        if(mTask != null){
+            mTask.stop();
+            mTask = null;
+        }
+        mTask = new SampleMemoryTask(mChartViewController);
         mTask.start();
     }
 
@@ -107,16 +111,14 @@ public class MemoryChartView extends DragSupportOverlayView {
         }
     }
 
-    private static class CheckMemoryTask extends AbstractLoopTask {
+    private static class SampleMemoryTask extends AbstractLoopTask {
 
         private DynamicChartViewController mController;
         private int mAxisXValue = -1;
         private static final float LOAD_FACTOR = 0.75F;
 
-        CheckMemoryTask(@NonNull View hostView, @NonNull DynamicChartViewController controller) {
-            super(hostView);
-            mDelayMillis = 1000;
-
+        SampleMemoryTask(@NonNull DynamicChartViewController controller) {
+            super(false,1000);
             this.mController = controller;
         }
 
@@ -126,12 +128,16 @@ public class MemoryChartView extends DragSupportOverlayView {
                 return;
             }
             mAxisXValue++;
-            double memoryUsed = MemorySampler.checkMemoryUsage();
-
-            if (checkIfNeedUpdateYAxis(memoryUsed)) {
-                mController.updateAxisY(0, (mController.getMaxY() - mController.getMinY()) * 2, 0);
-            }
-            mController.appendPointAndInvalidate(mAxisXValue, memoryUsed);
+            final double memoryUsed = MemorySampler.getMemoryUsage();
+            runOnUIThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (checkIfNeedUpdateYAxis(memoryUsed)) {
+                        mController.updateAxisY(0, (mController.getMaxY() - mController.getMinY()) * 2, 0);
+                    }
+                    mController.appendPointAndInvalidate(mAxisXValue, memoryUsed);
+                }
+            });
         }
 
         private boolean checkIfNeedUpdateYAxis(double memoryUsed) {
@@ -142,7 +148,6 @@ public class MemoryChartView extends DragSupportOverlayView {
         @Override
         protected void onStop() {
             mController = null;
-            mHostView = null;
         }
     }
 

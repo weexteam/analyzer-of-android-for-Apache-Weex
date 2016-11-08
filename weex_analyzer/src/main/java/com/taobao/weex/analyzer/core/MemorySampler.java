@@ -15,7 +15,7 @@ public class MemorySampler {
     /**
      * 获取当前内存占用,单位是MB
      */
-    public static double checkMemoryUsage() {
+    public static double getMemoryUsage() {
         Runtime runtime = Runtime.getRuntime();
         return (runtime.totalMemory() - runtime.freeMemory()) / (double) 1048576;
     }

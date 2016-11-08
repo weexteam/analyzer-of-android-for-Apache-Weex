@@ -7,6 +7,7 @@
     <string name="wxt_memory">memory statistics</string>
     <string name="wxt_perf_statistics">weex performance statistics</string>
     <string name="wxt_fps">fps statistics</string>
+    <string name="wxt_cpu">cpu statistics(current app,user+kernel)</string>
     <string name="wxt_settings">Settings</string>
     <string name="wxt_clear">Clear</string>
     <string name="wxt_search">Search</string>

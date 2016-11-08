@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.utils;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -50,6 +51,18 @@ public class SDKUtils {
         if(allowNotification){
             Toast.makeText(context,"copied to clipboard success",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static boolean isDebugMode(@NonNull Context context){
+        boolean isDebug = false;
+        try {
+            ApplicationInfo info = context.getApplicationInfo();
+            isDebug = (info.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return isDebug;
     }
 
 

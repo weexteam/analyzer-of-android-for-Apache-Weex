@@ -25,11 +25,11 @@ import java.util.Locale;
  * Time: 下午8:55<br/>
  */
 
-public class PerfCommonOverlayView extends DragSupportOverlayView {
+public class PerfSampleOverlayView extends DragSupportOverlayView {
 
     private InvalidateUITask mTask;
 
-    public PerfCommonOverlayView(Context application) {
+    public PerfSampleOverlayView(Context application) {
         super(application);
     }
 
@@ -46,10 +46,12 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
 
     @Override
     protected void onShown() {
-        if (mTask == null) {
-            mTask = new InvalidateUITask(mWholeView);
-            mTask.start();
+        if(mTask != null){
+            mTask.stop();
+            mTask = null;
         }
+        mTask = new InvalidateUITask(mWholeView);
+        mTask.start();
     }
 
     @Override
@@ -68,9 +70,8 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
 
         private int mTotalFrameDropped = 0;
 
-
         InvalidateUITask(@NonNull View hostView) {
-            super(hostView);
+            super(false);
             mDelayMillis = 1000;
             this.mFpsChecker = new FPSSampler();
             this.mMemoryText = (TextView) hostView.findViewById(R.id.memory_usage);
@@ -91,21 +92,29 @@ public class PerfCommonOverlayView extends DragSupportOverlayView {
         @Override
         protected void onRun() {
             //check memory
-            double usedMemInMB = MemorySampler.checkMemoryUsage();
-            mMemoryText.setText(String.format(Locale.CHINA, "memory : %.2fMB", usedMemInMB));
-
-            if (Build.VERSION.SDK_INT >= 16) {
-                //check fps
-                double fps = mFpsChecker.getFPS();
+            final double usedMemInMB = MemorySampler.getMemoryUsage();
+            final double fps;
+            if(Build.VERSION.SDK_INT >= 16){
+                fps = mFpsChecker.getFPS();
                 mTotalFrameDropped += Math.max(mFpsChecker.getExpectedNumFrames() - mFpsChecker.getNumFrames(), 0);
                 mFpsChecker.reset();
-
-                mFpsValueText.setText(String.format(Locale.CHINA, "fps : %.2f", fps));
-                mFrameSkippedText.setText("" + mTotalFrameDropped + " dropped so far");
-            } else {
-                mFpsValueText.setText("fps : ??");
-                mFrameSkippedText.setText("?? dropped so far");
+            }else{
+                fps = 0;
             }
+
+            runOnUIThread(new Runnable() {
+                @Override
+                public void run() {
+                    mMemoryText.setText(String.format(Locale.CHINA, "memory : %.2fMB", usedMemInMB));
+                    if (Build.VERSION.SDK_INT >= 16) {
+                        mFpsValueText.setText(String.format(Locale.CHINA, "fps : %.2f", fps));
+                        mFrameSkippedText.setText("" + mTotalFrameDropped + " dropped so far");
+                    }else{
+                        mFpsValueText.setText("fps : ??");
+                        mFrameSkippedText.setText("?? dropped so far");
+                    }
+                }
+            });
         }
 
         @Override

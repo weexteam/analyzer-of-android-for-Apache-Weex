@@ -1,7 +1,8 @@
 package com.taobao.weex.analyzer.core;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.view.View;
 
 import com.taobao.weex.analyzer.view.IOverlayView;
 
@@ -16,15 +17,25 @@ import com.taobao.weex.analyzer.view.IOverlayView;
 public abstract class AbstractLoopTask implements IOverlayView.ITask, Runnable {
 
     private boolean isStop = true;
-    protected View mHostView;
 
-    private static final int DEFAULT_DELAY_MILLIS = 500;
+    private static final int DEFAULT_DELAY_MILLIS = 500;//ms
 
     protected int mDelayMillis;
 
-    public AbstractLoopTask(@NonNull View hostView) {
-        this.mHostView = hostView;
+    private Handler mUIHandler = new Handler(Looper.getMainLooper());
+    private HandlerThreadWrapper mHandlerThreadWrapper;
+
+    private final boolean isRunInMainThread;
+
+
+    public AbstractLoopTask(boolean runInMainThread) {
         mDelayMillis = DEFAULT_DELAY_MILLIS;
+        this.isRunInMainThread = runInMainThread;
+    }
+
+    public AbstractLoopTask(boolean runInMainThread,int delayMillis){
+        this.isRunInMainThread = runInMainThread;
+        this.mDelayMillis = delayMillis;
     }
 
     @Override
@@ -32,8 +43,18 @@ public abstract class AbstractLoopTask implements IOverlayView.ITask, Runnable {
         if (isStop) {
             return;
         }
-        onRun();
-        mHostView.postDelayed(this, mDelayMillis);
+        try {
+            onRun();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if (isRunInMainThread) {
+            mUIHandler.postDelayed(this, mDelayMillis);
+        } else {
+            if (mHandlerThreadWrapper != null && mHandlerThreadWrapper.isAlive()) {
+                mHandlerThreadWrapper.getHandler().postDelayed(this, mDelayMillis);
+            }
+        }
     }
 
     @Override
@@ -43,13 +64,32 @@ public abstract class AbstractLoopTask implements IOverlayView.ITask, Runnable {
         }
         isStop = false;
         onStart();
-        mHostView.post(this);
+
+        if (isRunInMainThread) {
+            mUIHandler.post(this);
+        } else {
+            if (mHandlerThreadWrapper == null) {
+                mHandlerThreadWrapper = new HandlerThreadWrapper("wx-analyzer-" + this.getClass().getSimpleName());
+            } else {
+                if (!mHandlerThreadWrapper.isAlive()) {
+                    mHandlerThreadWrapper = new HandlerThreadWrapper("wx-analyzer-" + this.getClass().getSimpleName());
+                } else {
+                    mHandlerThreadWrapper.getHandler().removeCallbacksAndMessages(null);
+                }
+            }
+            mHandlerThreadWrapper.getHandler().post(this);
+        }
     }
 
     @Override
     public void stop() {
         isStop = true;
         onStop();
+        if (mHandlerThreadWrapper != null) {
+            mHandlerThreadWrapper.quit();
+            mHandlerThreadWrapper = null;
+        }
+        mUIHandler.removeCallbacksAndMessages(null);
     }
 
     protected void onStart() {
@@ -59,4 +99,19 @@ public abstract class AbstractLoopTask implements IOverlayView.ITask, Runnable {
     protected abstract void onRun();
 
     protected abstract void onStop();
+
+    protected void runOnUIThread(@NonNull final Runnable runnable) {
+        if(mUIHandler != null){
+            mUIHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        runnable.run();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
 }
