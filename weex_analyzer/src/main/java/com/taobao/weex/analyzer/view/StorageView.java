@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.StorageHacker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,6 +72,9 @@ public class StorageView extends AbstractAlertView {
         });
         mStorageList = (RecyclerView) window.findViewById(R.id.list);
         mStorageList.setLayoutManager(new LinearLayoutManager(getContext()));
+        List<StorageHacker.StorageInfo> empty = new ArrayList<>(6);
+        mAdapter = new PerformanceViewAdapter(getContext(), empty);
+        mStorageList.setAdapter(mAdapter);
     }
 
     @Override
@@ -180,10 +185,25 @@ public class StorageView extends AbstractAlertView {
                 @Override
                 public boolean onLongClick(View v) {
                     if (mListener != null) {
-                        int pos = getAdapterPosition();//todo
-                        mListener.onItemClick(pos, mCurStorageInfo.key);
+                        try {
+                            int pos = getAdapterPosition();
+                            if(mCurStorageInfo != null && mCurStorageInfo.key != null) {
+                                mListener.onItemClick(pos, mCurStorageInfo.key);
+                            }
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     return true;
+                }
+            });
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mCurStorageInfo != null && !TextUtils.isEmpty(mCurStorageInfo.value)) {
+                        Toast.makeText(v.getContext(),mCurStorageInfo.value,Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }
