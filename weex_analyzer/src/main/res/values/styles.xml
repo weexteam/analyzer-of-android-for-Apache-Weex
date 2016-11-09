@@ -4,4 +4,10 @@
            parent="android:Widget.Holo.CompoundButton.RadioButton">
         <item name="android:button">@drawable/wxt_radio_btn_style</item>
     </style>
+
+    <style name="WXTCheckBox"
+           parent="android:Widget.Holo.CompoundButton.CheckBox"
+        >
+        <item name="android:button">@drawable/wxt_check_box_style</item>
+    </style>
 </resources>

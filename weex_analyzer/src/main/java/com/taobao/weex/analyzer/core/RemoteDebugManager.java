@@ -3,15 +3,18 @@ package com.taobao.weex.analyzer.core;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.taobao.weex.WXEnvironment;
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
+import com.taobao.weex.bridge.WXBridgeManager;
 
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 /**
@@ -57,7 +60,7 @@ public class RemoteDebugManager {
                 stopRemoteJSDebug(context);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -65,7 +68,7 @@ public class RemoteDebugManager {
         AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(context);
         final EditText editText = new EditText(context);
 
-        if (mServerIP != null) {
+        if (!TextUtils.isEmpty(mServerIP)) {
             editText.setHint(mServerIP);
         } else {
             editText.setHint("127.0.0.1");
@@ -77,11 +80,6 @@ public class RemoteDebugManager {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mServerIP = editText.getText().toString();
-                if (autoStart) {
-                    startRemoteJSDebug(context);
-                }
-                dialog.dismiss();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -90,33 +88,58 @@ public class RemoteDebugManager {
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String temp = editText.getText().toString();
+                if(TextUtils.isEmpty(temp)) {
+                    Toast.makeText(context, "ip can not be null", Toast.LENGTH_SHORT).show();
+                }else{
+                    mServerIP = temp;
+                    dialog.dismiss();
+                }
+
+                if (autoStart) {
+                    startRemoteJSDebug(context);
+                }
+            }
+        });
+
     }
 
     private void startRemoteJSDebug(Context context) {
-        if (SDKUtils.isEmulator()) {
-            WXEnvironment.sRemoteDebugProxyUrl = String.format(Locale.CHINA, sRemoteUrlTemplate, "127.0.0.1");
-        } else {
-            if (mServerIP != null) {
+        try {
+            if (!TextUtils.isEmpty(mServerIP)) {
                 WXEnvironment.sRemoteDebugProxyUrl = String.format(Locale.CHINA, sRemoteUrlTemplate, mServerIP);
             } else {
                 requestDebugServer(context, true);
                 isEnabled = false;
                 return;
             }
-        }
 
-        WXSDKEngine.reload();
-        Toast.makeText(context, context.getString(R.string.wxt_opened), Toast.LENGTH_SHORT).show();
+            WXSDKEngine.reload();
+            Toast.makeText(context, context.getString(R.string.wxt_opened), Toast.LENGTH_SHORT).show();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void stopRemoteJSDebug(Context context) {
-        //todo
-        WXEnvironment.sRemoteDebugMode = false;
-        WXEnvironment.sRemoteDebugProxyUrl = "";
-        WXSDKEngine.reload();
-        Toast.makeText(context, context.getString(R.string.wxt_closed), Toast.LENGTH_SHORT).show();
-
+        try {
+            WXBridgeManager manager = WXBridgeManager.getInstance();
+            //todo 接口名称可能会更改
+            Method method = manager.getClass().getDeclaredMethod("stopRemoteDebug");
+            method.setAccessible(true);
+            method.invoke(manager);
+            Toast.makeText(context, "close success", Toast.LENGTH_SHORT).show();
+        }catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "close failed", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
