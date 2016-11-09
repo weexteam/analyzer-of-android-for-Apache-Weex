@@ -51,29 +51,33 @@ public abstract class AbstractOverlayView implements IOverlayView {
 
     @Override
     public void show() {
-        mWholeView = onCreateView();
-        onViewCreated(mWholeView);
-        int w = mWidth;
-        int h = mHeight;
+        try {
+            mWholeView = onCreateView();
+            onViewCreated(mWholeView);
+            int w = mWidth;
+            int h = mHeight;
 
-        int flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+            int flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 
-        //no permission needed when use TYPE_TOAST.
-        int type = WindowManager.LayoutParams.TYPE_TOAST;
-        //since window can not received touch event before kitkat when use TYPE_TOAST,
-        //so we use TYPE_PHONE instead.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            type = WindowManager.LayoutParams.TYPE_PHONE;
+            //no permission needed when use TYPE_TOAST.
+            int type = WindowManager.LayoutParams.TYPE_TOAST;
+            //since window can not received touch event before kitkat when use TYPE_TOAST,
+            //so we use TYPE_PHONE instead.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                type = WindowManager.LayoutParams.TYPE_PHONE;
+            }
+
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(w, h, type, flags, PixelFormat.TRANSLUCENT);
+            layoutParams.gravity = mGravity;
+            layoutParams.x = mX;
+            layoutParams.y = mY;
+            mWindowManager.addView(mWholeView, layoutParams);
+            isViewAttached = true;
+
+            onShown();
+        }catch (Exception e) {
+            e.printStackTrace();
         }
-
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(w, h, type, flags, PixelFormat.TRANSLUCENT);
-        layoutParams.gravity = mGravity;
-        layoutParams.x = mX;
-        layoutParams.y = mY;
-        mWindowManager.addView(mWholeView, layoutParams);
-        isViewAttached = true;
-
-        onShown();
     }
 
     protected abstract @NonNull View onCreateView();
@@ -92,12 +96,16 @@ public abstract class AbstractOverlayView implements IOverlayView {
 
     @Override
     public void dismiss() {
-        if (mWindowManager != null && mWholeView != null && isViewAttached) {
-            // remove view
-            mWindowManager.removeView(mWholeView);
-            isViewAttached = false;
-            onDismiss();
+        try {
+            if (mWindowManager != null && mWholeView != null && isViewAttached) {
+                // remove view
+                mWindowManager.removeView(mWholeView);
+                isViewAttached = false;
+                onDismiss();
+            }
+            onDestroy();
+        }catch (Exception e) {
+            e.printStackTrace();
         }
-        onDestroy();
     }
 }

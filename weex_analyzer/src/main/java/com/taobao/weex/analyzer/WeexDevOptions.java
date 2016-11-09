@@ -270,7 +270,7 @@ public class WeexDevOptions implements IWXDevOptions {
             return;
         }
 
-        if(((Activity)mContext).isFinishing()){
+        if((mContext instanceof Activity) && ((Activity)mContext).isFinishing()){
             return;
         }
 
@@ -439,7 +439,11 @@ public class WeexDevOptions implements IWXDevOptions {
     @Override
     public void onException(WXSDKInstance instance, String errCode, String msg) {
         if (mConfig != null && mConfig.isShownJSException()) {
-            JSExceptionCatcher.catchException(mContext, instance, errCode, msg);
+            try {
+                JSExceptionCatcher.catchException(mContext, instance, errCode, msg);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

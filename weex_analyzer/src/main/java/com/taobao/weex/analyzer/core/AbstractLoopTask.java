@@ -63,7 +63,11 @@ public abstract class AbstractLoopTask implements IOverlayView.ITask, Runnable {
             stop();
         }
         isStop = false;
-        onStart();
+        try {
+            onStart();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         if (isRunInMainThread) {
             mUIHandler.post(this);

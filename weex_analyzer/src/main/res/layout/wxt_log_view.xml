@@ -14,7 +14,7 @@
         android:layout_height="200dp"
         android:overScrollMode="never"
         android:scrollbars="vertical"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="72dp"
         />
 
     <include layout="@layout/wxt_log_settngs"/>

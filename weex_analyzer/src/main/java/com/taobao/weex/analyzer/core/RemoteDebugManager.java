@@ -99,7 +99,7 @@ public class RemoteDebugManager {
                 if(TextUtils.isEmpty(temp)) {
                     Toast.makeText(context, "ip can not be null", Toast.LENGTH_SHORT).show();
                 }else{
-                    mServerIP = temp;
+                    mServerIP = temp.trim();
                     dialog.dismiss();
                 }
 
@@ -131,7 +131,6 @@ public class RemoteDebugManager {
     private void stopRemoteJSDebug(Context context) {
         try {
             WXBridgeManager manager = WXBridgeManager.getInstance();
-            //todo 接口名称可能会更改
             Method method = manager.getClass().getDeclaredMethod("stopRemoteDebug");
             method.setAccessible(true);
             method.invoke(manager);

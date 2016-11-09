@@ -49,7 +49,11 @@ public class SettingsActivity extends Activity {
         mBtnConfigDebugIP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RemoteDebugManager.getInstance().requestDebugServer(v.getContext(), false);
+                try {
+                    RemoteDebugManager.getInstance().requestDebugServer(v.getContext(), false);
+                }catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
