@@ -53,9 +53,9 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private LogView mLogView;
 
-    private MemorySampleView mMemoryChartView;
+    private MemorySampleView mMemorySampleView;
     private CpuSampleView mCpuSampleView;
-    private FpsSampleView mFpsChartView;
+    private FpsSampleView mFpsSampleView;
 
     private String mCurPageName;
 
@@ -98,8 +98,8 @@ public class WeexDevOptions implements IWXDevOptions {
         });
 
 
-        mMemoryChartView = new MemorySampleView(context);
-        mMemoryChartView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+        mMemorySampleView = new MemorySampleView(context);
+        mMemorySampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
@@ -118,8 +118,8 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mFpsChartView = new FpsSampleView(context);
-        mFpsChartView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+        mFpsSampleView = new FpsSampleView(context);
+        mFpsSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
@@ -195,10 +195,10 @@ public class WeexDevOptions implements IWXDevOptions {
             public void onOptionClick(@NonNull String optionName) {
                 if (mConfig.isMemoryChartEnabled()) {
                     mConfig.setMemoryChartEnabled(false);
-                    mMemoryChartView.dismiss();
+                    mMemorySampleView.dismiss();
                 } else {
                     mConfig.setMemoryChartEnabled(true);
-                    mMemoryChartView.show();
+                    mMemorySampleView.show();
                 }
             }
         }));
@@ -224,10 +224,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
                 if (mConfig.isFpsChartEnabled()) {
                     mConfig.setFpsChartEnabled(false);
-                    mFpsChartView.dismiss();
+                    mFpsSampleView.dismiss();
                 } else {
                     mConfig.setFpsChartEnabled(true);
-                    mFpsChartView.show();
+                    mFpsSampleView.show();
                 }
             }
         }));
@@ -318,9 +318,9 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (mConfig.isMemoryChartEnabled()) {
-            mMemoryChartView.show();
+            mMemorySampleView.show();
         } else {
-            mMemoryChartView.dismiss();
+            mMemorySampleView.dismiss();
         }
 
         if(mConfig.isCPUChartEnabled()){
@@ -330,9 +330,9 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (mConfig.isFpsChartEnabled()) {
-            mFpsChartView.show();
+            mFpsSampleView.show();
         } else {
-            mFpsChartView.dismiss();
+            mFpsSampleView.dismiss();
         }
 
         if(mScalpelViewController != null){
@@ -353,15 +353,15 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (mConfig.isMemoryChartEnabled()) {
-            mMemoryChartView.dismiss();
+            mMemorySampleView.dismiss();
         }
 
         if (mConfig.isFpsChartEnabled()) {
-            mFpsChartView.dismiss();
+            mFpsSampleView.dismiss();
         }
 
         if (mConfig.isCPUChartEnabled()) {
-            mFpsChartView.dismiss();
+            mCpuSampleView.dismiss();
         }
 
         if(mScalpelViewController != null){
