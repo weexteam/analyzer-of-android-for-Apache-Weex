@@ -14,10 +14,6 @@ allprojects {
     repositories {
         mavenCentral()
         jcenter()
-        //todo must remove later
-        maven {
-            url "https://chuyi.bintray.com/maven"
-        }
     }
 }
 

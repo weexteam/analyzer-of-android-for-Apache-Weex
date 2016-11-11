@@ -101,10 +101,10 @@ public class RemoteDebugManager {
                 }else{
                     mServerIP = temp.trim();
                     dialog.dismiss();
-                }
 
-                if (autoStart) {
-                    startRemoteJSDebug(context);
+                    if (autoStart) {
+                        startRemoteJSDebug(context);
+                    }
                 }
             }
         });
