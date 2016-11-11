@@ -32,7 +32,7 @@ public class LogcatDumper implements Handler.Callback {
     private ExecutorService mExecutor = Executors.newCachedThreadPool(new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, "LOGCAT_DUMPER");
+            return new Thread(r, "wx_analyzer_logcat_dumper");
         }
     });
 

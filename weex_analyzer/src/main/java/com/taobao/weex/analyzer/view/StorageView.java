@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.StorageHacker;
+import com.taobao.weex.analyzer.utils.SDKUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,16 +37,15 @@ public class StorageView extends AbstractAlertView {
 
     private RecyclerView mStorageList;
 
-    public StorageView(Context context, StorageHacker storageHacker) {
+    public StorageView(Context context) {
         super(context);
-        this.mStorageHacker = storageHacker;
     }
 
 
     @Override
     protected void onShown() {
-        if (mStorageHacker == null) {
-            return;
+        if (mStorageHacker == null || mStorageHacker.isDestroy()) {
+            mStorageHacker = new StorageHacker(getContext(), SDKUtils.isDebugMode(getContext()));
         }
 
         mStorageHacker.fetch(new StorageHacker.OnLoadListener() {
@@ -60,6 +60,14 @@ public class StorageView extends AbstractAlertView {
             }
         });
 
+    }
+
+    @Override
+    protected void onDismiss() {
+        super.onDismiss();
+        if(mStorageHacker != null) {
+            mStorageHacker.destroy();
+        }
     }
 
     @Override
@@ -81,8 +89,6 @@ public class StorageView extends AbstractAlertView {
     protected int getLayoutResId() {
         return R.layout.wxt_storage_view;
     }
-
-    //-------
 
 
     private class PerformanceViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -108,7 +114,6 @@ public class StorageView extends AbstractAlertView {
                     builder.setPositiveButton("yes", new OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //remove
                             if (mStorageHacker != null && key != null) {
                                 mStorageHacker.remove(key, new StorageHacker.OnRemoveListener() {
                                     @Override
