@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.FPSSampler;
+import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
 
@@ -97,7 +99,7 @@ public class FpsSampleView extends DragSupportOverlayView {
             mTask.stop();
             mTask = null;
         }
-        mTask = new SampleFPSTask(mChartViewController);
+        mTask = new SampleFPSTask(mChartViewController, SDKUtils.isDebugMode(mContext));
         mTask.start();
     }
 
@@ -114,11 +116,13 @@ public class FpsSampleView extends DragSupportOverlayView {
         private DynamicChartViewController mController;
         private FPSSampler mFpsChecker;
         private int mAxisXValue = -1;
+        private boolean isDebug;
 
-        SampleFPSTask(@NonNull DynamicChartViewController controller) {
+        SampleFPSTask(@NonNull DynamicChartViewController controller, boolean isDebug) {
             super(false,1000);
             this.mController = controller;
             this.mFpsChecker = new FPSSampler();
+            this.isDebug = isDebug;
         }
 
         @Override
@@ -140,7 +144,9 @@ public class FpsSampleView extends DragSupportOverlayView {
                 //check fps
                 mAxisXValue++;
                 final double fps = mFpsChecker.getFPS();
-
+                if(isDebug) {
+                    Log.d("weex-analyzer", "current fps : "+ fps);
+                }
                 runOnUIThread(new Runnable() {
                     @Override
                     public void run() {

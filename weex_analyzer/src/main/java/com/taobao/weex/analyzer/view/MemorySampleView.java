@@ -4,17 +4,19 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.MemorySampler;
+import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
-import com.taobao.weex.analyzer.R;
 
 /**
  * Description:
@@ -98,7 +100,7 @@ public class MemorySampleView extends DragSupportOverlayView {
             mTask.stop();
             mTask = null;
         }
-        mTask = new SampleMemoryTask(mChartViewController);
+        mTask = new SampleMemoryTask(mChartViewController, SDKUtils.isDebugMode(mContext));
         mTask.start();
     }
 
@@ -116,10 +118,12 @@ public class MemorySampleView extends DragSupportOverlayView {
         private DynamicChartViewController mController;
         private int mAxisXValue = -1;
         private static final float LOAD_FACTOR = 0.75F;
+        private boolean isDebug;
 
-        SampleMemoryTask(@NonNull DynamicChartViewController controller) {
+        SampleMemoryTask(@NonNull DynamicChartViewController controller, boolean isDebug) {
             super(false,1000);
             this.mController = controller;
+            this.isDebug = isDebug;
         }
 
         @Override
@@ -129,6 +133,9 @@ public class MemorySampleView extends DragSupportOverlayView {
             }
             mAxisXValue++;
             final double memoryUsed = MemorySampler.getMemoryUsage();
+            if(isDebug) {
+                Log.d("weex-analyzer", "memory usage : "+ memoryUsed + "MB");
+            }
             runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
