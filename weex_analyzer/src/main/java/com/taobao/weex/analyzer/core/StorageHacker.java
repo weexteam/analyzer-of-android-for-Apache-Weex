@@ -1,12 +1,15 @@
 package com.taobao.weex.analyzer.core;
 
+import android.app.Application;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.appfram.storage.DefaultWXStorage;
@@ -18,6 +21,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Description:
@@ -27,7 +33,7 @@ import java.util.List;
  * Time: 下午1:03<br/>
  */
 
-public class StorageHacker {
+public final class StorageHacker {
 
     public interface OnLoadListener {
         void onLoad(List<StorageInfo> list);
@@ -39,12 +45,39 @@ public class StorageHacker {
 
     private IWXStorageAdapter mStorageAdapter;
     private Context mContext;
+    private final boolean isDebug;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private ExecutorService mExecutor = Executors.newCachedThreadPool(new ThreadFactory() {
+        @Override
+        public Thread newThread(@NonNull Runnable r) {
+            return new Thread(r, "wx_analyzer_storage_dumper");
+        }
+    });
 
-    public StorageHacker(Context context) {
+    public StorageHacker(@NonNull Context context, boolean isDebug) {
         mStorageAdapter = WXSDKEngine.getIWXStorageAdapter();
+        if(!(context instanceof Application)) {
+            context = context.getApplicationContext();
+        }
         this.mContext = context;
+        this.isDebug = isDebug;
+    }
+
+    public void destroy() {
+        if(mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+
+        if(mExecutor != null) {
+            mExecutor.shutdown();
+            mExecutor = null;
+        }
+    }
+
+    public boolean isDestroy(){
+        return mHandler == null || mExecutor == null || mExecutor.isShutdown();
     }
 
 
@@ -60,16 +93,19 @@ public class StorageHacker {
         }
 
         if (!(mStorageAdapter instanceof DefaultWXStorage)) {
-            //todo here we can return k-v list.
             listener.onLoad(Collections.<StorageInfo>emptyList());
             return;
         }
-        new Thread(new Runnable() {
+
+        if(isDestroy()) {
+            listener.onLoad(Collections.<StorageInfo>emptyList());
+            return;
+        }
+
+        mExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 final List<StorageInfo> resultList = new ArrayList<>();
-
-                //todo we don't need reflect in the future
                 WXSQLiteOpenHelper helper = null;
                 Cursor c = null;
                 try {
@@ -83,19 +119,35 @@ public class StorageHacker {
 
                     c = db.query("default_wx_storage", new String[]{"key", "value", "timestamp"}, null, null, null, null, null);
 
+                    if(isDebug) {
+                        Log.d("weex-analyzer","start dump weex storage");
+                    }
+
                     while (c.moveToNext()) {
                         StorageInfo info = new StorageInfo();
                         info.key = c.getString(c.getColumnIndex("key"));
                         info.value = c.getString(c.getColumnIndex("value"));
                         info.timestamp = c.getString(c.getColumnIndex("timestamp"));
+                        if(isDebug) {
+                            Log.d("weex-analyzer", "weex storage["+info.key + " | " + info.value +"]");
+                        }
                         resultList.add(info);
                     }
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onLoad(resultList);
-                        }
-                    });
+
+                    if(isDebug) {
+                        Log.d("weex-analyzer","end dump weex storage");
+                    }
+
+                    //we may be killed by user
+                    if(mHandler != null) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                listener.onLoad(resultList);
+                            }
+                        });
+                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -106,10 +158,8 @@ public class StorageHacker {
                         helper.closeDatabase();
                     }
                 }
-
             }
-        }).start();
-
+        });
     }
 
     public void remove(@Nullable final String key, @Nullable final OnRemoveListener listener) {
@@ -127,7 +177,12 @@ public class StorageHacker {
             return;
         }
 
-        new Thread(new Runnable() {
+        if(isDestroy()) {
+            listener.onRemoved(false);
+            return;
+        }
+
+        mExecutor.execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -136,21 +191,22 @@ public class StorageHacker {
                     if(method != null){
                         method.setAccessible(true);
                         final boolean result = (boolean) method.invoke(storage,key);
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                listener.onRemoved(result);
-                            }
-                        });
-                        method.setAccessible(false);
+                        if(mHandler != null) {
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    listener.onRemoved(result);
+                                }
+                            });
+                            method.setAccessible(false);
+                        }
                     }
 
                 }catch (Exception e){
                     e.printStackTrace();
                 }
             }
-        }).start();
-
+        });
     }
 
 

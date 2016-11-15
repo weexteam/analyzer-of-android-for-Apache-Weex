@@ -17,7 +17,6 @@ import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
-import com.taobao.weex.analyzer.core.StorageHacker;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
@@ -163,7 +162,7 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("weex storage", R.drawable.wxt_icon_storage, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick(@NonNull String optionName) {
-                StorageView mStorageView = new StorageView(mContext,new StorageHacker(mContext));
+                StorageView mStorageView = new StorageView(mContext);
                 mStorageView.show();
             }
         }));
