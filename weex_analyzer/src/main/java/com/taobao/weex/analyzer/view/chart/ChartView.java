@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -232,21 +233,22 @@ public class ChartView extends View {
      * @param canvas
      */
     protected void drawGraphElements(Canvas canvas) {
-        // must be in hardware accelerated mode
         if (android.os.Build.VERSION.SDK_INT >= 11 && !canvas.isHardwareAccelerated()) {
-            throw new IllegalStateException("ChartView must be used in hardware accelerated mode." +
-                    "You can use android:hardwareAccelerated=\"true\" on your activity. Read this for more info:" +
-                    "https://developer.android.com/guide/topics/graphics/hardware-accel.html");
+            Log.d("ChartView","use android:hardwareAccelerated=\"true\" for better performance");
         }
 
-        drawTitle(canvas);
-        mViewport.drawFirst(canvas);
-        mGridLabelRenderer.draw(canvas);
-        for (Series s : mSeries) {
-            s.draw(this, canvas);
+        try {
+            drawTitle(canvas);
+            mViewport.drawFirst(canvas);
+            mGridLabelRenderer.draw(canvas);
+            for (Series s : mSeries) {
+                s.draw(this, canvas);
+            }
+            mViewport.draw(canvas);
+            mLegendRenderer.draw(canvas);
+        }catch (Exception e) {
+            Log.d("ChartView", e.getMessage());
         }
-        mViewport.draw(canvas);
-        mLegendRenderer.draw(canvas);
     }
 
     /**
