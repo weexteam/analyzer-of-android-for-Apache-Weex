@@ -352,13 +352,6 @@ public class LogcatDumper implements Handler.Callback {
     }
 
 
-    /**
-     * 不过滤
-     * 仅js
-     * 仅calljs指令
-     * 仅callNative
-     */
-
     public static class Rule {
 
         private String name;
