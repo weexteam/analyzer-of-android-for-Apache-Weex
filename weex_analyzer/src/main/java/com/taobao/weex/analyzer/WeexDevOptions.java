@@ -31,6 +31,7 @@ import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
+import com.taobao.weex.analyzer.view.TrafficSampleView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class WeexDevOptions implements IWXDevOptions {
     private MemorySampleView mMemorySampleView;
     private CpuSampleView mCpuSampleView;
     private FpsSampleView mFpsSampleView;
+    private TrafficSampleView mTrafficSampleView;
 
     private String mCurPageName;
 
@@ -113,6 +115,16 @@ public class WeexDevOptions implements IWXDevOptions {
             public void close(IOverlayView host) {
                 if(host != null){
                     mConfig.setCpuChartEnabled(false);
+                }
+            }
+        });
+
+        mTrafficSampleView = new TrafficSampleView(context);
+        mTrafficSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if(host != null){
+                    mConfig.setTrafficChartEnabled(false);
                 }
             }
         });
@@ -230,10 +242,16 @@ public class WeexDevOptions implements IWXDevOptions {
                 }
             }
         }));
-        options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
+        options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick(@NonNull String optionName) {
-                RemoteDebugManager.getInstance().toggle(mContext);
+                if (mConfig.isTrafficChartEnabled()) {
+                    mConfig.setTrafficChartEnabled(false);
+                    mTrafficSampleView.dismiss();
+                } else {
+                    mConfig.setTrafficChartEnabled(true);
+                    mTrafficSampleView.show();
+                }
             }
         }));
 
@@ -247,6 +265,13 @@ public class WeexDevOptions implements IWXDevOptions {
                     mConfig.setPerfCommonEnabled(true);
                     mPerfMonitorOverlayView.show();
                 }
+            }
+        }));
+
+        options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick(@NonNull String optionName) {
+                RemoteDebugManager.getInstance().toggle(mContext);
             }
         }));
 
@@ -334,6 +359,12 @@ public class WeexDevOptions implements IWXDevOptions {
             mFpsSampleView.dismiss();
         }
 
+        if(mConfig.isTrafficChartEnabled()) {
+            mTrafficSampleView.show();
+        } else {
+            mTrafficSampleView.dismiss();
+        }
+
         if(mScalpelViewController != null){
             mScalpelViewController.resume();
         }
@@ -361,6 +392,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
         if (mConfig.isCPUChartEnabled()) {
             mCpuSampleView.dismiss();
+        }
+
+        if (mConfig.isTrafficChartEnabled()) {
+            mTrafficSampleView.dismiss();
         }
 
         if(mScalpelViewController != null){
