@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.taobao.weex.analyzer.view.chart.DataPoint;
@@ -74,6 +75,15 @@ public class DynamicChartViewController {
     }
 
 
+    @SuppressWarnings("unchecked")
+    public void appendPointAndInvalidate2(double x, double y) {
+        if(mChartView.getSeries().size() >= 2){
+            LineGraphSeries<DataPoint> series = (LineGraphSeries<DataPoint>) mChartView.getSeries().get(1);
+            series.appendData(new DataPoint(x, y), true, mMaxPoints);
+        }
+    }
+
+
     public double getMaxY() {
         if (mChartView == null) {
             return 0L;
@@ -135,6 +145,11 @@ public class DynamicChartViewController {
 
         private int mMaxDataPoints = 0;
 
+        private String mSeriesTitle;
+        private String mSeries2Title;
+
+        private int mLine2Color = Color.BLUE;
+        private int mFill2Color = Color.BLUE;
 
         public Builder(Context context) {
             this.mContext = context;
@@ -166,9 +181,32 @@ public class DynamicChartViewController {
 
             series.setColor(mLineColor);
 
+            if(!TextUtils.isEmpty(mSeriesTitle)) {
+                series.setTitle(mSeriesTitle);
+            }
+
+            //we have another line
+            LineGraphSeries<DataPoint> series2 = null;
+            if(!TextUtils.isEmpty(mSeries2Title)) {
+                series2 = new LineGraphSeries<>();
+                realView.addSeries(series2);
+
+                series2.setTitle(mSeries2Title);
+                series2.setColor(mLine2Color);
+            }
+
+
             series.setDrawBackground(isFill);
+
             if (isFill) {
                 series.setBackgroundColor(mFillColor);
+            }
+
+            if(series2 != null) {
+                series2.setDrawBackground(isFill);
+                if(isFill) {
+                    series2.setBackgroundColor(mFill2Color);
+                }
             }
 
             if (mMinX != -1 && mMaxX != -1) {
@@ -210,7 +248,6 @@ public class DynamicChartViewController {
 
             if (mLabelFormatter != null) {
                 labelRenderer.setLabelFormatter(mLabelFormatter);
-                //todo
                 labelRenderer.setHumanRounding(false);
             }
 
@@ -237,6 +274,16 @@ public class DynamicChartViewController {
             return this;
         }
 
+        public Builder lineTitle(@Nullable String title) {
+            this.mSeriesTitle = title;
+            return this;
+        }
+
+        public Builder lineTitle2(@Nullable String title) {
+            this.mSeries2Title = title;
+            return this;
+        }
+
         /**
          * 图表背景色
          */
@@ -247,6 +294,11 @@ public class DynamicChartViewController {
 
         public Builder fillColor(@ColorInt int fillColor) {
             this.mFillColor = fillColor;
+            return this;
+        }
+
+        public Builder fillColor2(@ColorInt int fillColor) {
+            this.mFill2Color = fillColor;
             return this;
         }
 
@@ -271,6 +323,14 @@ public class DynamicChartViewController {
          */
         public Builder lineColor(@ColorInt int lineColor) {
             this.mLineColor = lineColor;
+            return this;
+        }
+
+        /**
+         * 折线2颜色
+         * */
+        public Builder lineColor2(@ColorInt int line2Color) {
+            this.mLine2Color = line2Color;
             return this;
         }
 

@@ -139,7 +139,12 @@ public class LogcatDumper implements Handler.Callback {
         if (mCachedLogList != null) {
             mCachedLogList.clear();
         }
-        clearLog();
+        execute(new Runnable() {
+            @Override
+            public void run() {
+                clearLog();
+            }
+        });
     }
 
 
@@ -213,8 +218,9 @@ public class LogcatDumper implements Handler.Callback {
         Process tempProcess = null;
         try {
             tempProcess = Runtime.getRuntime().exec("logcat -c");
-        } catch (IOException e) {
-            e.printStackTrace();
+            Thread.sleep(500);
+        } catch (Exception e) {
+            Log.d(DevOptionsConfig.TAG, e.getMessage());
         } finally {
             if (tempProcess != null) {
                 tempProcess.destroy();
@@ -336,6 +342,7 @@ public class LogcatDumper implements Handler.Callback {
                     }
                 }
             } catch (IOException e) {
+                Log.e(DevOptionsConfig.TAG,e.getMessage());
             }
         }
 
@@ -345,19 +352,12 @@ public class LogcatDumper implements Handler.Callback {
                     logProcess.destroy();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(DevOptionsConfig.TAG, e.getMessage());
             }
         }
 
     }
 
-
-    /**
-     * 不过滤
-     * 仅js
-     * 仅calljs指令
-     * 仅callNative
-     */
 
     public static class Rule {
 

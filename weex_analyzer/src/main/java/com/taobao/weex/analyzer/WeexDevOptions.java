@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
+import com.taobao.weex.analyzer.view.TrafficSampleView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.ArrayList;
@@ -55,12 +57,15 @@ public class WeexDevOptions implements IWXDevOptions {
     private MemorySampleView mMemorySampleView;
     private CpuSampleView mCpuSampleView;
     private FpsSampleView mFpsSampleView;
+    private TrafficSampleView mTrafficSampleView;
 
     private String mCurPageName;
 
     private ScalpelViewController mScalpelViewController;
     private PerfSampleOverlayView mPerfMonitorOverlayView;
 
+    private boolean shown = false;
+    private List<DevOption> mExtraOptions = null;
 
     public WeexDevOptions(@NonNull Context context){
 
@@ -117,6 +122,16 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
+        mTrafficSampleView = new TrafficSampleView(context);
+        mTrafficSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if(host != null){
+                    mConfig.setTrafficChartEnabled(false);
+                }
+            }
+        });
+
         mFpsSampleView = new FpsSampleView(context);
         mFpsSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
@@ -143,7 +158,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
         options.add(new DevOption("weex性能指标", R.drawable.wxt_icon_performance, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (mCurPageName == null) {
                     Toast.makeText(mContext, "internal error", Toast.LENGTH_SHORT).show();
                     return;
@@ -161,14 +176,14 @@ public class WeexDevOptions implements IWXDevOptions {
         }));
         options.add(new DevOption("weex storage", R.drawable.wxt_icon_storage, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 StorageView mStorageView = new StorageView(mContext);
                 mStorageView.show();
             }
         }));
         options.add(new DevOption("3d视图", R.drawable.wxt_icon_3d_rotation, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (mScalpelViewController != null) {
                     mScalpelViewController.toggleScalpelEnabled();
                 }
@@ -176,7 +191,7 @@ public class WeexDevOptions implements IWXDevOptions {
         }));
         options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (mConfig.isLogOutputEnabled()) {
                     mConfig.setLogOutputEnabled(false);
                     mLogView.dismiss();
@@ -191,7 +206,7 @@ public class WeexDevOptions implements IWXDevOptions {
         }));
         options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (mConfig.isMemoryChartEnabled()) {
                     mConfig.setMemoryChartEnabled(false);
                     mMemorySampleView.dismiss();
@@ -203,7 +218,7 @@ public class WeexDevOptions implements IWXDevOptions {
         }));
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (mConfig.isCPUChartEnabled()) {
                     mConfig.setCpuChartEnabled(false);
                     mCpuSampleView.dismiss();
@@ -215,7 +230,7 @@ public class WeexDevOptions implements IWXDevOptions {
         }));
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (!FPSSampler.isSupported()) {
                     Toast.makeText(mContext, "your device is not support.", Toast.LENGTH_SHORT).show();
                     return;
@@ -230,16 +245,22 @@ public class WeexDevOptions implements IWXDevOptions {
                 }
             }
         }));
-        options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
+        options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
-                RemoteDebugManager.getInstance().toggle(mContext);
+            public void onOptionClick() {
+                if (mConfig.isTrafficChartEnabled()) {
+                    mConfig.setTrafficChartEnabled(false);
+                    mTrafficSampleView.dismiss();
+                } else {
+                    mConfig.setTrafficChartEnabled(true);
+                    mTrafficSampleView.show();
+                }
             }
         }));
 
         options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 if (mConfig.isPerfCommonEnabled()) {
                     mConfig.setPerfCommonEnabled(false);
                     mPerfMonitorOverlayView.dismiss();
@@ -250,16 +271,22 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         }));
 
+        options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                RemoteDebugManager.getInstance().toggle(mContext);
+            }
+        }));
+
         options.add(new DevOption("配置", R.drawable.wxt_icon_settings, new DevOption.OnOptionClickListener() {
             @Override
-            public void onOptionClick(@NonNull String optionName) {
+            public void onOptionClick() {
                 SettingsActivity.launch(mContext);
             }
         }));
         return options;
     }
 
-    private boolean shown = false;
     private void showDevOptions(){
         if(shown){
             return;
@@ -273,9 +300,15 @@ public class WeexDevOptions implements IWXDevOptions {
             return;
         }
 
-        EntranceView e = new EntranceView.Creator(mContext)
-                .injectOptions(registerDefaultOptions())
-                .create();
+        EntranceView.Creator creator = new EntranceView.Creator(mContext)
+                .injectOptions(registerDefaultOptions());
+
+        if(mExtraOptions != null && !mExtraOptions.isEmpty()) {
+            creator.injectOptions(mExtraOptions);
+        }
+
+        EntranceView e = creator.create();
+
         e.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
@@ -284,6 +317,32 @@ public class WeexDevOptions implements IWXDevOptions {
         });
         e.show();
         shown = true;
+    }
+
+    @SuppressWarnings("unused")
+    public void registerExtraOption(@NonNull DevOption option) {
+        if(mExtraOptions == null) {
+            mExtraOptions = new ArrayList<>();
+        }
+        mExtraOptions.add(option);
+    }
+
+    @SuppressWarnings("unused")
+    public void registerExtraOption(@NonNull String optionName, int iconRes,@NonNull final Runnable runnable) {
+        DevOption option = new DevOption();
+        option.listener = new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                try {
+                    runnable.run();
+                }catch (Exception e) {
+                    Log.e(DevOptionsConfig.TAG, e.getMessage());
+                }
+            }
+        };
+        option.iconRes = iconRes;
+        option.optionName = optionName;
+        registerExtraOption(option);
     }
 
 
@@ -334,6 +393,12 @@ public class WeexDevOptions implements IWXDevOptions {
             mFpsSampleView.dismiss();
         }
 
+        if(mConfig.isTrafficChartEnabled()) {
+            mTrafficSampleView.show();
+        } else {
+            mTrafficSampleView.dismiss();
+        }
+
         if(mScalpelViewController != null){
             mScalpelViewController.resume();
         }
@@ -361,6 +426,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
         if (mConfig.isCPUChartEnabled()) {
             mCpuSampleView.dismiss();
+        }
+
+        if (mConfig.isTrafficChartEnabled()) {
+            mTrafficSampleView.dismiss();
         }
 
         if(mScalpelViewController != null){

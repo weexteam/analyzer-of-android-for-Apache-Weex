@@ -28,11 +28,14 @@ public class DevOptionsConfig {
     private static final String CONFIG_MEMORY_CHART = "config_mem_chart";
     private static final String CONFIG_FPS_CHART = "config_fps_chart";
     private static final String CONFIG_CPU_CHART = "config_cpu_chart";
+    private static final String CONFIG_TRAFFIC_CHART = "config_traffic_chart";
 
 
     private static final String CONFIG_LOG_LEVEL = "config_log_level";
     private static final String CONFIG_LOG_FILTER = "config_log_filter";
     private static final String CONFIG_LOG_VIEW_SIZE = "config_log_view_size";
+
+    public static final String TAG = "weex-analyzer";
 
 
     public DevOptionsConfig(@NonNull Context context) {
@@ -83,6 +86,15 @@ public class DevOptionsConfig {
         return mSharedPreferences.getBoolean(CONFIG_CPU_CHART,false);
     }
 
+
+    /**设置是否展示流量曲线*/
+    public void setTrafficChartEnabled(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_TRAFFIC_CHART, enabled).apply();
+    }
+
+    public boolean isTrafficChartEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_TRAFFIC_CHART,false);
+    }
 
     /**
      * 设置是否展示fps变化曲线
