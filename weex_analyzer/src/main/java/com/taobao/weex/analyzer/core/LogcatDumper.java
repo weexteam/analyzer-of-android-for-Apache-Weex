@@ -52,8 +52,6 @@ public class LogcatDumper implements Handler.Callback {
     private boolean isCacheEnabled = true;
     private volatile LinkedList<LogInfo> mCachedLogList;
 
-    private static final String TAG = "LogcatDumper";
-
     LogcatDumper(@Nullable OnLogReceivedListener listener) {
         this.mListener = listener;
         this.mCacheLimit = DEFAULT_CACHE_LIMIT;
@@ -222,7 +220,7 @@ public class LogcatDumper implements Handler.Callback {
             tempProcess = Runtime.getRuntime().exec("logcat -c");
             Thread.sleep(500);
         } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
+            Log.d(DevOptionsConfig.TAG, e.getMessage());
         } finally {
             if (tempProcess != null) {
                 tempProcess.destroy();
@@ -344,6 +342,7 @@ public class LogcatDumper implements Handler.Callback {
                     }
                 }
             } catch (IOException e) {
+                Log.e(DevOptionsConfig.TAG,e.getMessage());
             }
         }
 
@@ -353,7 +352,7 @@ public class LogcatDumper implements Handler.Callback {
                     logProcess.destroy();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(DevOptionsConfig.TAG, e.getMessage());
             }
         }
 

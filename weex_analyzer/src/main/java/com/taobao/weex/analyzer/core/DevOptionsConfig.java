@@ -35,6 +35,8 @@ public class DevOptionsConfig {
     private static final String CONFIG_LOG_FILTER = "config_log_filter";
     private static final String CONFIG_LOG_VIEW_SIZE = "config_log_view_size";
 
+    public static final String TAG = "weex-analyzer";
+
 
     public DevOptionsConfig(@NonNull Context context) {
         mSharedPreferences = context.getSharedPreferences(DEV_CONFIG_NAME, Context.MODE_PRIVATE);
