@@ -11,20 +11,12 @@ import com.taobao.weex.WXSDKInstance;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-/**
- * Description:
- * <p>
- * Created by rowandjj(chuyi)<br/>
- * Date: 2016/10/27<br/>
- * Time: 下午7:01<br/>
- */
-
 public final class WXAnalyzerDelegate {
     private Object mWXAnalyzer;
 
     @SuppressWarnings("unchecked")
     public WXAnalyzerDelegate(@Nullable Context context) {
-        if(context == null){
+        if (context == null) {
             return;
         }
         try {
@@ -32,9 +24,23 @@ public final class WXAnalyzerDelegate {
             Constructor constructor = clazz.getDeclaredConstructor(Context.class);
             mWXAnalyzer = constructor.newInstance(context);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
+
+    public void registerExtraOption(String optionName, int iconRes, Runnable runnable) {
+        if (mWXAnalyzer == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(optionName) || runnable == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("registerExtraOption", String.class, int.class, Runnable.class);
+            method.invoke(mWXAnalyzer, optionName, iconRes, runnable);
+        } catch (Exception e) {
+        }
+    }
+
 
     public void onCreate() {
         if (mWXAnalyzer == null) {
@@ -44,7 +50,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onCreate");
             method.invoke(mWXAnalyzer);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -57,7 +62,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onStart");
             method.invoke(mWXAnalyzer);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -69,7 +73,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onResume");
             method.invoke(mWXAnalyzer);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -82,7 +85,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onPause");
             method.invoke(mWXAnalyzer);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -94,7 +96,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onStop");
             method.invoke(mWXAnalyzer);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -106,7 +107,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onDestroy");
             method.invoke(mWXAnalyzer);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -119,7 +119,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onWeexRenderSuccess", WXSDKInstance.class);
             method.invoke(mWXAnalyzer, instance);
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }
@@ -133,7 +132,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onKeyUp", int.class, KeyEvent.class);
             return (boolean) method.invoke(mWXAnalyzer, keyCode, event);
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -149,7 +147,6 @@ public final class WXAnalyzerDelegate {
             Method method = mWXAnalyzer.getClass().getDeclaredMethod("onException", WXSDKInstance.class, String.class, String.class);
             method.invoke(mWXAnalyzer, instance, errCode, msg);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -162,7 +159,6 @@ public final class WXAnalyzerDelegate {
             View retView = (View) method.invoke(mWXAnalyzer, instance, view);
             return retView;
         } catch (Exception e) {
-            e.printStackTrace();
             return view;
         }
     }

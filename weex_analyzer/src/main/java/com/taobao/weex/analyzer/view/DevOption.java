@@ -1,7 +1,6 @@
 package com.taobao.weex.analyzer.view;
 
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 
 /**
  * Description:
@@ -31,6 +30,6 @@ public class DevOption {
 
 
     public interface OnOptionClickListener {
-        void onOptionClick(@NonNull String optionName);
+        void onOptionClick();
     }
 }

@@ -177,7 +177,7 @@ public class EntranceView extends AbstractAlertView {
                 public void onClick(View v) {
                     if (curOption != null && curOption.listener != null) {
                         try {
-                            curOption.listener.onOptionClick(curOption.optionName);
+                            curOption.listener.onOptionClick();
                         }catch (Exception e) {
                             e.printStackTrace();
                         }
