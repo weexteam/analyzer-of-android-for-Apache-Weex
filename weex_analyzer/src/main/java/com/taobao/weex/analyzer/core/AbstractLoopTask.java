@@ -38,6 +38,16 @@ public abstract class AbstractLoopTask implements IOverlayView.ITask, Runnable {
         this.mDelayMillis = delayMillis;
     }
 
+    @SuppressWarnings("unused")
+    public void setDelayInMillis(int millis) {
+        this.mDelayMillis = millis;
+    }
+
+    @SuppressWarnings("unused")
+    public int getDelayInMillis() {
+        return this.mDelayMillis;
+    }
+
     @Override
     public void run() {
         if (isStop) {

@@ -1,10 +1,23 @@
-<manifest package="com.taobao.weex.analyzer"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.taobao.weex.analyzer">
+
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.READ_LOGS"/>
 
     <application>
-        <activity android:name=".view.SettingsActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+                android:name=".view.SettingsActivity"
+                android:screenOrientation="portrait"/>
+        <receiver
+                android:name=".core.LaunchAnalyzerReceiver"
+                android:enabled="true">
+            <intent-filter>
+                <action android:name="com.taobao.weex.analyzer.LaunchService"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".core.AnalyzerService"
+                android:exported="false">
+        </service>
     </application>
 </manifest>

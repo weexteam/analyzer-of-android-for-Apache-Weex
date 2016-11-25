@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
-import com.taobao.weex.analyzer.core.CpuSampler;
+import com.taobao.weex.analyzer.core.CpuTaskEntity;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -112,78 +111,35 @@ public class CpuSampleView extends DragSupportOverlayView {
     }
 
     private static class SampleCpuTask extends AbstractLoopTask {
-
-        private long mTotalCpuTimeLast = 0;
-        private long mPidTotalCpuTimeLast = 0;
-        private long mPidUserCpuTimeLast = 0;
-        private long mPidKernelCpuTimeLast = 0;
-
         private int mAxisXValue = -1;
         private DynamicChartViewController mController;
         private boolean isDebug = false;
         private static final float LOAD_FACTOR = 0.75F;
 
+        private CpuTaskEntity mEntity;
+
         SampleCpuTask(DynamicChartViewController controller, boolean isDebug) {
             super(false,1000);
             this.mController = controller;
             this.isDebug = isDebug;
+
+            mEntity = new CpuTaskEntity();
         }
 
         @Override
         protected void onStart() {
-            mTotalCpuTimeLast = 0L;
-            mPidTotalCpuTimeLast = 0L;
-            mPidUserCpuTimeLast = 0L;
-            mPidKernelCpuTimeLast = 0L;
+            mEntity.onTaskInit();
         }
 
         @Override
         protected void onRun() {
-            String pidCpuRate = CpuSampler.samplePidCpuRate();
-            String totalCpuRate = CpuSampler.sampleCpuRate();
+            CpuTaskEntity.CpuInfo cpuInfo = mEntity.onTaskRun();
+            final double pidCpuUsage = cpuInfo.pidCpuUsage;
+            final double pidUserCpuUsage = cpuInfo.pidUserCpuUsage;
+            final double pidKernelCpuUsage = cpuInfo.pidKernelCpuUsage;
 
-            if (TextUtils.isEmpty(pidCpuRate) || TextUtils.isEmpty(totalCpuRate)) {
-                return;
-            }
-
-            String[] cpuInfoArray = totalCpuRate.split(" ");
-            if (cpuInfoArray.length < 9) {
-                return;
-            }
-
-            String[] pidCpuInfoList = pidCpuRate.split(" ");
-            if (pidCpuInfoList.length < 17) {
-                return;
-            }
-
-            long user = Long.parseLong(cpuInfoArray[2]);
-            long nice = Long.parseLong(cpuInfoArray[3]);
-            long system = Long.parseLong(cpuInfoArray[4]);
-            long idle = Long.parseLong(cpuInfoArray[5]);
-            long ioWait = Long.parseLong(cpuInfoArray[6]);
-            long hardIrq = Long.parseLong(cpuInfoArray[7]);
-            long softIrq = Long.parseLong(cpuInfoArray[8]);
-            long stealTime = Long.parseLong(cpuInfoArray[9]);
-
-            long pidUTime = Long.parseLong(pidCpuInfoList[13]);
-            long pidSTime = Long.parseLong(pidCpuInfoList[14]);
-            long pidCUTime = Long.parseLong(pidCpuInfoList[15]);
-            long pidCSTime = Long.parseLong(pidCpuInfoList[16]);
-
-            long cpuTime = user + nice + system + idle + ioWait + hardIrq + softIrq + stealTime;
-            long pidCpuTime = pidUTime + pidSTime + pidCUTime + pidCSTime;
-
-            final long pidCpuUsage;
-            if (mTotalCpuTimeLast != 0) {
-                pidCpuUsage = (pidCpuTime - mPidTotalCpuTimeLast) * 100L / (cpuTime - mTotalCpuTimeLast);
-
-                long pidUserCpuUsage = (pidUTime - mPidUserCpuTimeLast) * 100L / (cpuTime - mTotalCpuTimeLast);
-                long pidKernelCpuUsage = (pidSTime - mPidKernelCpuTimeLast) * 100L / (cpuTime - mTotalCpuTimeLast);
-                if (isDebug) {
-                    Log.d("weex-analyzer", "cpu usage:" + pidCpuUsage + "% [user " + pidUserCpuUsage + ",kernel " + pidKernelCpuUsage + "]");
-                }
-            }else{
-                pidCpuUsage = 0L;
+            if (isDebug) {
+                Log.d("weex-analyzer", "cpu usage:" + pidCpuUsage + "% [user " + pidUserCpuUsage + ",kernel " + pidKernelCpuUsage + "]");
             }
 
             mAxisXValue++;
@@ -196,11 +152,6 @@ public class CpuSampleView extends DragSupportOverlayView {
                     mController.appendPointAndInvalidate(mAxisXValue, pidCpuUsage);
                 }
             });
-
-            mTotalCpuTimeLast = cpuTime;
-            mPidTotalCpuTimeLast = pidCpuTime;
-            mPidUserCpuTimeLast = pidUTime;
-            mPidKernelCpuTimeLast = pidSTime;
         }
 
         private boolean checkIfNeedUpdateYAxis(double cpuUsage) {
@@ -210,10 +161,7 @@ public class CpuSampleView extends DragSupportOverlayView {
 
         @Override
         protected void onStop() {
-            mTotalCpuTimeLast = 0L;
-            mPidTotalCpuTimeLast = 0L;
-            mPidUserCpuTimeLast = 0L;
-            mPidKernelCpuTimeLast = 0L;
+            mEntity.onTaskStop();
         }
     }
 }
