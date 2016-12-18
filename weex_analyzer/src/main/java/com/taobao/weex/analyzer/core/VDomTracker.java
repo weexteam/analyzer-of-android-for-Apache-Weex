@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.dom.WXDomObject;
+import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -26,6 +28,8 @@ import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +42,10 @@ import java.util.Map;
 
 public class VDomTracker {
     private WXSDKInstance mWxInstance;
-    private Deque<VDomNode> mLayeredQueue;
-    private ObjectPool<VDomNode> mObjectPool;
+    private Deque<LayeredVDomNode> mLayeredQueue;
+    private ObjectPool<LayeredVDomNode> mObjectPool;
+
+    private Map<WXComponent,NodeInfo> mCachedMap;
 
     private static final String TAG = "VDomTracker";
 
@@ -69,35 +75,46 @@ public class VDomTracker {
     public VDomTracker(@NonNull WXSDKInstance instance) {
         this.mWxInstance = instance;
         mLayeredQueue = new ArrayDeque<>();
-        mObjectPool = new ObjectPool<VDomNode>(10) {
+        mObjectPool = new ObjectPool<LayeredVDomNode>(10) {
             @Override
-            VDomNode newObject() {
-                return new VDomNode();
+            LayeredVDomNode newObject() {
+                return new LayeredVDomNode();
             }
         };
     }
 
-    public void traverse() {
+    /**
+     *
+     * */
+    public NodeInfo traverse() {
         WXComponent godComponent = mWxInstance.getGodCom();
         if(godComponent == null) {
-            return;
+            WXLogUtils.e(TAG,"god component not found");
+            return new NodeInfo();
         }
 
-        VDomNode layeredNode = mObjectPool.obtain();
+        LayeredVDomNode layeredNode = mObjectPool.obtain();
         layeredNode.set(godComponent,getComponentName(godComponent),1);
 
         mLayeredQueue.add(layeredNode);
 
+        if(mCachedMap == null) {
+            mCachedMap = new HashMap<>();
+        }
+        Map<WXComponent,NodeInfo> map = mCachedMap;
+
         while (!mLayeredQueue.isEmpty()) {
-            VDomNode domNode = mLayeredQueue.removeFirst();
+            LayeredVDomNode domNode = mLayeredQueue.removeFirst();
             WXComponent component = domNode.component;
             int layer = domNode.layer;
-            String name = domNode.simpleName;
 
-            //todo
-            WXLogUtils.e(TAG,"component: "+ name + ",layer: "+ layer);
+            NodeInfo nodeInfo = map.get(component);
+            if(nodeInfo == null) {
+                nodeInfo = createNode(domNode);
+                map.put(component,nodeInfo);
+            }
 
-            //restore to pool
+            //restore to pool for later use
             domNode.clear();
             mObjectPool.recycle(domNode);
 
@@ -105,13 +122,29 @@ public class VDomTracker {
                 WXVContainer container = (WXVContainer) component;
                 for (int i = 0,count = container.childCount(); i < count; i++) {
                     WXComponent child = container.getChild(i);
-                    VDomNode childNode = mObjectPool.obtain();
+                    LayeredVDomNode childNode = mObjectPool.obtain();
                     childNode.set(child,getComponentName(child),layer+1);
 
                     mLayeredQueue.add(childNode);
+
+                    NodeInfo childNodeInfo = createNode(childNode);
+
+                    if(nodeInfo.children == null) {
+                        nodeInfo.children = new ArrayList<>();
+                    }
+                    nodeInfo.children.add(childNodeInfo);
+                    map.put(child,childNodeInfo);
                 }
             }
         }
+
+        NodeInfo tree = map.get(godComponent);
+        map.clear();
+
+//        String json = JSON.toJSONString(tree);
+//        Log.e(TAG,json);
+        return tree;
+
     }
 
     @NonNull
@@ -120,7 +153,24 @@ public class VDomTracker {
         return TextUtils.isEmpty(name) ? "component" : name;
     }
 
-    private static class VDomNode {
+    private NodeInfo createNode(@NonNull LayeredVDomNode layeredNode){
+        NodeInfo nodeInfo = new NodeInfo();
+        nodeInfo.layer = layeredNode.layer;
+        nodeInfo.simpleName = layeredNode.simpleName;
+        nodeInfo.realName = layeredNode.component.getClass().getName();
+
+        WXDomObject domObject = layeredNode.component.getDomObject();
+        WXStyle styles = null;
+        if(domObject != null) {
+            styles = domObject.getStyles();
+        }
+        if(styles != null && !styles.isEmpty()) {
+            nodeInfo.styles = Collections.unmodifiableMap(styles);
+        }
+        return nodeInfo;
+    }
+
+    private static class LayeredVDomNode {
         WXComponent component;
         String simpleName;
         int layer;

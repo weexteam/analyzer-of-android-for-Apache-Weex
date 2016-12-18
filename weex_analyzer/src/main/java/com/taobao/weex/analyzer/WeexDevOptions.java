@@ -18,6 +18,7 @@ import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
+import com.taobao.weex.analyzer.core.VDomTracker;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
@@ -453,6 +454,12 @@ public class WeexDevOptions implements IWXDevOptions {
             return;
         }
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
+
+        try {
+            new VDomTracker(instance).traverse();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
