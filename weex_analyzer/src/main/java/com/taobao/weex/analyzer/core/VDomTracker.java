@@ -179,8 +179,8 @@ public class VDomTracker {
             WXLogUtils.e(e.getMessage());
         }
 
+        boolean isBigCell = false;
         for (WXComponent com : cellList) {
-            boolean isBigCell = false;
             if(com.getHostView() != null) {
                 isBigCell = isBigCell(com.getHostView().getMeasuredHeight());
             }
@@ -196,6 +196,7 @@ public class VDomTracker {
         cellList.clear();
         map.clear();
         report.vdom = tree;
+        report.hasBigCell = isBigCell;
         return report;
 
     }
