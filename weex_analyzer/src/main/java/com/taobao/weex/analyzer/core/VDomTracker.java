@@ -1,9 +1,15 @@
 package com.taobao.weex.analyzer.core;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.pojo.HealthReport;
+import com.taobao.weex.analyzer.pojo.NodeInfo;
+import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXA;
@@ -26,12 +32,14 @@ import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
 import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXLogUtils;
+import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,11 +53,13 @@ public class VDomTracker {
     private Deque<LayeredVDomNode> mLayeredQueue;
     private ObjectPool<LayeredVDomNode> mObjectPool;
 
-    private Map<WXComponent,NodeInfo> mCachedMap;
+    private Map<WXComponent, NodeInfo> mCachedMap;
+    private List<WXComponent> mCachedList;
 
     private static final String TAG = "VDomTracker";
 
-    private static final Map<Class,String> sVDomMap;
+    private static final Map<Class, String> sVDomMap;
+
     static {
         sVDomMap = new HashMap<>();
         sVDomMap.put(WXComponent.class, "component");
@@ -84,76 +94,142 @@ public class VDomTracker {
     }
 
     /**
-     *
-     * */
-    public NodeInfo traverse() {
+     * todo : need async
+     */
+    @Nullable
+    public HealthReport traverse() {
+        if(SDKUtils.isInUiThread()) {
+            WXLogUtils.e(TAG,"illegal thread...");
+            return null;
+        }
+
         WXComponent godComponent = mWxInstance.getGodCom();
-        if(godComponent == null) {
-            WXLogUtils.e(TAG,"god component not found");
-            return new NodeInfo();
+        if (godComponent == null) {
+            WXLogUtils.e(TAG, "god component not found");
+            return null;
         }
 
         LayeredVDomNode layeredNode = mObjectPool.obtain();
-        layeredNode.set(godComponent,getComponentName(godComponent),1);
+        layeredNode.set(godComponent, getComponentName(godComponent), 1);
 
         mLayeredQueue.add(layeredNode);
 
-        if(mCachedMap == null) {
+        if (mCachedMap == null) {
             mCachedMap = new HashMap<>();
         }
-        Map<WXComponent,NodeInfo> map = mCachedMap;
+        Map<WXComponent, NodeInfo> map = mCachedMap;
+
+        HealthReport report = new HealthReport(mWxInstance.getBundleUrl());
+
+        if (mCachedList == null) {
+            mCachedList = new ArrayList<>();
+        }
+        List<WXComponent> cellList = mCachedList;
 
         while (!mLayeredQueue.isEmpty()) {
             LayeredVDomNode domNode = mLayeredQueue.removeFirst();
             WXComponent component = domNode.component;
             int layer = domNode.layer;
 
+            if ("WXListComponent".equals(component.getClass().getSimpleName())) {
+                report.hasList = true;
+            }
+            if ("WXScroller".equals(component.getClass().getSimpleName())) {
+                report.hasScroller = true;
+            }
+            if ("WXCell".equals(component.getClass().getSimpleName())) {
+                cellList.add(component);
+            }
+
             NodeInfo nodeInfo = map.get(component);
-            if(nodeInfo == null) {
+            if (nodeInfo == null) {
                 nodeInfo = createNode(domNode);
-                map.put(component,nodeInfo);
+                map.put(component, nodeInfo);
             }
 
             //restore to pool for later use
             domNode.clear();
             mObjectPool.recycle(domNode);
 
-            if(component instanceof WXVContainer) {
+            if (component instanceof WXVContainer) {
                 WXVContainer container = (WXVContainer) component;
-                for (int i = 0,count = container.childCount(); i < count; i++) {
+                for (int i = 0, count = container.childCount(); i < count; i++) {
                     WXComponent child = container.getChild(i);
                     LayeredVDomNode childNode = mObjectPool.obtain();
-                    childNode.set(child,getComponentName(child),layer+1);
+                    childNode.set(child, getComponentName(child), layer + 1);
+                    report.maxLayer = layer + 1;
 
                     mLayeredQueue.add(childNode);
 
                     NodeInfo childNodeInfo = createNode(childNode);
 
-                    if(nodeInfo.children == null) {
+                    if (nodeInfo.children == null) {
                         nodeInfo.children = new ArrayList<>();
                     }
                     nodeInfo.children.add(childNodeInfo);
-                    map.put(child,childNodeInfo);
+                    map.put(child, childNodeInfo);
                 }
             }
         }
 
         NodeInfo tree = map.get(godComponent);
-        map.clear();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            WXLogUtils.e(e.getMessage());
+        }
 
-//        String json = JSON.toJSONString(tree);
-//        Log.e(TAG,json);
-        return tree;
+        for (WXComponent com : cellList) {
+            boolean isBigCell = false;
+            if(com.getHostView() != null) {
+                isBigCell = isBigCell(com.getHostView().getMeasuredHeight());
+            }
+            NodeInfo cellNode = map.get(com);
+            int viewNum = getCellViewNum(cellNode);
+            if(isBigCell) {
+                WXLogUtils.d(Constants.TAG,"[warning]please do not use big cell in list component or will cause terrible user experience");
+                WXLogUtils.d(Constants.TAG, JSON.toJSONString(cellNode, SerializerFeature.PrettyFormat));
+            }
+            report.maxCellViewNum = Math.max(report.maxCellViewNum, viewNum);
+        }
+
+        cellList.clear();
+        map.clear();
+        report.vdom = tree;
+        return report;
 
     }
 
+    private int getCellViewNum(NodeInfo cellNode) {
+        Deque<NodeInfo> deque = new ArrayDeque<>();
+        deque.add(cellNode);
+        int viewNum = 0;
+        while (!deque.isEmpty()) {
+            NodeInfo node = deque.removeFirst();
+            viewNum++;
+            if(node.children != null && !node.children.isEmpty()) {
+                for(NodeInfo n : node.children) {
+                    deque.add(n);
+                }
+            }
+        }
+        return viewNum;
+    }
+
+    private boolean isBigCell(float maxHeight) {
+        if(maxHeight <= 0) {
+            return false;
+        }
+        return maxHeight > WXViewUtils.getScreenHeight()*2/3.0;
+    }
+
     @NonNull
-    private String getComponentName(@NonNull WXComponent component){
+    private String getComponentName(@NonNull WXComponent component) {
         String name = sVDomMap.get(component.getClass());
         return TextUtils.isEmpty(name) ? "component" : name;
     }
 
-    private NodeInfo createNode(@NonNull LayeredVDomNode layeredNode){
+    private NodeInfo createNode(@NonNull LayeredVDomNode layeredNode) {
         NodeInfo nodeInfo = new NodeInfo();
         nodeInfo.layer = layeredNode.layer;
         nodeInfo.simpleName = layeredNode.simpleName;
@@ -161,10 +237,10 @@ public class VDomTracker {
 
         WXDomObject domObject = layeredNode.component.getDomObject();
         WXStyle styles = null;
-        if(domObject != null) {
+        if (domObject != null) {
             styles = domObject.getStyles();
         }
-        if(styles != null && !styles.isEmpty()) {
+        if (styles != null && !styles.isEmpty()) {
             nodeInfo.styles = Collections.unmodifiableMap(styles);
         }
         return nodeInfo;
@@ -175,7 +251,7 @@ public class VDomTracker {
         String simpleName;
         int layer;
 
-        void set(WXComponent component,String simpleName, int layer) {
+        void set(WXComponent component, String simpleName, int layer) {
             this.component = component;
             this.layer = layer;
             this.simpleName = simpleName;
@@ -188,11 +264,16 @@ public class VDomTracker {
         }
     }
 
+    private static class CellInfo {
+        int viewNum;
+        boolean isBigCell;
+    }
+
     private static abstract class ObjectPool<T> {
         private final Deque<T> mPool;
 
-        ObjectPool(int capacity){
-            capacity = Math.max(0,capacity);
+        ObjectPool(int capacity) {
+            capacity = Math.max(0, capacity);
             this.mPool = new ArrayDeque<>(capacity);
             for (int i = 0; i < capacity; i++) {
                 this.mPool.add(newObject());
@@ -201,7 +282,7 @@ public class VDomTracker {
 
         abstract T newObject();
 
-        T obtain(){
+        T obtain() {
             return mPool.isEmpty() ? newObject() : mPool.removeLast();
         }
 

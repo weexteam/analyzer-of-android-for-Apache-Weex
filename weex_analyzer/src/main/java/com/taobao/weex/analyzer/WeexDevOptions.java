@@ -18,7 +18,7 @@ import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
-import com.taobao.weex.analyzer.core.VDomTracker;
+import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
@@ -67,6 +67,8 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private boolean shown = false;
     private List<DevOption> mExtraOptions = null;
+
+    private VDomController mVdomController;
 
     public WeexDevOptions(@NonNull Context context){
 
@@ -150,6 +152,8 @@ public class WeexDevOptions implements IWXDevOptions {
                 showDevOptions();
             }
         });
+
+        mVdomController = new VDomController();
     }
 
 
@@ -444,7 +448,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onDestroy() {
-
+        if(mVdomController != null) {
+            mVdomController.destroy();
+            mVdomController = null;
+        }
     }
 
 
@@ -455,10 +462,8 @@ public class WeexDevOptions implements IWXDevOptions {
         }
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
 
-        try {
-            new VDomTracker(instance).traverse();
-        }catch (Exception e) {
-            e.printStackTrace();
+        if(mVdomController != null) {
+            mVdomController.trackVDom(instance);
         }
     }
 

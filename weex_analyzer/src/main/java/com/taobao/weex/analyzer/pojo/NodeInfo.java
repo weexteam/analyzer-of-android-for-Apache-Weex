@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.pojo;
 
 import java.util.List;
 import java.util.Map;

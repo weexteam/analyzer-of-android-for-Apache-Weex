@@ -38,7 +38,7 @@ public class AnalyzerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LaunchAnalyzerReceiver.TAG, "service start success");
+        Log.d(Constants.TAG, "service start success");
         if (mTask == null) {
             createTask();
         }
@@ -52,7 +52,7 @@ public class AnalyzerService extends Service {
         if (mTask != null) {
             mTask.stop();
         }
-        Log.d(LaunchAnalyzerReceiver.TAG, "service is destroyed");
+        Log.d(Constants.TAG, "service is destroyed");
     }
 
     private void createTask() {
@@ -89,7 +89,7 @@ public class AnalyzerService extends Service {
         protected void onRun() {
             if (((mHostRef.get() != null) && !SDKUtils.isHostRunning(mHostRef.get())) ||
                     ((mHostRef.get() != null) && !SDKUtils.isInteractive(mHostRef.get()))) {
-                Log.d(LaunchAnalyzerReceiver.TAG, "service is stopped because we are in background or killed");
+                Log.d(Constants.TAG, "service is stopped because we are in background or killed");
                 ((Service) mHostRef.get()).stopSelf();
                 return;
             }
@@ -114,14 +114,14 @@ public class AnalyzerService extends Service {
             }
 
             if (cpuInfo != null) {
-                Log.d(LaunchAnalyzerReceiver.TAG, "cpu usage(total :" + String.format("%.2f", cpuInfo.pidCpuUsage) +
+                Log.d(Constants.TAG, "cpu usage(total :" + String.format("%.2f", cpuInfo.pidCpuUsage) +
                         "% user : " + String.format("%.2f", cpuInfo.pidUserCpuUsage) + "% kernel : " + String.format("%.2f", cpuInfo.pidKernelCpuUsage) + "%)\r\n");
             }
-            Log.d(LaunchAnalyzerReceiver.TAG, "memory usage : " + String.format("%.2f", memoryUsage) + "MB\r\n");
-            Log.d(LaunchAnalyzerReceiver.TAG, "fps : " + String.format("%.2f", fps) + "\r\n");
+            Log.d(Constants.TAG, "memory usage : " + String.format("%.2f", memoryUsage) + "MB\r\n");
+            Log.d(Constants.TAG, "fps : " + String.format("%.2f", fps) + "\r\n");
 
             if (trafficInfo != null) {
-                Log.d(LaunchAnalyzerReceiver.TAG, "traffic speed(rx :" +
+                Log.d(Constants.TAG, "traffic speed(rx :" +
                         String.format("%.2f", trafficInfo.rxSpeed) + "kb/s tx : " + String.format("%.2f", trafficInfo.txSpeed) + "kb/s)\r\n\r\n");
             }
         }

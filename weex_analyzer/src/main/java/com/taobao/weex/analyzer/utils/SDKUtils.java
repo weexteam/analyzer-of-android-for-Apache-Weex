@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -89,6 +90,10 @@ public class SDKUtils {
         PowerManager manager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         return manager.isScreenOn();
 
+    }
+
+    public static boolean isInUiThread() {
+        return Looper.getMainLooper() == Looper.myLooper();
     }
 
 }

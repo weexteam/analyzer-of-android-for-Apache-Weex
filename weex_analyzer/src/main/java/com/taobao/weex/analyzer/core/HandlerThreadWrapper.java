@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.core;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Description:
@@ -18,9 +19,13 @@ public class HandlerThreadWrapper {
     private HandlerThread mHandlerThread;
 
     public HandlerThreadWrapper(@NonNull String threadName) {
+        this(threadName,null);
+    }
+
+    public HandlerThreadWrapper(@NonNull String threadName, @Nullable Handler.Callback callback) {
         mHandlerThread = new HandlerThread(threadName);
         mHandlerThread.start();
-        mHandler = new Handler(mHandlerThread.getLooper());
+        mHandler = new Handler(mHandlerThread.getLooper(),callback);
     }
 
     public @NonNull Handler getHandler() {

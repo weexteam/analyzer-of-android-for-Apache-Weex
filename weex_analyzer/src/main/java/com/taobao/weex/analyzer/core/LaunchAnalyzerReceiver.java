@@ -30,7 +30,6 @@ import com.taobao.weex.analyzer.utils.SDKUtils;
 
 public class LaunchAnalyzerReceiver extends BroadcastReceiver {
     private static final String ACTION = "com.taobao.weex.analyzer.LaunchService";
-    static final String TAG = "weex-analyzer";
     private static final String CMD = "c";
     private static final String CMD_ON = "on";
     private static final String CMD_OFF = "off";
@@ -46,13 +45,13 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         } else if(CMD_OFF.equals(cmd)) {
             performStop(context);
         } else {
-            Log.d(TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on] to start");
+            Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on] to start");
         }
     }
 
     private void performStart(@NonNull Context context) {
         if(!SDKUtils.isHostRunning(context) || !SDKUtils.isInteractive(context)) {
-            Log.d(TAG,"service start failed(host app is not in foreground,is your app running?)");
+            Log.d(Constants.TAG,"service start failed(host app is not in foreground,is your app running?)");
             return;
         }
 
