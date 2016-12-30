@@ -1,10 +1,14 @@
 package com.taobao.weex.analyzer.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,25 +21,24 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.utils.ViewUtils;
+import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description:
- * <p>
- * Created by rowandjj(chuyi)<br/>
- * Date: 2016/11/4<br/>
- * Time: 下午1:58<br/>
+ * Description: <p> Created by rowandjj(chuyi)<br/> Date: 2016/11/4<br/> Time: 下午1:58<br/>
  */
 
 public class EntranceView extends AbstractAlertView {
 
     private RecyclerView mList;
     private List<DevOption> mDevOptions;
+    private static final String TAG = "EntranceView";
 
     public EntranceView(Context context) {
         super(context);
@@ -91,35 +94,36 @@ public class EntranceView extends AbstractAlertView {
         mDevOptions.add(option);
     }
 
-    public void registerDevOptions(List<DevOption> options){
-        if(options == null || options.isEmpty()){
+    public void registerDevOptions(List<DevOption> options) {
+        if (options == null || options.isEmpty()) {
             return;
         }
-        if(mDevOptions == null){
+        if (mDevOptions == null) {
             mDevOptions = new ArrayList<>();
         }
         mDevOptions.addAll(options);
     }
 
-    public static class Creator{
+    public static class Creator {
         private List<DevOption> options;
         private Context context;
-        public Creator(@NonNull Context context){
+
+        public Creator(@NonNull Context context) {
             this.context = context;
             this.options = new ArrayList<>();
         }
 
-        public Creator injectOptions(List<DevOption> options){
+        public Creator injectOptions(List<DevOption> options) {
             this.options.addAll(options);
             return this;
         }
 
-        public Creator injectOption(DevOption option){
+        public Creator injectOption(DevOption option) {
             this.options.add(option);
             return this;
         }
 
-        public EntranceView create(){
+        public EntranceView create() {
             EntranceView entranceView = new EntranceView(context);
             entranceView.registerDevOptions(options);
             return entranceView;
@@ -177,8 +181,19 @@ public class EntranceView extends AbstractAlertView {
                 public void onClick(View v) {
                     if (curOption != null && curOption.listener != null) {
                         try {
+                            if (curOption.isOverlayView
+                                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1
+                                    && !Settings.canDrawOverlays(getContext())
+                                    ) {
+                                WXLogUtils.d(TAG, "we have no permission to draw overlay views.");
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                        Uri.parse("package:" + getContext().getPackageName()));
+                                getContext().startActivity(intent);
+                                Toast.makeText(getContext(),"please granted overlay permission before use this option",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             curOption.listener.onOptionClick();
-                        }catch (Exception e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 

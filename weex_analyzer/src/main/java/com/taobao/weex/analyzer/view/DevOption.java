@@ -14,6 +14,7 @@ public class DevOption {
     public String optionName;
     @DrawableRes public int iconRes;
     public OnOptionClickListener listener;
+    public boolean isOverlayView;
 
     public DevOption(){
     }
@@ -28,6 +29,12 @@ public class DevOption {
         this.listener = listener;
     }
 
+    public DevOption(String optionName, int iconRes, OnOptionClickListener listener, boolean isOverlayView) {
+        this.optionName = optionName;
+        this.iconRes = iconRes;
+        this.listener = listener;
+        this.isOverlayView = isOverlayView;
+    }
 
     public interface OnOptionClickListener {
         void onOptionClick();

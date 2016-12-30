@@ -193,7 +193,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mScalpelViewController.toggleScalpelEnabled();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -208,7 +208,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mLogView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -220,7 +220,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mMemorySampleView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -232,7 +232,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mCpuSampleView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -249,7 +249,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mFpsSampleView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -261,7 +261,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mTrafficSampleView.show();
                 }
             }
-        }));
+        },true));
 
         options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
             @Override
@@ -274,7 +274,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mPerfMonitorOverlayView.show();
                 }
             }
-        }));
+        },true));
 
         options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
             @Override
