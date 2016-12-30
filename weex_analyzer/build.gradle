@@ -22,7 +22,7 @@ apply from: 'binary.gradle'
 apply from: 'maven.gradle'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion "23.0.2"
 
     defaultConfig {
@@ -44,6 +44,6 @@ android {
 
 dependencies {
     provided 'com.taobao.android:weex_sdk:0.8.0'
-    provided 'com.android.support:recyclerview-v7:23.1.1'
+    provided 'com.android.support:recyclerview-v7:25.0.1'
     provided 'com.alibaba:fastjson:1.1.46.android'
 }
