@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -183,7 +184,7 @@ public class EntranceView extends AbstractAlertView {
                         try {
                             if (curOption.isOverlayView
                                     && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1
-                                    && !Settings.canDrawOverlays(getContext())
+                                    && !SDKUtils.canDrawOverlays(getContext())
                                     ) {
                                 WXLogUtils.d(TAG, "we have no permission to draw overlay views.");
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,

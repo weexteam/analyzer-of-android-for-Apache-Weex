@@ -1,5 +1,6 @@
 package com.taobao.weex.analyzer.utils;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -9,6 +10,7 @@ import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -96,4 +98,8 @@ public class SDKUtils {
         return Looper.getMainLooper() == Looper.myLooper();
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    public static boolean canDrawOverlays(@NonNull Context context){
+        return Settings.canDrawOverlays(context);
+    }
 }
