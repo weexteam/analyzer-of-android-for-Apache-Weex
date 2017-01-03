@@ -10,6 +10,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.pojo.NodeInfo;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.dom.WXAttr;
 import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXA;
@@ -48,13 +49,13 @@ import java.util.Map;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class VDomTracker {
+class VDomTracker {
     private WXSDKInstance mWxInstance;
     private Deque<LayeredVDomNode> mLayeredQueue;
     private ObjectPool<LayeredVDomNode> mObjectPool;
 
-    private Map<WXComponent, NodeInfo> mCachedMap;
-    private List<WXComponent> mCachedList;
+    private static Map<WXComponent, NodeInfo> mCachedMap;//todo 此处需优化
+    private static List<WXComponent> mCachedList;
 
     private static final String TAG = "VDomTracker";
 
@@ -82,7 +83,7 @@ public class VDomTracker {
         sVDomMap.put(WXCell.class, WXBasicComponentType.CELL);
     }
 
-    public VDomTracker(@NonNull WXSDKInstance instance) {
+    VDomTracker(@NonNull WXSDKInstance instance) {
         this.mWxInstance = instance;
         mLayeredQueue = new ArrayDeque<>();
         mObjectPool = new ObjectPool<LayeredVDomNode>(10) {
@@ -97,7 +98,7 @@ public class VDomTracker {
      * todo : need async
      */
     @Nullable
-    public HealthReport traverse() {
+    HealthReport traverse() {
         if(SDKUtils.isInUiThread()) {
             WXLogUtils.e(TAG,"illegal thread...");
             return null;
@@ -118,6 +119,7 @@ public class VDomTracker {
             mCachedMap = new HashMap<>();
         }
         Map<WXComponent, NodeInfo> map = mCachedMap;
+        map.clear();
 
         HealthReport report = new HealthReport(mWxInstance.getBundleUrl());
 
@@ -125,19 +127,20 @@ public class VDomTracker {
             mCachedList = new ArrayList<>();
         }
         List<WXComponent> cellList = mCachedList;
+        cellList.clear();
 
         while (!mLayeredQueue.isEmpty()) {
             LayeredVDomNode domNode = mLayeredQueue.removeFirst();
             WXComponent component = domNode.component;
             int layer = domNode.layer;
 
-            if ("WXListComponent".equals(component.getClass().getSimpleName())) {
+            if (component instanceof WXListComponent) {
                 report.hasList = true;
             }
-            if ("WXScroller".equals(component.getClass().getSimpleName())) {
+            if (component instanceof WXScroller) {
                 report.hasScroller = true;
             }
-            if ("WXCell".equals(component.getClass().getSimpleName())) {
+            if(component instanceof WXCell) {
                 cellList.add(component);
             }
 
@@ -173,30 +176,25 @@ public class VDomTracker {
         }
 
         NodeInfo tree = map.get(godComponent);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            WXLogUtils.e(e.getMessage());
-        }
-
-        boolean isBigCell = false;
         for (WXComponent com : cellList) {
+            boolean isBigCell = false;
             if(com.getHostView() != null) {
                 isBigCell = isBigCell(com.getHostView().getMeasuredHeight());
             }
             NodeInfo cellNode = map.get(com);
             int viewNum = getCellViewNum(cellNode);
             if(isBigCell) {
-                WXLogUtils.d(Constants.TAG,"[warning]please do not use big cell in list component or will cause terrible user experience");
-                WXLogUtils.d(Constants.TAG, JSON.toJSONString(cellNode, SerializerFeature.PrettyFormat));
+                WXLogUtils.d(TAG,"[warning]please do not use big cell in list component or will cause terrible user experience,"+com.getHostView()+","+cellList.size());
+                WXLogUtils.d(TAG, JSON.toJSONString(cellNode, SerializerFeature.PrettyFormat));
             }
             report.maxCellViewNum = Math.max(report.maxCellViewNum, viewNum);
+            report.hasBigCell |= isBigCell;
         }
+        report.cellNum = cellList.size();
 
         cellList.clear();
         map.clear();
         report.vdom = tree;
-        report.hasBigCell = isBigCell;
         return report;
 
     }
@@ -237,6 +235,7 @@ public class VDomTracker {
         nodeInfo.realName = layeredNode.component.getClass().getName();
 
         WXDomObject domObject = layeredNode.component.getDomObject();
+        //styles
         WXStyle styles = null;
         if (domObject != null) {
             styles = domObject.getStyles();
@@ -244,6 +243,16 @@ public class VDomTracker {
         if (styles != null && !styles.isEmpty()) {
             nodeInfo.styles = Collections.unmodifiableMap(styles);
         }
+
+        //attrs
+        WXAttr attr = null;
+        if(domObject != null) {
+            attr = domObject.getAttrs();
+        }
+        if(attr != null && !attr.isEmpty()) {
+            nodeInfo.attrs = Collections.unmodifiableMap(attr);
+        }
+
         return nodeInfo;
     }
 
@@ -263,11 +272,6 @@ public class VDomTracker {
             layer = -1;
             simpleName = null;
         }
-    }
-
-    private static class CellInfo {
-        int viewNum;
-        boolean isBigCell;
     }
 
     private static abstract class ObjectPool<T> {

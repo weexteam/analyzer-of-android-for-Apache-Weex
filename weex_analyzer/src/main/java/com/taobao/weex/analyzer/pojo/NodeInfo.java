@@ -8,6 +8,7 @@ public class NodeInfo {
     public String realName;
     public int layer;
     public Map<String,Object> styles;
+    public Map<String,Object> attrs;
     public List<NodeInfo> children;
 
     @Override
@@ -17,6 +18,7 @@ public class NodeInfo {
                 ", realName='" + realName + '\'' +
                 ", layer=" + layer +
                 ", styles=" + styles +
+                ", attrs=" + attrs +
                 ", children=" + children +
                 '}';
     }

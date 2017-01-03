@@ -26,6 +26,8 @@ public class HealthReport {
     public int maxLayer;
     /**cell下view个数*/
     public int maxCellViewNum;
+    /**当前cell个数*/
+    public int cellNum;
     /**扩展字段*/
     public Map<String,String> extendProps;
 
@@ -42,6 +44,7 @@ public class HealthReport {
         Log.d(Constants.TAG,"[health report] hasScroller:" + hasScroller);
         Log.d(Constants.TAG,"[health report] hasBigCell:" + hasBigCell);
         Log.d(Constants.TAG,"[health report] maxCellViewNum:" + maxCellViewNum);
+        Log.d(Constants.TAG,"[health report] cellNum:" + cellNum);
 
         if(extendProps != null) {
             for(Map.Entry<String,String> me : extendProps.entrySet()) {

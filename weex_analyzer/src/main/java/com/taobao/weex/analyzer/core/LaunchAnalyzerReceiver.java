@@ -30,7 +30,8 @@ import com.taobao.weex.analyzer.utils.SDKUtils;
 
 public class LaunchAnalyzerReceiver extends BroadcastReceiver {
     private static final String ACTION = "com.taobao.weex.analyzer.LaunchService";
-    private static final String CMD = "c";
+    private static final String CMD_PERFORMANCE = "c";
+    private static final String CMD_VDOM_TRACKER = "d";
     private static final String CMD_ON = "on";
     private static final String CMD_OFF = "off";
 
@@ -39,13 +40,29 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         if (!ACTION.equals(intent.getAction())) {
             return;
         }
-        String cmd = intent.getStringExtra(CMD);
-        if(TextUtils.isEmpty(cmd) || CMD_ON.equals(cmd)) {
-            performStart(context);
-        } else if(CMD_OFF.equals(cmd)) {
-            performStop(context);
-        } else {
-            Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on] to start");
+        //性能数据
+        String cmd_performance = intent.getStringExtra(CMD_PERFORMANCE);
+        if(!TextUtils.isEmpty(cmd_performance)) {
+            if(CMD_ON.equals(cmd_performance)) {
+                performStart(context);
+            } else if(CMD_OFF.equals(cmd_performance)) {
+                performStop(context);
+            } else{
+                Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on] to fetch performance data");
+            }
+        }
+
+
+        //vdom调优
+        String cmd_vdom_tracker = intent.getStringExtra(CMD_VDOM_TRACKER);
+        if(!TextUtils.isEmpty(cmd_vdom_tracker)) {
+            if(CMD_ON.equals(cmd_vdom_tracker)) {
+                VDomController.isOpen = true;
+            } else if(CMD_OFF.equals(cmd_vdom_tracker)) {
+                VDomController.isOpen = false;
+            } else {
+                Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e d on] to start vdom tracker");
+            }
         }
     }
 
