@@ -463,7 +463,7 @@ public class WeexDevOptions implements IWXDevOptions {
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
 
         if(mVdomController != null) {
-            mVdomController.trackVDom(instance);
+            mVdomController.monitor(instance);
         }
     }
 

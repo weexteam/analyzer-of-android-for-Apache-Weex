@@ -45,6 +45,7 @@ public class HealthReport {
         Log.d(Constants.TAG,"[health report] hasBigCell:" + hasBigCell);
         Log.d(Constants.TAG,"[health report] maxCellViewNum:" + maxCellViewNum);
         Log.d(Constants.TAG,"[health report] cellNum:" + cellNum);
+        Log.d(Constants.TAG,"\n");
 
         if(extendProps != null) {
             for(Map.Entry<String,String> me : extendProps.entrySet()) {
