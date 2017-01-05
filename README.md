@@ -2,7 +2,7 @@
 
 ---
 
-[ ![Download](https://api.bintray.com/packages/chuyi/maven/weex_analyzer/images/download.svg) ](https://bintray.com/chuyi/maven/weex_analyzer/_latestVersion)[![GitHub release](https://img.shields.io/badge/release-v0.1.0.4-brightgreen.svg)](https://github.com/weexteam/weex-analyzer-android/releases/latest) [![GitHub release](https://img.shields.io/badge/license-%20Apache--2.0-yellowgreen.svg)](https://github.com/weexteam/weex-analyzer-android/blob/master/LICENSE)
+[ ![Download](https://api.bintray.com/packages/rowandjj/maven/weex_analyzer/images/download.svg) ](https://bintray.com/rowandjj/maven/weex_analyzer/_latestVersion)[![GitHub release](https://img.shields.io/badge/release-v0.1.0.4-brightgreen.svg)](https://github.com/weexteam/weex-analyzer-android/releases/latest) [![GitHub release](https://img.shields.io/badge/license-%20Apache--2.0-yellowgreen.svg)](https://github.com/weexteam/weex-analyzer-android/blob/master/LICENSE)
 
 `Weex Analyzer`是一款运行在手机客户端上辅助开发者进行[weex开发](https://github.com/alibaba/weex)的小工具。
 接入此工具后，开发者可以在debug包中通过摇一摇打开功能选项。目前实现的功能有:
