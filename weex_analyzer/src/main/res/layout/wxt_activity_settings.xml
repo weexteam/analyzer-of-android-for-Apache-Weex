@@ -46,46 +46,6 @@
         android:layout_height="1dp"
         android:background="#e0e0e0"/>
 
-    <!--<RelativeLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:padding="10dp">-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/switch_storage"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="是否存储用户记录"-->
-            <!--android:textColor="#000"-->
-            <!--android:textSize="16sp"/>-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/switch_storage_desc"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/switch_storage"-->
-            <!--android:layout_marginTop="4dp"-->
-            <!--android:layout_toLeftOf="@+id/cb_storage"-->
-            <!--android:paddingRight="20dp"-->
-            <!--android:text="如果开启，下次打开app会自动开启上次打开的悬浮窗"-->
-            <!--android:textColor="#BDBDBD"-->
-            <!--android:textSize="14sp"/>-->
-
-        <!--<CheckBox-->
-            <!--android:id="@+id/cb_storage"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--/>-->
-
-    <!--</RelativeLayout>-->
-
-    <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:background="#e0e0e0"/>-->
-
     <RelativeLayout
         android:id="@+id/btn_config_debug_ip"
         android:gravity="center_vertical"

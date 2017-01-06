@@ -15,7 +15,7 @@ import java.lang.ref.WeakReference;
  * Created by rowandjj(chuyi)<br/>
  */
 
-class PollingVDomMonitor implements IVDomMonitor{
+public class PollingVDomMonitor implements IVDomMonitor{
 
     private PollingTask mTask;
 

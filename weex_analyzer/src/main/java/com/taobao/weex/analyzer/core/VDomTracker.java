@@ -49,7 +49,7 @@ import java.util.Map;
  * Created by rowandjj(chuyi)<br/>
  */
 
-class VDomTracker {
+public class VDomTracker {
     private WXSDKInstance mWxInstance;
     private Deque<LayeredVDomNode> mLayeredQueue;
     private ObjectPool<LayeredVDomNode> mObjectPool;
@@ -83,7 +83,7 @@ class VDomTracker {
         sVDomMap.put(WXCell.class, WXBasicComponentType.CELL);
     }
 
-    VDomTracker(@NonNull WXSDKInstance instance) {
+    public VDomTracker(@NonNull WXSDKInstance instance) {
         this.mWxInstance = instance;
         mLayeredQueue = new ArrayDeque<>();
         mObjectPool = new ObjectPool<LayeredVDomNode>(10) {
@@ -98,7 +98,7 @@ class VDomTracker {
      * todo : need async
      */
     @Nullable
-    HealthReport traverse() {
+    public HealthReport traverse() {
         if(SDKUtils.isInUiThread()) {
             WXLogUtils.e(TAG,"illegal thread...");
             return null;

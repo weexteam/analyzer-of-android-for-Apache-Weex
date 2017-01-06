@@ -17,7 +17,7 @@ import com.taobao.weex.utils.WXLogUtils;
  * Created by rowandjj(chuyi)<br/>
  */
 
-class StandardVDomMonitor implements IVDomMonitor, Handler.Callback {
+public class StandardVDomMonitor implements IVDomMonitor, Handler.Callback {
 
     private HandlerThreadWrapper mHandlerThreadWrapper;
     private WXSDKInstance mInstance;

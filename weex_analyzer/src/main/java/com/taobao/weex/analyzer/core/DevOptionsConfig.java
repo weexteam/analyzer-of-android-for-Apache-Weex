@@ -11,17 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Description:
- * <p>
- * Created by rowandjj(chuyi)<br/>
- * Date: 16/10/8<br/>
- * Time: 下午12:45<br/>
+ * Description: <p> Created by rowandjj(chuyi)<br/> Date: 16/10/8<br/> Time: 下午12:45<br/>
  */
 public class DevOptionsConfig {
 
     private SharedPreferences mSharedPreferences;
     private static final String DEV_CONFIG_NAME = "weex_dev_config";
     private static final String CONFIG_PERF_COMMON = "config_perf_common";//性能悬浮窗
+    private static final String CONFIG_VDOM_DEPTH = "config_vdom_depth";
+
     private static final String CONFIG_LOG_OUTPUT = "config_log_output";
     private static final String CONFIG_JS_EXCEPTION = "config_js_exception";
 
@@ -54,6 +52,14 @@ public class DevOptionsConfig {
         return mSharedPreferences.getBoolean(CONFIG_PERF_COMMON, false);
     }
 
+    public void setVdomDepthEnabled(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_VDOM_DEPTH, enabled).apply();
+    }
+
+    public boolean isVDomDepthEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_VDOM_DEPTH, false);
+    }
+
     /**
      * 设置是否展示日志
      */
@@ -77,23 +83,27 @@ public class DevOptionsConfig {
         return mSharedPreferences.getBoolean(CONFIG_MEMORY_CHART, false);
     }
 
-    /**设置是否展示cpu曲线*/
-    public void setCpuChartEnabled(boolean enabled){
+    /**
+     * 设置是否展示cpu曲线
+     */
+    public void setCpuChartEnabled(boolean enabled) {
         mSharedPreferences.edit().putBoolean(CONFIG_CPU_CHART, enabled).apply();
     }
 
-    public boolean isCPUChartEnabled(){
-        return mSharedPreferences.getBoolean(CONFIG_CPU_CHART,false);
+    public boolean isCPUChartEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_CPU_CHART, false);
     }
 
 
-    /**设置是否展示流量曲线*/
+    /**
+     * 设置是否展示流量曲线
+     */
     public void setTrafficChartEnabled(boolean enabled) {
         mSharedPreferences.edit().putBoolean(CONFIG_TRAFFIC_CHART, enabled).apply();
     }
 
     public boolean isTrafficChartEnabled() {
-        return mSharedPreferences.getBoolean(CONFIG_TRAFFIC_CHART,false);
+        return mSharedPreferences.getBoolean(CONFIG_TRAFFIC_CHART, false);
     }
 
     /**
@@ -112,7 +122,7 @@ public class DevOptionsConfig {
     }
 
     public boolean isShownJSException() {
-        return mSharedPreferences.getBoolean(CONFIG_JS_EXCEPTION,true);
+        return mSharedPreferences.getBoolean(CONFIG_JS_EXCEPTION, true);
     }
 
     public void setLogLevel(int level) {
