@@ -83,18 +83,21 @@ public class CpuTaskEntity implements TaskEntity<CpuTaskEntity.CpuInfo> {
         final double pidUserCpuUsage;
         final double pidKernelCpuUsage;
         if (mTotalCpuTimeLast != 0) {
-            pidCpuUsage = (pidCpuTime - mPidTotalCpuTimeLast) * 100L /(double) (cpuTime - mTotalCpuTimeLast);
+            //we found that sometimes pidCpuUsage is over 100% if use below algorithm,
+            //so we use pidCpuUsage = pidUserCpuUsage + pidKernelCpuUsage instead.
+//            pidCpuUsage = (pidCpuTime - mPidTotalCpuTimeLast) * 100L /(double) (cpuTime - mTotalCpuTimeLast);
             pidUserCpuUsage = (pidUTime - mPidUserCpuTimeLast) * 100L /(double) (cpuTime - mTotalCpuTimeLast);
             pidKernelCpuUsage = (pidSTime - mPidKernelCpuTimeLast) * 100L /(double) (cpuTime - mTotalCpuTimeLast);
+            pidCpuUsage = pidUserCpuUsage + pidKernelCpuUsage;
         }else{
             pidCpuUsage = 0L;
             pidUserCpuUsage = 0L;
             pidKernelCpuUsage = 0L;
         }
 
-        mCachedCpuInfo.pidCpuUsage = pidCpuUsage;
-        mCachedCpuInfo.pidUserCpuUsage = pidUserCpuUsage;
-        mCachedCpuInfo.pidKernelCpuUsage = pidKernelCpuUsage;
+        mCachedCpuInfo.pidCpuUsage = Math.max(0,pidCpuUsage);
+        mCachedCpuInfo.pidUserCpuUsage = Math.max(0,pidUserCpuUsage);
+        mCachedCpuInfo.pidKernelCpuUsage = Math.max(0,pidKernelCpuUsage);
 
         mTotalCpuTimeLast = cpuTime;
         mPidTotalCpuTimeLast = pidCpuTime;

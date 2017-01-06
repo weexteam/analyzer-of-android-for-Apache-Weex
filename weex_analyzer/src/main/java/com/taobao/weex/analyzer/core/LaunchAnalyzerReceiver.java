@@ -21,6 +21,8 @@ import com.taobao.weex.utils.WXLogUtils;
  *       - start: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on
  *       - stop: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c off
  *
+ *       建议增加-n指定componentName
+ *
  *    2. shake device and start it by click option
  *
  *  notice:
