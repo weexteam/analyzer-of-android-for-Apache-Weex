@@ -11,10 +11,12 @@
 2. weex性能分析(查看当前weex页面性能指标/以图表方式展示历史性能指标变化趋势)
 3. weex storage查看、删除
 4. 实时帧率、丢帧数、内存占用悬浮框
-5. cpu/内存/fps 实时折线图
-6. 页面3d视图
-7. js报错时弹框提醒
-8. 远程调试js。(依赖[weex dev tool](https://github.com/weexteam/weex-devtools-android))
+5. 流量监控
+6. cpu/内存/fps 实时折线图
+7. 页面3d视图
+8. js报错时弹框提醒
+9. 远程调试js。(依赖[weex dev tool](https://github.com/weexteam/weex-devtools-android))
+10. **vdom层级检查**
 
 ### 接入
 
@@ -97,5 +99,16 @@ debugCompile 'com.taobao.android:weex_analyzer:${latest version}'
 
 此功能方便没有集成【扫一扫】功能的app，或者是无法使用【扫一扫】的场景(如模拟器)。
 
+
+##### 10. vdom层级查看
+
+点击【vdom层级】按钮，即可开启。
+
+注:
+
+1. 展示的是vdom层级，而不是真实的native层级(同devtool)。
+2. 默认还会展示页面是否使用list/scroller组件
+
+![日志](./art/08.png)
 
 
