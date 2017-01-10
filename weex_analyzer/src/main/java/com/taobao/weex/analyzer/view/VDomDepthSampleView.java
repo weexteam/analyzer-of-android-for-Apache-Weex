@@ -80,13 +80,12 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             if(report == null) {
                 return;
             }
-            //todo
             final StringBuilder builder = new StringBuilder();
             builder.append("*weex-analyzer检测结果:\n");
             builder.append("*当前页面VDom最深层级为 ")
                     .append(report.maxLayer + 1)//1主要是为了和dev tool兼容
                     .append("\n");
-            if(report.maxLayer + 1 > 15) {
+            if(report.maxLayer + 1 >= 15) {
                 builder.append("*层级过深，建议优化\n");
             }else {
                 builder.append("*层级合理\n");
