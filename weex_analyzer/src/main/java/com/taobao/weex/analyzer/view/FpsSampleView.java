@@ -12,9 +12,9 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.core.FPSSampler;
+import com.taobao.weex.analyzer.core.AbstractLoopTask;
+import com.taobao.weex.analyzer.core.FpsTaskEntity;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -114,25 +114,22 @@ public class FpsSampleView extends DragSupportOverlayView {
 
     private static class SampleFPSTask extends AbstractLoopTask {
         private DynamicChartViewController mController;
-        private FPSSampler mFpsChecker;
         private int mAxisXValue = -1;
         private boolean isDebug;
+
+        private FpsTaskEntity mEntity;
 
         SampleFPSTask(@NonNull DynamicChartViewController controller, boolean isDebug) {
             super(false,1000);
             this.mController = controller;
-            this.mFpsChecker = new FPSSampler();
             this.isDebug = isDebug;
+            mEntity = new FpsTaskEntity();
         }
 
         @Override
         protected void onStart() {
             super.onStart();
-            if (mFpsChecker == null) {
-                mFpsChecker = new FPSSampler();
-            }
-            mFpsChecker.reset();
-            mFpsChecker.start();
+            mEntity.onTaskInit();
         }
 
         @Override
@@ -143,7 +140,7 @@ public class FpsSampleView extends DragSupportOverlayView {
             if (Build.VERSION.SDK_INT >= 16) {
                 //check fps
                 mAxisXValue++;
-                final double fps = mFpsChecker.getFPS();
+                final double fps = mEntity.onTaskRun();
                 if(isDebug) {
                     Log.d("weex-analyzer", "current fps : "+ fps);
                 }
@@ -151,7 +148,6 @@ public class FpsSampleView extends DragSupportOverlayView {
                     @Override
                     public void run() {
                         mController.appendPointAndInvalidate(mAxisXValue, fps);
-                        mFpsChecker.reset();
                     }
                 });
             }
@@ -160,8 +156,7 @@ public class FpsSampleView extends DragSupportOverlayView {
         @Override
         protected void onStop() {
             mController = null;
-            mFpsChecker.stop();
-            mFpsChecker = null;
+            mEntity.onTaskStop();
         }
     }
 }

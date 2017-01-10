@@ -36,7 +36,7 @@ public class JSExceptionCatcher {
         }
 
         AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(context);
-        builder.setTitle("JS Exception");
+        builder.setTitle("wx-analyzer found a JS Exception");
         builder.setMessage(String.format(Locale.CHINA,"errorCode : %s\nerrorMsg : %s\n",TextUtils.isEmpty(errCode) ? "unknown" : errCode, TextUtils.isEmpty(msg) ? "unknown" : msg));
         builder.setPositiveButton("okay", new DialogInterface.OnClickListener() {
             @Override

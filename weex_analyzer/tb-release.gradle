@@ -41,7 +41,7 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion '23.0.2'
     defaultConfig {
         minSdkVersion 14
@@ -67,8 +67,9 @@ android {
 }
 
 dependencies {
-    provided 'com.taobao.android:weex_sdk:0.9.1.5'
-    provided 'com.android.support:recyclerview-v7:23.1.1'
+    provided 'com.taobao.android:weex_sdk:0.9.4'
+    provided 'com.android.support:recyclerview-v7:25.0.1'
+    provided 'com.alibaba:fastjson:1.1.46.android'
 }
 
 publishing {

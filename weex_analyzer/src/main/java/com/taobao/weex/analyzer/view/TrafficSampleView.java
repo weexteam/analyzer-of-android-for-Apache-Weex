@@ -2,7 +2,6 @@ package com.taobao.weex.analyzer.view;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Process;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,7 +13,7 @@ import android.widget.TextView;
 
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
-import com.taobao.weex.analyzer.core.TrafficSampler;
+import com.taobao.weex.analyzer.core.TrafficTaskEntity;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.ChartView;
@@ -127,38 +126,35 @@ public class TrafficSampleView extends DragSupportOverlayView {
     private static class SampleTrafficTask extends AbstractLoopTask {
 
         private boolean isDebug;
-
-        private double mTotalRxKBytes = 0;
-        private double mTotalTxKBytes = 0;
-        private static final int DELAY = 1;
         private DynamicChartViewController mController;
 
         private static final float LOAD_FACTOR = 0.5F;
 
         private int mAxisXValue = -1;
 
+        private TrafficTaskEntity mEntity;
+        private static final int DELAY_IN_MILLIS = 1000;
 
         SampleTrafficTask(DynamicChartViewController controller, boolean isDebug) {
-            super(false, 1000 * DELAY);
+            super(false, DELAY_IN_MILLIS);
             this.isDebug = isDebug;
             this.mController = controller;
+            mEntity = new TrafficTaskEntity(DELAY_IN_MILLIS);
+        }
+
+        @Override
+        protected void onStart() {
+            mEntity.onTaskInit();
         }
 
         @Override
         protected void onRun() {
-            double txKBytes = TrafficSampler.getUidTxBytes(Process.myUid()) / 1024;
-            double rxKBytes = TrafficSampler.getUidRxBytes(Process.myUid()) / 1024;
-
             final double txSpeed;
             final double rxSpeed;
-            if (mTotalTxKBytes == 0 && mTotalRxKBytes == 0) {
-                txSpeed = 0;
-                rxSpeed = 0;
-            } else {
-                txSpeed = Math.max(0, (txKBytes - mTotalTxKBytes) / DELAY);
-                rxSpeed = Math.max(0, (rxKBytes - mTotalRxKBytes) / DELAY);
-            }
 
+            TrafficTaskEntity.TrafficInfo info = mEntity.onTaskRun();
+            txSpeed = info.txSpeed;
+            rxSpeed = info.rxSpeed;
             if (isDebug) {
                 Log.d("weex-analyzer", "network[tx:" + txSpeed + "kb/s,rx:" + rxSpeed + "kb/s]");
             }
@@ -177,9 +173,6 @@ public class TrafficSampleView extends DragSupportOverlayView {
                     mController.appendPointAndInvalidate2(mAxisXValue,txSpeed);
                 }
             });
-
-            mTotalRxKBytes = rxKBytes;
-            mTotalTxKBytes = txKBytes;
         }
 
         private boolean checkIfNeedUpdateYAxis(double traffic) {
@@ -189,8 +182,7 @@ public class TrafficSampleView extends DragSupportOverlayView {
 
         @Override
         protected void onStop() {
-            mTotalRxKBytes = 0;
-            mTotalTxKBytes = 0;
+            mEntity.onTaskStop();
         }
     }
 }

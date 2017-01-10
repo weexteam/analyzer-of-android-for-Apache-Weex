@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.MemorySampler;
+import com.taobao.weex.analyzer.core.MemoryTaskEntity;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -120,10 +121,19 @@ public class MemorySampleView extends DragSupportOverlayView {
         private static final float LOAD_FACTOR = 0.75F;
         private boolean isDebug;
 
+        private MemoryTaskEntity mEntity;
+
         SampleMemoryTask(@NonNull DynamicChartViewController controller, boolean isDebug) {
             super(false,1000);
             this.mController = controller;
             this.isDebug = isDebug;
+
+            mEntity = new MemoryTaskEntity();
+        }
+
+        @Override
+        protected void onStart() {
+            mEntity.onTaskInit();
         }
 
         @Override
@@ -132,7 +142,7 @@ public class MemorySampleView extends DragSupportOverlayView {
                 return;
             }
             mAxisXValue++;
-            final double memoryUsed = MemorySampler.getMemoryUsage();
+            final double memoryUsed = mEntity.onTaskRun();
             if(isDebug) {
                 Log.d("weex-analyzer", "memory usage : "+ memoryUsed + "MB");
             }
@@ -154,6 +164,7 @@ public class MemorySampleView extends DragSupportOverlayView {
 
         @Override
         protected void onStop() {
+            mEntity.onTaskStop();
             mController = null;
         }
     }

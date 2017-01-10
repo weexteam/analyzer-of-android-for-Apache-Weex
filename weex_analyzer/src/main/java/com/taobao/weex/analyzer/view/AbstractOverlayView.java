@@ -67,6 +67,13 @@ public abstract class AbstractOverlayView implements IOverlayView {
                 type = WindowManager.LayoutParams.TYPE_PHONE;
             }
 
+            //since android7.1.1 only allow add one toast window at a time for a uid,
+            // so we use TYPE_PHONE instead.
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                type = WindowManager.LayoutParams.TYPE_PHONE;
+            }
+
+
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams(w, h, type, flags, PixelFormat.TRANSLUCENT);
             layoutParams.gravity = mGravity;
             layoutParams.x = mX;

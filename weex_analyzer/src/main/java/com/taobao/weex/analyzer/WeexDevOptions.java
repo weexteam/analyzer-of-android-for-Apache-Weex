@@ -18,6 +18,7 @@ import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
+import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
@@ -33,6 +34,7 @@ import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
 import com.taobao.weex.analyzer.view.TrafficSampleView;
+import com.taobao.weex.analyzer.view.VDomDepthSampleView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.ArrayList;
@@ -63,9 +65,14 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private ScalpelViewController mScalpelViewController;
     private PerfSampleOverlayView mPerfMonitorOverlayView;
+    private VDomDepthSampleView mVDomDepthSampleView;
 
     private boolean shown = false;
     private List<DevOption> mExtraOptions = null;
+
+    private VDomController mVdomController;
+
+    private WXSDKInstance mInstance;
 
     public WeexDevOptions(@NonNull Context context){
 
@@ -73,6 +80,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
         mConfig = new DevOptionsConfig(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
+        mVDomDepthSampleView = new VDomDepthSampleView(context);
 
         mLogView = new LogView(context);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {
@@ -149,6 +157,8 @@ public class WeexDevOptions implements IWXDevOptions {
                 showDevOptions();
             }
         });
+
+        mVdomController = new VDomController();
     }
 
 
@@ -188,7 +198,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mScalpelViewController.toggleScalpelEnabled();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -203,7 +213,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mLogView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -215,7 +225,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mMemorySampleView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -227,7 +237,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mCpuSampleView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -244,7 +254,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mFpsSampleView.show();
                 }
             }
-        }));
+        },true));
         options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -256,7 +266,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mTrafficSampleView.show();
                 }
             }
-        }));
+        },true));
 
         options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
             @Override
@@ -269,7 +279,23 @@ public class WeexDevOptions implements IWXDevOptions {
                     mPerfMonitorOverlayView.show();
                 }
             }
-        }));
+        },true));
+
+        options.add(new DevOption("vDom层级", R.drawable.wxt_icon_vdom_depth, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isVDomDepthEnabled()) {
+                    mConfig.setVdomDepthEnabled(false);
+                    mVDomDepthSampleView.dismiss();
+                } else {
+                    mConfig.setVdomDepthEnabled(true);
+                    mVDomDepthSampleView.show();
+                    mVDomDepthSampleView.bindInstance(mInstance
+                    );
+                }
+            }
+        },true));
+
 
         options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
             @Override
@@ -366,6 +392,13 @@ public class WeexDevOptions implements IWXDevOptions {
             mPerfMonitorOverlayView.dismiss();
         }
 
+        if(mConfig.isVDomDepthEnabled()) {
+            mVDomDepthSampleView.show();
+            mVDomDepthSampleView.bindInstance(mInstance);
+        } else {
+            mVDomDepthSampleView.dismiss();
+        }
+
         if (mConfig.isLogOutputEnabled()) {
             mLogView.setLogLevel(mConfig.getLogLevel());
             mLogView.setFilterName(mConfig.getLogFilter());
@@ -412,6 +445,10 @@ public class WeexDevOptions implements IWXDevOptions {
             mPerfMonitorOverlayView.dismiss();
         }
 
+        if(mConfig.isVDomDepthEnabled()) {
+            mVDomDepthSampleView.dismiss();
+        }
+
         if (mConfig.isLogOutputEnabled()) {
             mLogView.dismiss();
         }
@@ -443,7 +480,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onDestroy() {
-
+        if(mVdomController != null) {
+            mVdomController.destroy();
+            mVdomController = null;
+        }
     }
 
 
@@ -452,7 +492,16 @@ public class WeexDevOptions implements IWXDevOptions {
         if (instance == null) {
             return;
         }
+        this.mInstance = instance;
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
+
+        if(mVdomController != null) {
+            mVdomController.monitor(instance);
+        }
+
+        if(mVDomDepthSampleView != null) {
+            mVDomDepthSampleView.bindInstance(instance);
+        }
     }
 
     @Override

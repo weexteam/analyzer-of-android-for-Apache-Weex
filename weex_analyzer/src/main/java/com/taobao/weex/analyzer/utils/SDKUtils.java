@@ -1,16 +1,24 @@
 package com.taobao.weex.analyzer.utils;
 
+import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import android.os.Looper;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.taobao.weex.WXSDKEngine;
+
+import java.util.List;
 
 /**
  * Description:
@@ -66,4 +74,32 @@ public class SDKUtils {
     }
 
 
+    public static boolean isHostRunning(@NonNull Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+        if(tasks == null || tasks.isEmpty()) {
+            return false;
+        }
+        ComponentName cn = tasks.get(0).topActivity;
+        if(cn == null) {
+            return false;
+        }
+        return (!TextUtils.isEmpty(context.getPackageName()) && context.getPackageName().equals(cn.getPackageName()));
+    }
+
+
+    public static boolean isInteractive(@NonNull Context context) {
+        PowerManager manager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        return manager.isScreenOn();
+
+    }
+
+    public static boolean isInUiThread() {
+        return Looper.getMainLooper() == Looper.myLooper();
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public static boolean canDrawOverlays(@NonNull Context context){
+        return Settings.canDrawOverlays(context);
+    }
 }
