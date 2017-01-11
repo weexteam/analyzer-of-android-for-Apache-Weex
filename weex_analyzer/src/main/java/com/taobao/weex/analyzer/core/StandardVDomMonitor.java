@@ -35,7 +35,8 @@ public class StandardVDomMonitor implements IVDomMonitor, Handler.Callback {
     @Override
     public void monitor(@NonNull WXSDKInstance instance) {
         this.mInstance = instance;
-        View view = instance.getGodCom().getHostView();
+//        View view = instance.getGodCom().getHostView();
+        View view = instance.getContainerView();
         if(view == null) {
             WXLogUtils.e(TAG,"host view is null");
             return;
@@ -52,7 +53,7 @@ public class StandardVDomMonitor implements IVDomMonitor, Handler.Callback {
         }
 
         if(mInstance != null && mLayoutChangeListener != null) {
-            View hostView = mInstance.getGodCom().getHostView();
+            View hostView = mInstance.getContainerView();
             if(hostView != null) {
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     hostView.getViewTreeObserver().removeGlobalOnLayoutListener(mLayoutChangeListener);

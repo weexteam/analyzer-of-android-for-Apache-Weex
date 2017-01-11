@@ -83,7 +83,7 @@ dependencies {
     debugCompile project(':weex_analyzer')
 //    debugCompile 'com.taobao.android:weex_analyzer:0.1.0.4'
 
-    compile 'com.taobao.android:weex_sdk:0.9.4'
+    compile 'com.taobao.android:weex_sdk:0.10.1.chuyi-SNAPSHOT'
     compile 'com.taobao.android:dexposed:0.1.8'
     compile 'com.loopj.android:android-async-http:1.4.9@aar'
     compile 'com.facebook.fresco:fresco:0.12.0+'

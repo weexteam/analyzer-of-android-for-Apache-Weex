@@ -10,8 +10,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.pojo.NodeInfo;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.dom.ImmutableDomObject;
 import com.taobao.weex.dom.WXAttr;
-import com.taobao.weex.dom.WXDomObject;
 import com.taobao.weex.dom.WXStyle;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
@@ -104,7 +104,7 @@ public class VDomTracker {
             return null;
         }
 
-        WXComponent godComponent = mWxInstance.getGodCom();
+        WXComponent godComponent = mWxInstance.getRootComponent();
         if (godComponent == null) {
             WXLogUtils.e(TAG, "god component not found");
             return null;
@@ -234,7 +234,7 @@ public class VDomTracker {
         nodeInfo.simpleName = layeredNode.simpleName;
         nodeInfo.realName = layeredNode.component.getClass().getName();
 
-        WXDomObject domObject = layeredNode.component.getDomObject();
+        ImmutableDomObject domObject = layeredNode.component.getDomObject();
         //styles
         WXStyle styles = null;
         if (domObject != null) {
