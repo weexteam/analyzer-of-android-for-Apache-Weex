@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
@@ -23,6 +24,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
 
     public VDomDepthSampleView(Context application) {
         super(application);
+        mWidth = WindowManager.LayoutParams.MATCH_PARENT;
     }
 
     @NonNull
@@ -70,6 +72,10 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             this.instance = instance;
         }
 
+        private String convertResult(boolean result) {
+            return result ? "✓ " : "✕ ";
+        }
+
         @Override
         protected void onRun() {
             if(instance == null) {
@@ -81,29 +87,38 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
                 return;
             }
             final StringBuilder builder = new StringBuilder();
-            builder.append("*weex-analyzer检测结果:\n");
-            builder.append("*当前页面VDom最深层级为 ")
+            builder.append("weex-analyzer检测结果:\n");
+
+            //////
+            builder.append(convertResult(report.maxLayer < 14));
+            builder.append("检测到VDOM最深嵌套层级为 ")
                     .append(report.maxLayer + 1)//1主要是为了和dev tool兼容
+                    .append(",建议<14")
                     .append("\n");
-            if(report.maxLayer + 1 >= 15) {
-                builder.append("*层级过深，建议优化\n");
-            }else {
-                builder.append("*层级合理\n");
+            //////
+
+            if(report.hasScroller) {
+                builder.append(convertResult(true));
+                builder.append("检测到该页面使用了Scroller,长列表建议使用ListView")
+                        .append("\n");
             }
+
+            //////
             if(report.hasList) {
-                builder.append("*使用了list组件,cell个数为")
+                builder.append(convertResult(true));
+                builder.append("检测到该页面使用了List,cell个数为")
                         .append(report.cellNum)
                         .append("\n");
 
-                builder.append("*最大的cell包含了").append(report.maxCellViewNum).append("个组件\n");
-
+                builder.append(convertResult(!report.hasBigCell));
                 if(report.hasBigCell) {
-                    builder.append("*可能存在大cell,对性能产生影响，请仔细检查\n");
+                    builder.append("检测到页面可能存在大cell,最大的cell中包含")
+                            .append(report.maxCellViewNum).append("个组件,建议按行合理拆分");
+                }else {
+                    builder.append("经检测，cell大小合理");
                 }
             }
-            if(report.hasScroller) {
-                builder.append("*使用了Scroller组件\n");
-            }
+
 
             runOnUIThread(new Runnable() {
                 @Override

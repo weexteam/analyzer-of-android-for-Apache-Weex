@@ -65,6 +65,8 @@ public class PerformanceMonitor {
         p.WXSDKVersion = rawPerformance.WXSDKVersion;
         p.pageName = rawPerformance.pageName;
         p.templateUrl = rawPerformance.templateUrl;
+        p.requestType = rawPerformance.requestType;
+        p.connectionType = rawPerformance.connectionType;
         return p;
     }
 

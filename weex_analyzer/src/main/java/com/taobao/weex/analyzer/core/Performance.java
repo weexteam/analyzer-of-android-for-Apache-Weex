@@ -127,6 +127,10 @@ public class Performance {
     public String WXSDKVersion = WXEnvironment.WXSDK_VERSION;
 
 
+    public String requestType;
+
+    public String connectionType;
+
     public static List<String> transfer(Performance performance){
         List<String> list = new ArrayList<>();
         list.add("pageName : " + performance.pageName);
@@ -157,6 +161,8 @@ public class Performance {
         list.add("callNativeTime : "+ performance.callNativeTime);
 
         list.add("communicateTime : "+ performance.communicateTime);
+        list.add("requestType : " + performance.requestType);
+        list.add("connectionType : " + performance.connectionType);
         return list;
     }
 
@@ -188,6 +194,8 @@ public class Performance {
                 ", componentCount=" + componentCount +
                 ", JSLibVersion='" + JSLibVersion + '\'' +
                 ", WXSDKVersion='" + WXSDKVersion + '\'' +
+                ", requestType='" + requestType + '\'' +
+                ", connectionType='" + connectionType + '\'' +
                 '}';
     }
 }
