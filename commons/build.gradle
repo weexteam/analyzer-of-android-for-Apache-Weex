@@ -44,7 +44,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.facebook.fresco:fresco:0.10.0'
-    provided 'com.taobao.android:weex_sdk:0.8.0'
+    provided 'com.taobao.android:weex_sdk:0.9.5'
 
     provided project(':weex_analyzer')
 //    provided 'com.taobao.android:weex_analyzer:0.1.0.4'

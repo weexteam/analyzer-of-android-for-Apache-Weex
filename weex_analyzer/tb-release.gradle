@@ -67,7 +67,7 @@ android {
 }
 
 dependencies {
-    provided 'com.taobao.android:weex_sdk:0.10.1.chuyi-SNAPSHOT'
+    provided 'com.taobao.android:weex_sdk:0.9.5'
     provided 'com.android.support:recyclerview-v7:25.0.1'
     provided 'com.alibaba:fastjson:1.1.46.android'
 }
