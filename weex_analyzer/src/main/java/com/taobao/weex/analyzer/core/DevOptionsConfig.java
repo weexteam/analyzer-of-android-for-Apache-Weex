@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.taobao.weex.analyzer.view.LogView;
+import com.taobao.weex.analyzer.view.IResizableView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +34,7 @@ public class DevOptionsConfig {
     private static final String CONFIG_LOG_LEVEL = "config_log_level";
     private static final String CONFIG_LOG_FILTER = "config_log_filter";
     private static final String CONFIG_LOG_VIEW_SIZE = "config_log_view_size";
+    private static final String CONFIG_INSPECTOR_VIEW_SIZE = "config_inspector_view_size";
 
     public static final String TAG = "weex-analyzer";
 
@@ -151,14 +152,22 @@ public class DevOptionsConfig {
         return mSharedPreferences.getString(CONFIG_LOG_FILTER, null);
     }
 
-    public void setLogViewSize(@LogView.Size int size) {
+    public void setLogViewSize(@IResizableView.Size int size) {
         mSharedPreferences.edit().putInt(CONFIG_LOG_VIEW_SIZE, size).apply();
     }
 
-    public
-    @LogView.Size
-    int getLogViewSize() {
-        return mSharedPreferences.getInt(CONFIG_LOG_VIEW_SIZE, LogView.Size.MEDIUM);
+    @IResizableView.Size
+    public int getLogViewSize() {
+        return mSharedPreferences.getInt(CONFIG_LOG_VIEW_SIZE, IResizableView.Size.MEDIUM);
+    }
+
+    public void setInspectorViewSize(@IResizableView.Size int size) {
+        mSharedPreferences.edit().putInt(CONFIG_INSPECTOR_VIEW_SIZE, size).apply();
+    }
+
+    @IResizableView.Size
+    public int getInspectorViewSize() {
+        return mSharedPreferences.getInt(CONFIG_INSPECTOR_VIEW_SIZE, IResizableView.Size.MEDIUM);
     }
 
 

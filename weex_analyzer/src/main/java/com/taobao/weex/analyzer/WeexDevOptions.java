@@ -26,6 +26,7 @@ import com.taobao.weex.analyzer.view.DevOption;
 import com.taobao.weex.analyzer.view.EntranceView;
 import com.taobao.weex.analyzer.view.FpsSampleView;
 import com.taobao.weex.analyzer.view.IOverlayView;
+import com.taobao.weex.analyzer.view.IResizableView;
 import com.taobao.weex.analyzer.view.LogView;
 import com.taobao.weex.analyzer.view.MemorySampleView;
 import com.taobao.weex.analyzer.view.NetworkInspectorView;
@@ -94,6 +95,20 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
+        mNetworkInspectorView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
+            @Override
+            public void onSizeChanged(@IResizableView.Size int size) {
+                //todo
+
+            }
+        });
+        mNetworkInspectorView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
+            @Override
+            public void onSizeChanged(@IResizableView.Size int size) {
+                mConfig.setInspectorViewSize(size);
+            }
+        });
+
         mLogView = new LogView(context);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
@@ -114,9 +129,11 @@ public class WeexDevOptions implements IWXDevOptions {
             public void onLogFilterChanged(String filterName) {
                 mConfig.setLogFilter(filterName);
             }
+        });
 
+        mLogView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
             @Override
-            public void onLogSizeChanged(@LogView.Size int size) {
+            public void onSizeChanged(@IResizableView.Size int size) {
                 mConfig.setLogViewSize(size);
             }
         });
@@ -315,6 +332,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mNetworkInspectorView.dismiss();
                 } else {
                     mConfig.setNetworkInspectorEnabled(true);
+                    mNetworkInspectorView.setViewSize(mConfig.getInspectorViewSize());
                     mNetworkInspectorView.show();
                 }
             }
@@ -424,6 +442,7 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if(mConfig.isNetworkInspectorEnabled()) {
+            mNetworkInspectorView.setViewSize(mConfig.getInspectorViewSize());
             mNetworkInspectorView.show();
         } else {
             mNetworkInspectorView.dismiss();

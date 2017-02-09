@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -32,12 +34,14 @@ import java.util.Locale;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class NetworkInspectorView extends DragSupportOverlayView {
+public class NetworkInspectorView extends AbstractResizableOverlayView {
 
     private NetworkEventListAdapter mAdapter;
 
     private NetworkEventInspector mNetworkEventInspector;
     private OnCloseListener mOnCloseListener;
+
+    private boolean isSizeMenuOpened;
 
     private static final String TAG = "NetworkInspectorView";
 
@@ -105,8 +109,53 @@ public class NetworkInspectorView extends DragSupportOverlayView {
         final RecyclerView networkEventList = (RecyclerView) wholeView.findViewById(R.id.list);
         networkEventList.setLayoutManager(new LinearLayoutManager(mContext));
 
-        mAdapter = new NetworkEventListAdapter(mContext,networkEventList);
+        mAdapter = new NetworkEventListAdapter(mContext, networkEventList);
         networkEventList.setAdapter(mAdapter);
+
+        //size
+        final TextView sizeBtn = (TextView) wholeView.findViewById(R.id.size);
+        final ViewGroup sizeContent = (ViewGroup) wholeView.findViewById(R.id.size_content);
+        RadioGroup sizeGroup = (RadioGroup) wholeView.findViewById(R.id.height_group);
+
+        sizeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSizeMenuOpened = !isSizeMenuOpened;
+                if (isSizeMenuOpened) {
+                    sizeContent.setVisibility(View.VISIBLE);
+                } else {
+                    sizeContent.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        setViewSize(mViewSize, networkEventList, false);
+        switch (mViewSize) {
+            case Size.SMALL:
+                ((RadioButton) wholeView.findViewById(R.id.height_small)).setChecked(true);
+                break;
+            case Size.MEDIUM:
+                ((RadioButton) wholeView.findViewById(R.id.height_medium)).setChecked(true);
+                break;
+            case Size.LARGE:
+                ((RadioButton) wholeView.findViewById(R.id.height_large)).setChecked(true);
+                break;
+        }
+
+
+        sizeGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.height_small) {
+                    mViewSize = Size.SMALL;
+                } else if (checkedId == R.id.height_medium) {
+                    mViewSize = Size.MEDIUM;
+                } else if (checkedId == R.id.height_large) {
+                    mViewSize = Size.LARGE;
+                }
+                setViewSize(mViewSize, networkEventList, true);
+            }
+        });
 
         return wholeView;
     }
@@ -138,7 +187,8 @@ public class NetworkInspectorView extends DragSupportOverlayView {
 
         private boolean isHoldMode = false;
         private RecyclerView list;
-        NetworkEventListAdapter(Context context,RecyclerView list) {
+
+        NetworkEventListAdapter(Context context, RecyclerView list) {
             mMessageList = new ArrayList<>();
             this.mContext = context;
             this.list = list;

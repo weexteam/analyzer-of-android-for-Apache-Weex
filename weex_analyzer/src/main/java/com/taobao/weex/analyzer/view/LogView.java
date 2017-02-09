@@ -3,7 +3,6 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -24,17 +22,14 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.LogcatDumpBuilder;
 import com.taobao.weex.analyzer.core.LogcatDumper;
 import com.taobao.weex.analyzer.utils.SDKUtils;
-import com.taobao.weex.analyzer.utils.ViewUtils;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class LogView extends DragSupportOverlayView {
+public class LogView extends AbstractResizableOverlayView {
 
     private LogcatDumper mLogcatDumper;
 
@@ -53,17 +48,8 @@ public class LogView extends DragSupportOverlayView {
     private static final String FILTER_EXCEPTION = "reportJSException";
     private static final String FILTER_CUSTOM = "custom";
 
-    @IntDef({Size.SMALL, Size.MEDIUM, Size.LARGE})
-    @Retention(RetentionPolicy.SOURCE)
-    public @interface Size {
-        int SMALL = 0;
-        int MEDIUM = 1;
-        int LARGE = 2;
-    }
-
     private int mLogLevel;
     private String mFilterName;
-    private int mViewSize = Size.MEDIUM;
 
     private LogListAdapter mLogAdapter;
 
@@ -87,8 +73,6 @@ public class LogView extends DragSupportOverlayView {
         void onLogLevelChanged(int level);
 
         void onLogFilterChanged(String filterName);
-
-        void onLogSizeChanged(@Size int size);
     }
 
     public interface onStatusChangedListener {
@@ -121,11 +105,6 @@ public class LogView extends DragSupportOverlayView {
     public void setFilterName(String filterName) {
         this.mFilterName = filterName;
     }
-
-    public void setViewSize(@Size int size) {
-        this.mViewSize = size;
-    }
-
 
     @NonNull
     @Override
@@ -185,7 +164,7 @@ public class LogView extends DragSupportOverlayView {
 
         //view size
 
-        setLogSize(mViewSize, logList, false);
+        setViewSize(mViewSize, logList, false);
         switch (mViewSize) {
             case Size.SMALL:
                 ((RadioButton) wholeView.findViewById(R.id.height_small)).setChecked(true);
@@ -209,7 +188,7 @@ public class LogView extends DragSupportOverlayView {
                 } else if (checkedId == R.id.height_large) {
                     mViewSize = Size.LARGE;
                 }
-                setLogSize(mViewSize, logList, true);
+                setViewSize(mViewSize, logList, true);
             }
         });
 
@@ -520,43 +499,6 @@ public class LogView extends DragSupportOverlayView {
         }
         mCollapsedView.show();
     }
-
-
-    private void setLogSize(@Size int size, RecyclerView logList, boolean allowFireEvent) {
-        if (logList == null) {
-            return;
-        }
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) logList.getLayoutParams();
-        if (params == null) {
-            return;
-        }
-
-        //hard code here..
-        final int heightSmall = (int) ViewUtils.dp2px(mContext, 200);
-        final int heightMedium = (int) ViewUtils.dp2px(mContext, 350);
-        final int heightLarge = FrameLayout.LayoutParams.MATCH_PARENT;
-
-        int height = params.height;
-        switch (size) {
-            case Size.SMALL:
-                height = heightSmall;
-                break;
-            case Size.MEDIUM:
-                height = heightMedium;
-                break;
-            case Size.LARGE:
-                height = heightLarge;
-                break;
-        }
-        if (height != params.height) {
-            params.height = height;
-            logList.setLayoutParams(params);
-            if (mConfigChangeListener != null && allowFireEvent) {
-                mConfigChangeListener.onLogSizeChanged(mViewSize);
-            }
-        }
-    }
-
 
     private static class LogListAdapter extends RecyclerView.Adapter {
 
