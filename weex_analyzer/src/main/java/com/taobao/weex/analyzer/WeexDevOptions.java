@@ -85,6 +85,14 @@ public class WeexDevOptions implements IWXDevOptions {
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
         mVDomDepthSampleView = new VDomDepthSampleView(context);
         mNetworkInspectorView = new NetworkInspectorView(context);
+        mNetworkInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if (host != null) {
+                    mConfig.setNetworkInspectorEnabled(false);
+                }
+            }
+        });
 
         mLogView = new LogView(context);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {

@@ -23,32 +23,6 @@
             />
 
 
-        <TextView
-            android:id="@+id/collapse"
-            android:layout_width="55dp"
-            android:layout_height="25dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="@string/wxt_collapse"
-            android:textColor="#fff"
-            android:textSize="12sp"
-            />
-
-
-        <TextView
-            android:id="@+id/settings"
-            android:layout_width="55dp"
-            android:layout_height="25dp"
-            android:layout_below="@id/title"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/wxt_btn_bg"
-            android:gravity="center"
-            android:padding="2dp"
-            android:text="@string/wxt_settings"
-            android:textColor="#000"
-            android:textSize="12sp"
-            />
 
         <TextView
             android:id="@+id/size"
@@ -56,7 +30,6 @@
             android:layout_height="25dp"
             android:layout_below="@id/title"
             android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@id/settings"
             android:background="@drawable/wxt_btn_bg"
             android:gravity="center"
             android:padding="2dp"

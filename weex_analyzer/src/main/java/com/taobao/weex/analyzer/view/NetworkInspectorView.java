@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ public class NetworkInspectorView extends DragSupportOverlayView {
     private NetworkEventListAdapter mAdapter;
 
     private NetworkEventInspector mNetworkEventInspector;
+    private OnCloseListener mOnCloseListener;
 
     private static final String TAG = "NetworkInspectorView";
 
@@ -44,17 +46,66 @@ public class NetworkInspectorView extends DragSupportOverlayView {
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
     }
 
+    public void setOnCloseListener(@Nullable OnCloseListener listener) {
+        this.mOnCloseListener = listener;
+    }
+
     @NonNull
     @Override
     protected View onCreateView() {
         View wholeView = View.inflate(mContext, R.layout.wxt_network_inspector_view, null);
 
 
+        //clear
+        View clear = wholeView.findViewById(R.id.clear);
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isViewAttached && mAdapter != null) {
+                    mAdapter.clear();
+                }
+            }
+        });
+
+        //hold
+        final View hold = wholeView.findViewById(R.id.hold);
+        hold.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mAdapter == null) {
+                    return;
+                }
+
+                if (isViewAttached) {
+                    if (mAdapter.isHoldModeEnabled()) {
+                        mAdapter.setHoldModeEnabled(false);
+                        ((TextView) hold).setText("hold(off)");
+                    } else {
+                        mAdapter.setHoldModeEnabled(true);
+                        ((TextView) hold).setText("hold(on)");
+                    }
+                }
+            }
+        });
+
+        //close
+        View close = wholeView.findViewById(R.id.close);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isViewAttached && mOnCloseListener != null) {
+                    mOnCloseListener.close(NetworkInspectorView.this);
+                    dismiss();
+                }
+            }
+        });
+
+
         //recycler view
         final RecyclerView networkEventList = (RecyclerView) wholeView.findViewById(R.id.list);
         networkEventList.setLayoutManager(new LinearLayoutManager(mContext));
 
-        mAdapter = new NetworkEventListAdapter(mContext);
+        mAdapter = new NetworkEventListAdapter(mContext,networkEventList);
         networkEventList.setAdapter(mAdapter);
 
         return wholeView;
@@ -70,9 +121,6 @@ public class NetworkInspectorView extends DragSupportOverlayView {
                 }
             }
         });
-//        NetworkEventInspector.MessageBean bean =
-//                new NetworkEventInspector.MessageBean("Request","mtop.common.getTimestamp","GET",null,"我是body拉");
-//        mAdapter.addMessage(bean);
     }
 
     @Override
@@ -88,9 +136,12 @@ public class NetworkInspectorView extends DragSupportOverlayView {
         private List<NetworkEventInspector.MessageBean> mMessageList;
         private Context mContext;
 
-        NetworkEventListAdapter(Context context) {
+        private boolean isHoldMode = false;
+        private RecyclerView list;
+        NetworkEventListAdapter(Context context,RecyclerView list) {
             mMessageList = new ArrayList<>();
             this.mContext = context;
+            this.list = list;
         }
 
         @Override
@@ -112,6 +163,27 @@ public class NetworkInspectorView extends DragSupportOverlayView {
         void addMessage(@NonNull NetworkEventInspector.MessageBean msg) {
             mMessageList.add(msg);
             notifyItemInserted(mMessageList.size());
+
+            if (!isHoldMode) {
+                try {
+                    list.smoothScrollToPosition(this.getItemCount() - 1);
+                } catch (Exception e) {
+                    //ignored
+                }
+            }
+        }
+
+        void clear() {
+            mMessageList.clear();
+            notifyDataSetChanged();
+        }
+
+        void setHoldModeEnabled(boolean enabled) {
+            this.isHoldMode = enabled;
+        }
+
+        boolean isHoldModeEnabled() {
+            return this.isHoldMode;
         }
     }
 
