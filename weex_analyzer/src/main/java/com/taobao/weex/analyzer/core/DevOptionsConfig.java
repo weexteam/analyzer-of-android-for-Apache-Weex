@@ -19,6 +19,8 @@ public class DevOptionsConfig {
     private static final String DEV_CONFIG_NAME = "weex_dev_config";
     private static final String CONFIG_PERF_COMMON = "config_perf_common";//性能悬浮窗
     private static final String CONFIG_VDOM_DEPTH = "config_vdom_depth";
+    private static final String CONFIG_NETWORK_INSPECTOR = "config_network_inspector";
+
 
     private static final String CONFIG_LOG_OUTPUT = "config_log_output";
     private static final String CONFIG_JS_EXCEPTION = "config_js_exception";
@@ -58,6 +60,14 @@ public class DevOptionsConfig {
 
     public boolean isVDomDepthEnabled() {
         return mSharedPreferences.getBoolean(CONFIG_VDOM_DEPTH, false);
+    }
+
+    public boolean isNetworkInspectorEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_NETWORK_INSPECTOR, false);
+    }
+
+    public void setNetworkInspectorEnabled(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_NETWORK_INSPECTOR, enabled).apply();
     }
 
     /**

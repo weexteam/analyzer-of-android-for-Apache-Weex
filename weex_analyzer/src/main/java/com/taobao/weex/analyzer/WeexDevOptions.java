@@ -28,6 +28,7 @@ import com.taobao.weex.analyzer.view.FpsSampleView;
 import com.taobao.weex.analyzer.view.IOverlayView;
 import com.taobao.weex.analyzer.view.LogView;
 import com.taobao.weex.analyzer.view.MemorySampleView;
+import com.taobao.weex.analyzer.view.NetworkInspectorView;
 import com.taobao.weex.analyzer.view.PerfSampleOverlayView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
@@ -67,6 +68,8 @@ public class WeexDevOptions implements IWXDevOptions {
     private PerfSampleOverlayView mPerfMonitorOverlayView;
     private VDomDepthSampleView mVDomDepthSampleView;
 
+    private NetworkInspectorView mNetworkInspectorView;
+
     private boolean shown = false;
     private List<DevOption> mExtraOptions = null;
 
@@ -81,6 +84,7 @@ public class WeexDevOptions implements IWXDevOptions {
         mConfig = new DevOptionsConfig(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
         mVDomDepthSampleView = new VDomDepthSampleView(context);
+        mNetworkInspectorView = new NetworkInspectorView(context);
 
         mLogView = new LogView(context);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {
@@ -290,8 +294,20 @@ public class WeexDevOptions implements IWXDevOptions {
                 } else {
                     mConfig.setVdomDepthEnabled(true);
                     mVDomDepthSampleView.show();
-                    mVDomDepthSampleView.bindInstance(mInstance
-                    );
+                    mVDomDepthSampleView.bindInstance(mInstance);
+                }
+            }
+        },true));
+
+        options.add(new DevOption("MTOP", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if(mConfig.isNetworkInspectorEnabled()) {
+                    mConfig.setNetworkInspectorEnabled(false);
+                    mNetworkInspectorView.dismiss();
+                } else {
+                    mConfig.setNetworkInspectorEnabled(true);
+                    mNetworkInspectorView.show();
                 }
             }
         },true));
@@ -399,6 +415,12 @@ public class WeexDevOptions implements IWXDevOptions {
             mVDomDepthSampleView.dismiss();
         }
 
+        if(mConfig.isNetworkInspectorEnabled()) {
+            mNetworkInspectorView.show();
+        } else {
+            mNetworkInspectorView.dismiss();
+        }
+
         if (mConfig.isLogOutputEnabled()) {
             mLogView.setLogLevel(mConfig.getLogLevel());
             mLogView.setFilterName(mConfig.getLogFilter());
@@ -447,6 +469,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
         if(mConfig.isVDomDepthEnabled()) {
             mVDomDepthSampleView.dismiss();
+        }
+
+        if(mConfig.isNetworkInspectorEnabled()) {
+            mNetworkInspectorView.dismiss();
         }
 
         if (mConfig.isLogOutputEnabled()) {

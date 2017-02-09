@@ -1,0 +1,131 @@
+package com.taobao.weex.analyzer.core;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * Description:
+ *
+ *  负责接受网络消息 并整理后发送给NetworkInspectorView
+ *
+ *
+ * 1. 注册localbroadcastManager
+ * 2. 接受消息
+ * 3. 整理
+ * 4. 转发
+ *
+ * Created by rowandjj(chuyi)<br/>
+ */
+
+public class NetworkEventInspector {
+
+    private LocalBroadcastManager mLocalBroadcastManager;
+    private OnMessageReceivedListener mListener;
+    private CoreMessageReceiver mCoreMessageReceiver;
+
+    private static final String TAG = "NetworkEventInspector";
+
+    private NetworkEventInspector(@NonNull Context context) {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
+    }
+
+    private void setOnMessageReceivedListener(@NonNull OnMessageReceivedListener listener) {
+        this.mListener = listener;
+        mCoreMessageReceiver = new CoreMessageReceiver(mListener);
+        IntentFilter filter = new IntentFilter(NetworkEventSender.ACTION_NETWORK_REPORTER);
+        mLocalBroadcastManager.registerReceiver(mCoreMessageReceiver,filter);
+    }
+
+    public static NetworkEventInspector createInstance(@NonNull Context context, @NonNull OnMessageReceivedListener listener) {
+        NetworkEventInspector reporter = new NetworkEventInspector(context);
+        reporter.setOnMessageReceivedListener(listener);
+        return reporter;
+    }
+
+    public void destroy() {
+        if(mCoreMessageReceiver != null && mLocalBroadcastManager != null) {
+            mLocalBroadcastManager.unregisterReceiver(mCoreMessageReceiver);
+            mCoreMessageReceiver = null;
+            mLocalBroadcastManager = null;
+        }
+        mListener = null;
+    }
+
+    static class CoreMessageReceiver extends BroadcastReceiver {
+        OnMessageReceivedListener listener;
+
+        CoreMessageReceiver(@NonNull OnMessageReceivedListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent == null || !intent.getAction().equals(NetworkEventSender.ACTION_NETWORK_REPORTER)) {
+                return;
+            }
+
+            String type = intent.getStringExtra(NetworkEventSender.INTENT_EXTRA_TYPE);
+
+            String title = intent.getStringExtra(NetworkEventSender.INTENT_EXTRA_TITLE);
+            String desc = intent.getStringExtra(NetworkEventSender.INTENT_EXTRA_DESC);
+            String body = intent.getStringExtra(NetworkEventSender.INTENT_EXTRA_BODY);
+            Bundle bundle = intent.getExtras();
+            Map<String,String> extendProps = null;
+            if(bundle != null) {
+                extendProps = new HashMap<>();
+                for(String key : bundle.keySet()) {
+                    if(NetworkEventSender.INTENT_EXTRA_TYPE.equals(key) ||
+                            NetworkEventSender.INTENT_EXTRA_DESC.equals(key) || NetworkEventSender.INTENT_EXTRA_TITLE.equals(key)
+                            || NetworkEventSender.INTENT_EXTRA_BODY.equals(key)) {
+                        continue;
+                    }
+                    extendProps.put(key,bundle.getString(key));
+                }
+            }
+            MessageBean msg = new MessageBean(type,title,desc,extendProps,body);
+            if(listener != null) {
+                listener.onMessageReceived(msg);
+            }
+        }
+    }
+
+    public interface OnMessageReceivedListener {
+        void onMessageReceived(MessageBean msg);
+    }
+
+    public static class MessageBean {
+        public String title;
+        public String desc;
+        public String body;
+        public String type;
+        public Map<String,String> extendProps;
+
+        public MessageBean(String type, String title, String desc, Map<String, String> extendProps, String body) {
+            this.type = type;
+            this.title = title;
+            this.desc = desc;
+            this.extendProps = extendProps;
+            this.body = body;
+        }
+
+        @Override
+        public String toString() {
+            return "MessageBean{" +
+                    "title='" + title + '\'' +
+                    ", desc='" + desc + '\'' +
+                    ", body='" + body + '\'' +
+                    ", type='" + type + '\'' +
+                    ", extendProps=" + extendProps +
+                    '}';
+        }
+    }
+}
