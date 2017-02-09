@@ -324,7 +324,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         },true));
 
-        options.add(new DevOption("MTOP", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
+        options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
                 if(mConfig.isNetworkInspectorEnabled()) {

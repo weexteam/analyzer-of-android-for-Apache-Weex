@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
+              android:background="#000"
               android:padding="5dp"
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
@@ -10,7 +11,7 @@
     <!--top-->
     <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp">
+            android:layout_height="64dp">
 
         <TextView
                 android:id="@+id/type"
@@ -25,6 +26,7 @@
         <TextView
                 android:id="@+id/title"
                 android:textSize="14sp"
+                android:layout_marginTop="5dp"
                 android:textColor="#fff"
                 android:layout_toRightOf="@id/type"
                 tools:text="mtop.common.getTimestamp"
