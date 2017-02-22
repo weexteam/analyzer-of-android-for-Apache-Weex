@@ -60,6 +60,7 @@ public class VDomTracker {
     private static final String TAG = "VDomTracker";
 
     private static final Map<Class, String> sVDomMap;
+    private OnTrackNodeListener mOnTrackNodeListener;
 
     static {
         sVDomMap = new HashMap<>();
@@ -83,6 +84,10 @@ public class VDomTracker {
         sVDomMap.put(WXCell.class, WXBasicComponentType.CELL);
     }
 
+    public interface OnTrackNodeListener {
+        void onTrackNode(@NonNull WXComponent component, int layer);
+    }
+
     public VDomTracker(@NonNull WXSDKInstance instance) {
         this.mWxInstance = instance;
         mLayeredQueue = new ArrayDeque<>();
@@ -94,13 +99,14 @@ public class VDomTracker {
         };
     }
 
-    /**
-     * todo : need async
-     */
+    public void setOnTrackNodeListener(OnTrackNodeListener listener) {
+        this.mOnTrackNodeListener = listener;
+    }
+
     @Nullable
     public HealthReport traverse() {
-        if(SDKUtils.isInUiThread()) {
-            WXLogUtils.e(TAG,"illegal thread...");
+        if (SDKUtils.isInUiThread()) {
+            WXLogUtils.e(TAG, "illegal thread...");
             return null;
         }
 
@@ -134,13 +140,17 @@ public class VDomTracker {
             WXComponent component = domNode.component;
             int layer = domNode.layer;
 
+            if (mOnTrackNodeListener != null && component != null) {
+                mOnTrackNodeListener.onTrackNode(component, layer);
+            }
+
             if (component instanceof WXListComponent) {
                 report.hasList = true;
             }
             if (component instanceof WXScroller) {
                 report.hasScroller = true;
             }
-            if(component instanceof WXCell) {
+            if (component instanceof WXCell) {
                 cellList.add(component);
             }
 
@@ -178,13 +188,13 @@ public class VDomTracker {
         NodeInfo tree = map.get(godComponent);
         for (WXComponent com : cellList) {
             boolean isBigCell = false;
-            if(com.getHostView() != null) {
+            if (com.getHostView() != null) {
                 isBigCell = isBigCell(com.getHostView().getMeasuredHeight());
             }
             NodeInfo cellNode = map.get(com);
             int viewNum = getCellViewNum(cellNode);
-            if(isBigCell) {
-                WXLogUtils.d(TAG,"[warning]please do not use big cell in list component or will cause terrible user experience,"+com.getHostView()+","+cellList.size());
+            if (isBigCell) {
+                WXLogUtils.d(TAG, "[warning]please do not use big cell in list component or will cause terrible user experience," + com.getHostView() + "," + cellList.size());
                 WXLogUtils.d(TAG, JSON.toJSONString(cellNode, SerializerFeature.PrettyFormat));
             }
             report.maxCellViewNum = Math.max(report.maxCellViewNum, viewNum);
@@ -206,8 +216,8 @@ public class VDomTracker {
         while (!deque.isEmpty()) {
             NodeInfo node = deque.removeFirst();
             viewNum++;
-            if(node.children != null && !node.children.isEmpty()) {
-                for(NodeInfo n : node.children) {
+            if (node.children != null && !node.children.isEmpty()) {
+                for (NodeInfo n : node.children) {
                     deque.add(n);
                 }
             }
@@ -216,10 +226,10 @@ public class VDomTracker {
     }
 
     private boolean isBigCell(float maxHeight) {
-        if(maxHeight <= 0) {
+        if (maxHeight <= 0) {
             return false;
         }
-        return maxHeight > WXViewUtils.getScreenHeight()*2/3.0;
+        return maxHeight > WXViewUtils.getScreenHeight() * 2 / 3.0;
     }
 
     @NonNull
@@ -246,10 +256,10 @@ public class VDomTracker {
 
         //attrs
         WXAttr attr = null;
-        if(domObject != null) {
+        if (domObject != null) {
             attr = domObject.getAttrs();
         }
-        if(attr != null && !attr.isEmpty()) {
+        if (attr != null && !attr.isEmpty()) {
             nodeInfo.attrs = Collections.unmodifiableMap(attr);
         }
 

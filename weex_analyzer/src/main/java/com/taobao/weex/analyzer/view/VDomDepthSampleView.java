@@ -1,6 +1,7 @@
 package com.taobao.weex.analyzer.view;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.WindowManager;
@@ -11,6 +12,8 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.VDomTracker;
 import com.taobao.weex.analyzer.pojo.HealthReport;
+import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
+import com.taobao.weex.ui.component.WXComponent;
 
 
 /**
@@ -58,14 +61,19 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
     }
 
 
-    private static class SampleTask extends AbstractLoopTask {
+    private static class SampleTask extends AbstractLoopTask implements VDomTracker.OnTrackNodeListener{
 
         WXSDKInstance instance;
         TextView resultTextView;
+        MutipleViewHighlighter mViewHighlighter;
+
+        static final int MAX_LAYER = 14;
         SampleTask(@NonNull View hostView) {
             super(false);
             mDelayMillis = 1000;
             resultTextView = (TextView) hostView.findViewById(R.id.result);
+            mViewHighlighter = MutipleViewHighlighter.newInstance();
+            mViewHighlighter.setColor(Color.parseColor("#420000ff"));
         }
 
         void setInstance(WXSDKInstance instance){
@@ -82,6 +90,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
                 return;
             }
             VDomTracker tracker = new VDomTracker(instance);
+            tracker.setOnTrackNodeListener(this);
             HealthReport report = tracker.traverse();
             if(report == null) {
                 return;
@@ -90,11 +99,15 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             builder.append("weex-analyzer检测结果:\n");
 
             //////
-            builder.append(convertResult(report.maxLayer < 14));
+            boolean deepLayer = report.maxLayer >= MAX_LAYER;
+            builder.append(convertResult(!deepLayer));
             builder.append("检测到VDOM最深嵌套层级为 ")
                     .append(report.maxLayer + 1)//1主要是为了和dev tool兼容
-                    .append(",建议<14")
-                    .append("\n");
+                    .append(",建议<14");
+            if(deepLayer && mViewHighlighter != null && mViewHighlighter.isSupport()) {
+                builder.append(",深层嵌套已高亮透出");
+            }
+            builder.append("\n");
             //////
 
             if(report.hasScroller) {
@@ -131,6 +144,24 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
         @Override
         protected void onStop() {
             instance = null;
+            if(mViewHighlighter != null) {
+                mViewHighlighter.clearHighlight();
+            }
+        }
+
+        @Override
+        public void onTrackNode(@NonNull WXComponent component, int layer) {
+            if(layer < MAX_LAYER) {
+                return;
+            }
+            View hostView = component.getHostView();
+            if(hostView == null) {
+                return;
+            }
+
+            if(mViewHighlighter != null) {
+                mViewHighlighter.addHighlightedView(hostView);
+            }
         }
     }
 }
