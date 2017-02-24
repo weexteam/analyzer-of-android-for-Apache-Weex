@@ -31,6 +31,9 @@ public class HealthReport {
     /**扩展字段*/
     public Map<String,String> extendProps;
 
+    /**是否包含embed标签*/
+    public boolean hasEmbed;
+
     private String bundleUrl;
 
     public HealthReport(@NonNull String bundleUrl){
@@ -42,6 +45,7 @@ public class HealthReport {
         Log.d(Constants.TAG,"[health report] maxLayer:" + maxLayer);
         Log.d(Constants.TAG,"[health report] hasList:" + hasList);
         Log.d(Constants.TAG,"[health report] hasScroller:" + hasScroller);
+        Log.d(Constants.TAG,"[health report] hasEmbed:"+hasEmbed);
         Log.d(Constants.TAG,"[health report] hasBigCell:" + hasBigCell);
         Log.d(Constants.TAG,"[health report] maxCellViewNum:" + maxCellViewNum);
         Log.d(Constants.TAG,"[health report] cellNum:" + cellNum);

@@ -102,7 +102,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             boolean deepLayer = report.maxLayer >= MAX_LAYER;
             builder.append(convertResult(!deepLayer));
             builder.append("检测到VDOM最深嵌套层级为 ")
-                    .append(report.maxLayer + 1)//1主要是为了和dev tool兼容
+                    .append(report.maxLayer + 1)//1主要是为了和dev tool兼容,dev tool认为instance为第一层嵌套
                     .append(",建议<14");
             if(deepLayer && mViewHighlighter != null && mViewHighlighter.isSupport()) {
                 builder.append(",深层嵌套已高亮透出");
@@ -113,6 +113,13 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             if(report.hasScroller) {
                 builder.append(convertResult(true));
                 builder.append("检测到该页面使用了Scroller,长列表建议使用ListView")
+                        .append("\n");
+            }
+
+            //////
+            if(report.hasEmbed) {
+                builder.append(convertResult(true));
+                builder.append("检测到该页面使用了Embed标签")
                         .append("\n");
             }
 

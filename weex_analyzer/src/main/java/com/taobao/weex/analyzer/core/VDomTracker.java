@@ -146,12 +146,12 @@ public class VDomTracker {
 
             if (component instanceof WXListComponent) {
                 report.hasList = true;
-            }
-            if (component instanceof WXScroller) {
+            } else if (component instanceof WXScroller) {
                 report.hasScroller = true;
-            }
-            if (component instanceof WXCell) {
+            } else if (component instanceof WXCell) {
                 cellList.add(component);
+            } else if(component instanceof WXEmbed) {
+                report.hasEmbed = true;
             }
 
             NodeInfo nodeInfo = map.get(component);
