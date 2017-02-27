@@ -9,7 +9,7 @@
     <LinearLayout
         android:id="@+id/overlay_view_content_view"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="wrap_content"
         android:background="#89000000"
         android:gravity="center_vertical"
         android:orientation="vertical"

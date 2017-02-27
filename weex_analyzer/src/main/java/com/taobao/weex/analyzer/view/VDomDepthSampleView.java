@@ -102,7 +102,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             boolean deepLayer = report.maxLayer >= MAX_LAYER;
             builder.append(convertResult(!deepLayer));
             builder.append("检测到VDOM最深嵌套层级为 ")
-                    .append(report.maxLayer + 1)//1主要是为了和dev tool兼容,dev tool认为instance为第一层嵌套
+                    .append(report.maxLayer)
                     .append(",建议<14");
             if(deepLayer && mViewHighlighter != null && mViewHighlighter.isSupport()) {
                 builder.append(",深层嵌套已高亮透出");
@@ -116,12 +116,6 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
                         .append("\n");
             }
 
-            //////
-            if(report.hasEmbed) {
-                builder.append(convertResult(true));
-                builder.append("检测到该页面使用了Embed标签")
-                        .append("\n");
-            }
 
             //////
             if(report.hasList) {
@@ -133,10 +127,38 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
                 builder.append(convertResult(!report.hasBigCell));
                 if(report.hasBigCell) {
                     builder.append("检测到页面可能存在大cell,最大的cell中包含")
-                            .append(report.maxCellViewNum).append("个组件,建议按行合理拆分");
+                            .append(report.maxCellViewNum).append("个组件,建议按行合理拆分")
+                            .append("\n");
                 }else {
-                    builder.append("经检测，cell大小合理");
+                    builder.append("经检测，cell大小合理")
+                            .append("\n");
                 }
+            }
+
+            //////
+            if(report.hasEmbed) {
+                int embedNum = report.embedDescList.size();
+
+                builder.append(convertResult(true));
+                builder.append("检测到该页面使用了Embed标签")
+                        .append(",")
+                        .append("该标签数目为")
+                        .append(embedNum)
+                        .append("\n");
+
+                for(int i = 0 ; i < embedNum; i++) {
+                    HealthReport.EmbedDesc desc = report.embedDescList.get(i);
+                    boolean isEmbedDeep = desc.actualMaxLayer>=MAX_LAYER;
+                    builder.append(convertResult(!isEmbedDeep))
+                            .append("第")
+                            .append(i+1)
+                            .append("个embed标签地址为")
+                            .append(desc.src)
+                            .append(",内容最深嵌套层级为")
+                            .append(desc.actualMaxLayer)
+                            .append("\n");
+                }
+
             }
 
 

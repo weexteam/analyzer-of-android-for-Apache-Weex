@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.taobao.weex.analyzer.core.Constants;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,47 +15,94 @@ import java.util.Map;
  */
 
 public class HealthReport {
-    /**vdom树*/
+    /**
+     * vdom树
+     */
     public NodeInfo vdom;
-    /**是否使用list*/
+    /**
+     * 是否使用list
+     */
     public boolean hasList;
-    /**是否使用scroller*/
+    /**
+     * 是否使用scroller
+     */
     public boolean hasScroller;
-    /**是否使用大cell*/
+    /**
+     * 是否使用大cell
+     */
     public boolean hasBigCell;
-    /**最深嵌套层级*/
+    /**
+     * 最深嵌套层级
+     */
     public int maxLayer;
-    /**cell下view个数*/
+    /**
+     * cell下view个数
+     */
     public int maxCellViewNum;
-    /**当前cell个数*/
+    /**
+     * 当前cell个数
+     */
     public int cellNum;
-    /**扩展字段*/
-    public Map<String,String> extendProps;
+    /**
+     * 扩展字段
+     */
+    public Map<String, String> extendProps;
 
-    /**是否包含embed标签*/
+    /**
+     * 是否包含embed标签
+     */
     public boolean hasEmbed;
+
+    public List<EmbedDesc> embedDescList;
+
 
     private String bundleUrl;
 
-    public HealthReport(@NonNull String bundleUrl){
+    public HealthReport(@NonNull String bundleUrl) {
         this.bundleUrl = bundleUrl;
     }
 
     public void writeToConsole() {
-        Log.d(Constants.TAG,"health report("+bundleUrl+")");
-        Log.d(Constants.TAG,"[health report] maxLayer:" + maxLayer);
-        Log.d(Constants.TAG,"[health report] hasList:" + hasList);
-        Log.d(Constants.TAG,"[health report] hasScroller:" + hasScroller);
-        Log.d(Constants.TAG,"[health report] hasEmbed:"+hasEmbed);
-        Log.d(Constants.TAG,"[health report] hasBigCell:" + hasBigCell);
-        Log.d(Constants.TAG,"[health report] maxCellViewNum:" + maxCellViewNum);
-        Log.d(Constants.TAG,"[health report] cellNum:" + cellNum);
-        Log.d(Constants.TAG,"\n");
+        Log.d(Constants.TAG, "health report(" + bundleUrl + ")");
+        Log.d(Constants.TAG, "[health report] maxLayer:" + maxLayer);
+        Log.d(Constants.TAG, "[health report] hasList:" + hasList);
+        Log.d(Constants.TAG, "[health report] hasScroller:" + hasScroller);
+        Log.d(Constants.TAG, "[health report] hasBigCell:" + hasBigCell);
+        Log.d(Constants.TAG, "[health report] maxCellViewNum:" + maxCellViewNum);
+        Log.d(Constants.TAG, "[health report] cellNum:" + cellNum);
+        Log.d(Constants.TAG, "[health report] hasEmbed:" + hasEmbed);
 
-        if(extendProps != null) {
-            for(Map.Entry<String,String> me : extendProps.entrySet()) {
-                Log.d(Constants.TAG,"[health report] " + me.getKey() + ":" + me.getValue() + ")");
+
+        if (embedDescList != null && !embedDescList.isEmpty()) {
+            Log.d(Constants.TAG, "[health report] embedNum:" + embedDescList.size());
+            for (EmbedDesc desc : embedDescList) {
+                Log.d(Constants.TAG, "[health report] embedDesc: (src:" + desc.src + ",layer:" + desc.actualMaxLayer + ")");
+
             }
         }
+
+
+        Log.d(Constants.TAG, "\n");
+
+        if (extendProps != null) {
+            for (Map.Entry<String, String> me : extendProps.entrySet()) {
+                Log.d(Constants.TAG, "[health report] " + me.getKey() + ":" + me.getValue() + ")");
+            }
+        }
+    }
+
+    public static class EmbedDesc {
+        /**
+         * embed标签的源
+         */
+        public String src;
+        /**
+         * embed标签起始的层级
+         */
+        public int beginLayer;
+        /**
+         * embed自身内容实际层级(embed嵌套embed的情况，不计算子embed标签深度)
+         */
+        public int actualMaxLayer;
     }
 }

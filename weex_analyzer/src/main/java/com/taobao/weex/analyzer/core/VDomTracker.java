@@ -35,6 +35,7 @@ import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +62,8 @@ public class VDomTracker {
 
     private static final Map<Class, String> sVDomMap;
     private OnTrackNodeListener mOnTrackNodeListener;
+
+    private static final int START_LAYER = 2;//instance为第一层，rootComponent为第二层
 
     static {
         sVDomMap = new HashMap<>();
@@ -117,7 +120,7 @@ public class VDomTracker {
         }
 
         LayeredVDomNode layeredNode = mObjectPool.obtain();
-        layeredNode.set(godComponent, getComponentName(godComponent), 1);
+        layeredNode.set(godComponent, getComponentName(godComponent), START_LAYER);
 
         mLayeredQueue.add(layeredNode);
 
@@ -139,6 +142,17 @@ public class VDomTracker {
             LayeredVDomNode domNode = mLayeredQueue.removeFirst();
             WXComponent component = domNode.component;
             int layer = domNode.layer;
+
+            report.maxLayer = Math.max(report.maxLayer,layer);
+
+            //如果节点被染色，需要计算其该染色子树的最大深度
+            if(!TextUtils.isEmpty(domNode.tint)) {
+                for(HealthReport.EmbedDesc desc : report.embedDescList) {
+                    if(desc.src != null && desc.src.equals(domNode.tint)) {
+                        desc.actualMaxLayer = Math.max(desc.actualMaxLayer,(layer-desc.beginLayer));
+                    }
+                }
+            }
 
             if (mOnTrackNodeListener != null && component != null) {
                 mOnTrackNodeListener.onTrackNode(component, layer);
@@ -164,13 +178,46 @@ public class VDomTracker {
             domNode.clear();
             mObjectPool.recycle(domNode);
 
-            if (component instanceof WXVContainer) {
+            if(component instanceof WXEmbed) {
+
+                if(report.embedDescList == null) {
+                    report.embedDescList = new ArrayList<>();
+                }
+                HealthReport.EmbedDesc desc = new HealthReport.EmbedDesc();
+                desc.src = ((WXEmbed)component).getSrc();
+                desc.beginLayer = layer;
+
+                report.embedDescList.add(desc);
+
+                //add nested component to layeredQueue
+                WXComponent nestedRootComponent = getNestedRootComponent((WXEmbed) component);
+                if(nestedRootComponent != null) {
+                    LayeredVDomNode childNode = mObjectPool.obtain();
+                    childNode.set(nestedRootComponent, getComponentName(nestedRootComponent), layer+1);
+                    mLayeredQueue.add(childNode);
+
+                    //tint
+                    childNode.tint = desc.src;
+
+                    //build tree
+                    NodeInfo nestedNodeInfo = createNode(childNode);
+                    if(nodeInfo.children == null) {
+                        nodeInfo.children = new ArrayList<>(2);
+                    }
+                    nodeInfo.children.add(nestedNodeInfo);
+                    map.put(nestedRootComponent,nestedNodeInfo);
+                }
+            } else if (component instanceof WXVContainer) {
                 WXVContainer container = (WXVContainer) component;
                 for (int i = 0, count = container.childCount(); i < count; i++) {
                     WXComponent child = container.getChild(i);
                     LayeredVDomNode childNode = mObjectPool.obtain();
                     childNode.set(child, getComponentName(child), layer + 1);
-                    report.maxLayer = layer + 1;
+
+                    //if parent is tinted,then tint it's children
+                    if(!TextUtils.isEmpty(domNode.tint)) {
+                        childNode.tint = domNode.tint;
+                    }
 
                     mLayeredQueue.add(childNode);
 
@@ -207,6 +254,24 @@ public class VDomTracker {
         report.vdom = tree;
         return report;
 
+    }
+
+    @Nullable
+    private WXComponent getNestedRootComponent(@NonNull WXEmbed embed) {
+        try {
+            Class embedClazz = embed.getClass();
+            Field field = embedClazz.getDeclaredField("mNestedInstance");
+            field.setAccessible(true);
+            WXSDKInstance nestedInstance = (WXSDKInstance) field.get(embed);
+            if(nestedInstance == null) {
+                return null;
+            }
+            return nestedInstance.getRootComponent();
+
+        }catch (Exception e) {
+            WXLogUtils.e(TAG,e.getMessage());
+        }
+        return null;
     }
 
     private int getCellViewNum(NodeInfo cellNode) {
@@ -270,6 +335,8 @@ public class VDomTracker {
         WXComponent component;
         String simpleName;
         int layer;
+
+        String tint;
 
         void set(WXComponent component, String simpleName, int layer) {
             this.component = component;
