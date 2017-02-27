@@ -112,7 +112,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
 
             if(report.hasScroller) {
                 builder.append(convertResult(true));
-                builder.append("检测到该页面使用了Scroller,长列表建议使用ListView")
+                builder.append("检测到该页面使用了纵向的Scroller,长列表建议使用ListView")
                         .append("\n");
             }
 
