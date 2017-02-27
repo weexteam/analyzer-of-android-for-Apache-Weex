@@ -13,17 +13,22 @@ import com.taobao.weex.utils.WXLogUtils;
 /**
  * Description:
  *
- *  monitor cpu & fps & memory
+ *  1. monitor cpu & fps & memory
+ *  2. monitor weex page layer/list/big cell and so on
+ *
  *
  *  usage:
  *
- *    1. adb command:
+ *    1. adb command(monitor cpu & fps & memory):
  *       - start: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on
  *       - stop: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c off
  *
- *       建议增加-n指定componentName
+ *    2.  adb command(monitor weex page layer/list/big cell and so on):
+ *       - start: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e d on
+ *       - stop: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e d off
  *
- *    2. shake device and start it by click option
+ *       - start: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f on
+ *       - stop: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f off
  *
  *  notice:
  *    make sure your host app is running and interactive or the service is not started.
@@ -63,6 +68,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         if(!TextUtils.isEmpty(cmd_tracker_standard)) {
             if(CMD_ON.equals(cmd_tracker_standard)) {
                 VDomController.isStandardMode = true;
+                VDomController.isPollingMode = false;
             } else if(CMD_OFF.equals(cmd_tracker_standard)) {
                 VDomController.isStandardMode = false;
             } else {
@@ -75,6 +81,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         if(!TextUtils.isEmpty(cmd_tracker_polling)) {
             if(CMD_ON.equals(cmd_tracker_polling)) {
                 VDomController.isPollingMode = true;
+                VDomController.isStandardMode = false;
                 PollingVDomMonitor.shouldStop = false;
             } else if(CMD_OFF.equals(cmd_tracker_polling)) {
                 VDomController.isPollingMode = false;
