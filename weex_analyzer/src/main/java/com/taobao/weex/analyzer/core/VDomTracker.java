@@ -161,7 +161,11 @@ public class VDomTracker {
             if (component instanceof WXListComponent) {
                 report.hasList = true;
             } else if (component instanceof WXScroller) {
-                report.hasScroller = true;
+                if(component.getDomObject() != null && component.getDomObject().getAttrs() != null
+                        && "vertical".equals(component.getDomObject().getAttrs().getScrollDirection())) {
+                    report.hasScroller = true;
+                }
+
             } else if (component instanceof WXCell) {
                 cellList.add(component);
             } else if(component instanceof WXEmbed) {
