@@ -2,6 +2,7 @@ package com.taobao.weex.analyzer.core;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.view.Choreographer;
 
 /**
@@ -25,8 +26,8 @@ public class FPSSampler implements Choreographer.FrameCallback {
 
     private static final float DEVICE_REFRESH_RATE_IN_MS = 16.67F;
 
-    public FPSSampler() {
-        mChoreographer = Choreographer.getInstance();
+    public FPSSampler(@NonNull Choreographer choreographer) {
+        this.mChoreographer = choreographer;
     }
 
     public void start() {

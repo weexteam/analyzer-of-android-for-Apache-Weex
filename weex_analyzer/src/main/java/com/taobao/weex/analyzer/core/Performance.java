@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.core;
 import com.taobao.weex.WXEnvironment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -136,16 +137,12 @@ public class Performance {
         list.add("pageName : " + performance.pageName);
         list.add("templateUrl : " + performance.templateUrl);
         list.add("jslib version : " + performance.JSLibVersion);
-//        list.add("weex sdk version : " + performance.WXSDKVersion);
         list.add("component count : "+ performance.componentCount);
         list.add("JSLibInitTime : "+ performance.JSLibInitTime);
         list.add("JSLibSize : "+ performance.JSLibSize);
         list.add("JSTemplateSize : "+ performance.JSTemplateSize);
         list.add("localReadTime : "+ performance.localReadTime);
         list.add("templateLoadTime : "+ performance.templateLoadTime);
-
-//        list.add("totalTime : "+ performance.totalTime);
-//        list.add("screenRenderTime : "+ performance.screenRenderTime);
 
         list.add("actualNetworkTime : "+ performance.actualNetworkTime);
         list.add("pureNetworkTime : "+ performance.pureNetworkTime);
@@ -163,7 +160,7 @@ public class Performance {
         list.add("communicateTime : "+ performance.communicateTime);
         list.add("requestType : " + performance.requestType);
         list.add("connectionType : " + performance.connectionType);
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
 

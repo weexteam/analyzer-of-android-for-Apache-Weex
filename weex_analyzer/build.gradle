@@ -43,6 +43,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled = true
+        }
     }
 }
 
@@ -51,4 +54,12 @@ dependencies {
     provided 'com.android.support:recyclerview-v7:25.2.0'
     provided 'com.alibaba:fastjson:1.1.46.android'
     provided 'com.android.support:support-v4:25.2.0'
+    testCompile 'junit:junit:4.12'
+
+    testCompile 'org.mockito:mockito-core:1.9.5'
+
+    testCompile "org.robolectric:robolectric:3.1.4"
+    testCompile "org.powermock:powermock-module-junit4:1.6.4"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
+    testCompile "org.powermock:powermock-api-mockito:1.6.4"
 }

@@ -72,7 +72,9 @@ public class AnalyzerService extends Service {
             mTaskEntities.add(new CpuTaskEntity());
             mTaskEntities.add(new TrafficTaskEntity(delayMillis));
             mTaskEntities.add(new MemoryTaskEntity());
-            mTaskEntities.add(new FpsTaskEntity());
+            if(FPSSampler.isSupported()) {
+                mTaskEntities.add(new FpsTaskEntity());
+            }
 
         }
 
