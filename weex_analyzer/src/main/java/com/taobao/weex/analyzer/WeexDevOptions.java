@@ -36,7 +36,7 @@ import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
 import com.taobao.weex.analyzer.view.TrafficSampleView;
-import com.taobao.weex.analyzer.view.VDomDepthSampleView;
+import com.taobao.weex.analyzer.view.ProfileDomView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.ArrayList;
@@ -67,7 +67,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private ScalpelViewController mScalpelViewController;
     private PerfSampleOverlayView mPerfMonitorOverlayView;
-    private VDomDepthSampleView mVDomDepthSampleView;
+    private ProfileDomView mProfileDomView;
 
     private NetworkInspectorView mNetworkInspectorView;
 
@@ -84,7 +84,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
         mConfig = new DevOptionsConfig(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
-        mVDomDepthSampleView = new VDomDepthSampleView(context);
+        mProfileDomView = new ProfileDomView(context);
         mNetworkInspectorView = new NetworkInspectorView(context);
         mNetworkInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
@@ -315,11 +315,11 @@ public class WeexDevOptions implements IWXDevOptions {
             public void onOptionClick() {
                 if (mConfig.isVDomDepthEnabled()) {
                     mConfig.setVdomDepthEnabled(false);
-                    mVDomDepthSampleView.dismiss();
+                    mProfileDomView.dismiss();
                 } else {
                     mConfig.setVdomDepthEnabled(true);
-                    mVDomDepthSampleView.show();
-                    mVDomDepthSampleView.bindInstance(mInstance);
+                    mProfileDomView.show();
+                    mProfileDomView.bindInstance(mInstance);
                 }
             }
         },true));
@@ -435,10 +435,10 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if(mConfig.isVDomDepthEnabled()) {
-            mVDomDepthSampleView.show();
-            mVDomDepthSampleView.bindInstance(mInstance);
+            mProfileDomView.show();
+            mProfileDomView.bindInstance(mInstance);
         } else {
-            mVDomDepthSampleView.dismiss();
+            mProfileDomView.dismiss();
         }
 
         if(mConfig.isNetworkInspectorEnabled()) {
@@ -495,7 +495,7 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if(mConfig.isVDomDepthEnabled()) {
-            mVDomDepthSampleView.dismiss();
+            mProfileDomView.dismiss();
         }
 
         if(mConfig.isNetworkInspectorEnabled()) {
@@ -552,8 +552,8 @@ public class WeexDevOptions implements IWXDevOptions {
             mVdomController.monitor(instance);
         }
 
-        if(mVDomDepthSampleView != null) {
-            mVDomDepthSampleView.bindInstance(instance);
+        if(mProfileDomView != null) {
+            mProfileDomView.bindInstance(instance);
         }
     }
 

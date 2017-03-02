@@ -16,10 +16,6 @@ import java.util.Map;
 
 public class HealthReport {
     /**
-     * vdom树
-     */
-    public NodeInfo vdom;
-    /**
      * 是否使用list
      */
     public boolean hasList;
@@ -32,9 +28,14 @@ public class HealthReport {
      */
     public boolean hasBigCell;
     /**
-     * 最深嵌套层级
+     * 最深嵌套层级(virtual dom)
      */
     public int maxLayer;
+
+    /**
+     * native view层级
+     * */
+    public int maxLayerOfRealDom;
     /**
      * cell下view个数
      */
@@ -65,6 +66,7 @@ public class HealthReport {
     public void writeToConsole() {
         Log.d(Constants.TAG, "health report(" + bundleUrl + ")");
         Log.d(Constants.TAG, "[health report] maxLayer:" + maxLayer);
+        Log.d(Constants.TAG, "[health report] maxLayerOfRealDom:" + maxLayerOfRealDom);
         Log.d(Constants.TAG, "[health report] hasList:" + hasList);
         Log.d(Constants.TAG, "[health report] hasScroller:" + hasScroller);
         Log.d(Constants.TAG, "[health report] hasBigCell:" + hasBigCell);

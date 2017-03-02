@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
-import com.taobao.weex.analyzer.core.VDomTracker;
+import com.taobao.weex.analyzer.core.DomTracker;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
 import com.taobao.weex.ui.component.WXComponent;
@@ -22,10 +22,10 @@ import com.taobao.weex.ui.component.WXComponent;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class VDomDepthSampleView extends DragSupportOverlayView{
+public class ProfileDomView extends DragSupportOverlayView{
     private SampleTask mTask;
 
-    public VDomDepthSampleView(Context application) {
+    public ProfileDomView(Context application) {
         super(application);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
     }
@@ -61,13 +61,15 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
     }
 
 
-    private static class SampleTask extends AbstractLoopTask implements VDomTracker.OnTrackNodeListener{
+    private static class SampleTask extends AbstractLoopTask implements DomTracker.OnTrackNodeListener{
 
         WXSDKInstance instance;
         TextView resultTextView;
         MutipleViewHighlighter mViewHighlighter;
 
-        static final int MAX_LAYER = 14;
+        static final int MAX_VDOM_LAYER = 14;
+        static final int MAX_REAL_DOM_LAYER = 20;
+
         SampleTask(@NonNull View hostView) {
             super(false);
             mDelayMillis = 1000;
@@ -89,7 +91,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             if(instance == null) {
                 return;
             }
-            VDomTracker tracker = new VDomTracker(instance);
+            DomTracker tracker = new DomTracker(instance);
             tracker.setOnTrackNodeListener(this);
             HealthReport report = tracker.traverse();
             if(report == null) {
@@ -99,7 +101,14 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
             builder.append("weex-analyzer检测结果:\n");
 
             //////
-            boolean deepLayer = report.maxLayer >= MAX_LAYER;
+            builder.append(convertResult(report.maxLayerOfRealDom<MAX_REAL_DOM_LAYER))
+                    .append("检测到native最深嵌套层级为 ")
+                    .append(report.maxLayerOfRealDom)
+                    .append("(仅统计weex自身渲染出来的层级)")
+                    .append("\n");
+
+            //////
+            boolean deepLayer = report.maxLayer >= MAX_VDOM_LAYER;
             builder.append(convertResult(!deepLayer));
             builder.append("检测到VDOM最深嵌套层级为 ")
                     .append(report.maxLayer)
@@ -148,7 +157,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
 
                 for(int i = 0 ; i < embedNum; i++) {
                     HealthReport.EmbedDesc desc = report.embedDescList.get(i);
-                    boolean isEmbedDeep = desc.actualMaxLayer>=MAX_LAYER;
+                    boolean isEmbedDeep = desc.actualMaxLayer>= MAX_VDOM_LAYER;
                     builder.append(convertResult(!isEmbedDeep))
                             .append("第")
                             .append(i+1)
@@ -180,7 +189,7 @@ public class VDomDepthSampleView extends DragSupportOverlayView{
 
         @Override
         public void onTrackNode(@NonNull WXComponent component, int layer) {
-            if(layer < MAX_LAYER) {
+            if(layer < MAX_VDOM_LAYER) {
                 return;
             }
             View hostView = component.getHostView();

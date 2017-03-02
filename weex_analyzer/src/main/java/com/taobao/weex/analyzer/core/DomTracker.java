@@ -3,6 +3,8 @@ package com.taobao.weex.analyzer.core;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.pojo.HealthReport;
@@ -42,17 +44,19 @@ import java.util.Map;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class VDomTracker {
+public class DomTracker {
     private WXSDKInstance mWxInstance;
-    private Deque<LayeredVDomNode> mLayeredQueue;
-    private ObjectPool<LayeredVDomNode> mObjectPool;
+    private Deque<LayeredNode<WXComponent>> mLayeredQueue;
+    private ObjectPool<LayeredNode<WXComponent>> mVDomObjectPool;
+    private ObjectPool<LayeredNode<View>> mRealDomObjectPool;
 
     private static final String TAG = "VDomTracker";
 
     private static final Map<Class, String> sVDomMap;
     private OnTrackNodeListener mOnTrackNodeListener;
 
-    private static final int START_LAYER = 2;//instance为第一层，rootComponent为第二层
+    private static final int START_LAYER_OF_VDOM = 2;//instance为第一层，rootComponent为第二层
+    private static final int START_LAYER_OF_REAL_DOM = 2;//renderContainer为第一层
 
     static {
         sVDomMap = new HashMap<>();
@@ -80,13 +84,19 @@ public class VDomTracker {
         void onTrackNode(@NonNull WXComponent component, int layer);
     }
 
-    public VDomTracker(@NonNull WXSDKInstance instance) {
+    public DomTracker(@NonNull WXSDKInstance instance) {
         this.mWxInstance = instance;
         mLayeredQueue = new ArrayDeque<>();
-        mObjectPool = new ObjectPool<LayeredVDomNode>(10) {
+        mVDomObjectPool = new ObjectPool<LayeredNode<WXComponent>>(10) {
             @Override
-            LayeredVDomNode newObject() {
-                return new LayeredVDomNode();
+            LayeredNode<WXComponent> newObject() {
+                return new LayeredNode<>();
+            }
+        };
+        mRealDomObjectPool = new ObjectPool<LayeredNode<View>>(15) {
+            @Override
+            LayeredNode<View> newObject() {
+                return new LayeredNode<>();
             }
         };
     }
@@ -108,16 +118,20 @@ public class VDomTracker {
             WXLogUtils.e(TAG, "god component not found");
             return null;
         }
+        HealthReport report = new HealthReport(mWxInstance.getBundleUrl());
 
-        LayeredVDomNode layeredNode = mObjectPool.obtain();
-        layeredNode.set(godComponent, getComponentName(godComponent), START_LAYER);
+        View hostView = godComponent.getHostView();
+        if(hostView != null) {
+            report.maxLayerOfRealDom = getRealDomMaxLayer(hostView);
+        }
+
+        LayeredNode<WXComponent> layeredNode = mVDomObjectPool.obtain();
+        layeredNode.set(godComponent, getComponentName(godComponent), START_LAYER_OF_VDOM);
 
         mLayeredQueue.add(layeredNode);
 
-        HealthReport report = new HealthReport(mWxInstance.getBundleUrl());
-
         while (!mLayeredQueue.isEmpty()) {
-            LayeredVDomNode domNode = mLayeredQueue.removeFirst();
+            LayeredNode<WXComponent> domNode = mLayeredQueue.removeFirst();
             WXComponent component = domNode.component;
             int layer = domNode.layer;
 
@@ -151,14 +165,14 @@ public class VDomTracker {
                     report.hasBigCell |= isBigCell(height);
                 }
 
-                report.maxCellViewNum = Math.max(report.maxCellViewNum,getCellViewNum(component));
+                report.maxCellViewNum = Math.max(report.maxCellViewNum, getComponentNumOfNode(component));
             } else if(component instanceof WXEmbed) {
                 report.hasEmbed = true;
             }
 
             //restore to pool for later use
             domNode.clear();
-            mObjectPool.recycle(domNode);
+            mVDomObjectPool.recycle(domNode);
 
             if(component instanceof WXEmbed) {
 
@@ -174,7 +188,7 @@ public class VDomTracker {
                 //add nested component to layeredQueue
                 WXComponent nestedRootComponent = getNestedRootComponent((WXEmbed) component);
                 if(nestedRootComponent != null) {
-                    LayeredVDomNode childNode = mObjectPool.obtain();
+                    LayeredNode<WXComponent> childNode = mVDomObjectPool.obtain();
                     childNode.set(nestedRootComponent, getComponentName(nestedRootComponent), layer+1);
                     mLayeredQueue.add(childNode);
 
@@ -185,7 +199,7 @@ public class VDomTracker {
                 WXVContainer container = (WXVContainer) component;
                 for (int i = 0, count = container.childCount(); i < count; i++) {
                     WXComponent child = container.getChild(i);
-                    LayeredVDomNode childNode = mObjectPool.obtain();
+                    LayeredNode<WXComponent> childNode = mVDomObjectPool.obtain();
                     childNode.set(child, getComponentName(child), layer + 1);
 
                     //if parent is tinted,then tint it's children
@@ -223,9 +237,9 @@ public class VDomTracker {
         return null;
     }
 
-    private int getCellViewNum(@NonNull WXComponent cellNode) {
+    private int getComponentNumOfNode(@NonNull WXComponent rootNode) {
         Deque<WXComponent> deque = new ArrayDeque<>();
-        deque.add(cellNode);
+        deque.add(rootNode);
         int viewNum = 0;
         while (!deque.isEmpty()) {
             WXComponent node = deque.removeFirst();
@@ -238,6 +252,37 @@ public class VDomTracker {
             }
         }
         return viewNum;
+    }
+
+    int getRealDomMaxLayer(@NonNull View rootView) {
+        int maxLayer = 0;
+        Deque<LayeredNode<View>> deque = new ArrayDeque<>();
+        LayeredNode<View> rootNode = mRealDomObjectPool.obtain();
+        rootNode.set(rootView,null,START_LAYER_OF_REAL_DOM);
+        deque.add(rootNode);
+
+        while (!deque.isEmpty()) {
+            LayeredNode<View> currentNode = deque.removeFirst();
+            maxLayer = Math.max(maxLayer,currentNode.layer);
+
+            View component = currentNode.component;
+            int layer = currentNode.layer;
+
+            currentNode.clear();
+            mRealDomObjectPool.recycle(currentNode);
+
+            if(component instanceof ViewGroup && ((ViewGroup) component).getChildCount() > 0) {
+                ViewGroup viewGroup = (ViewGroup) component;
+                for (int i = 0,count = viewGroup.getChildCount(); i < count; i++) {
+                    View child = viewGroup.getChildAt(i);
+                    LayeredNode<View> childNode = mRealDomObjectPool.obtain();
+                    childNode.set(child,null,layer+1);
+                    deque.add(childNode);
+                }
+            }
+        }
+
+        return maxLayer;
     }
 
     private boolean isBigCell(float maxHeight) {
@@ -253,14 +298,14 @@ public class VDomTracker {
         return TextUtils.isEmpty(name) ? "component" : name;
     }
 
-    private static class LayeredVDomNode {
-        WXComponent component;
+    private static class LayeredNode<T> {
+        T component;
         String simpleName;
         int layer;
 
         String tint;
 
-        void set(WXComponent component, String simpleName, int layer) {
+        void set(T component, String simpleName, int layer) {
             this.component = component;
             this.layer = layer;
             this.simpleName = simpleName;

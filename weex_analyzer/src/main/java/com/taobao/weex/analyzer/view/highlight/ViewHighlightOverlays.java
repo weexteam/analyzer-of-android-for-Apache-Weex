@@ -42,14 +42,14 @@ abstract class ViewHighlightOverlays {
         private final MainHighlightDrawable mMainHighlightDrawable = new MainHighlightDrawable();
         private final HighlightDrawable[] mHighlightDrawables = {
                 mMainHighlightDrawable,
-                new PaddingTopHighlightDrawable(),
-                new PaddingBottomHighlightDrawable(),
-                new PaddingRightHighlightDrawable(),
-                new PaddingLeftHighlightDrawable(),
-                new MarginTopHighlightDrawable(),
-                new MarginBottomHighlightDrawable(),
-                new MarginRightHighlightDrawable(),
-                new MarginLeftHighlightDrawable()
+//                new PaddingTopHighlightDrawable(),
+//                new PaddingBottomHighlightDrawable(),
+//                new PaddingRightHighlightDrawable(),
+//                new PaddingLeftHighlightDrawable(),
+//                new MarginTopHighlightDrawable(),
+//                new MarginBottomHighlightDrawable(),
+//                new MarginRightHighlightDrawable(),
+//                new MarginLeftHighlightDrawable()
         };
 
         ViewHighlightOverlaysJellybeanMR2() {
