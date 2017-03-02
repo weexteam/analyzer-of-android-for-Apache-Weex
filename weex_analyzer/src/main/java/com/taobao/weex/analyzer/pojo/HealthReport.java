@@ -40,6 +40,9 @@ public class HealthReport {
      * cell下view个数
      */
     public int maxCellViewNum;
+
+    public int componentNumOfBigCell;
+
     /**
      * 当前cell个数
      */

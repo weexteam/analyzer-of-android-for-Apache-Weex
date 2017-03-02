@@ -136,7 +136,7 @@ public class ProfileDomView extends DragSupportOverlayView{
                 builder.append(convertResult(!report.hasBigCell));
                 if(report.hasBigCell) {
                     builder.append("检测到页面可能存在大cell,最大的cell中包含")
-                            .append(report.maxCellViewNum).append("个组件,建议按行合理拆分")
+                            .append(report.componentNumOfBigCell).append("个组件,建议按行合理拆分")
                             .append("\n");
                 }else {
                     builder.append("经检测，cell大小合理")

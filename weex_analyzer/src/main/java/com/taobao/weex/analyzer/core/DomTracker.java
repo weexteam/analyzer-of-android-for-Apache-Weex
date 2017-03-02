@@ -160,12 +160,15 @@ public class DomTracker {
 
             } else if (component instanceof WXCell) {
                 report.cellNum++;
+                int num = getComponentNumOfNode(component);
+                report.maxCellViewNum = Math.max(report.maxCellViewNum, num);
+
                 if(((WXCell) component).getHostView() != null) {
                     int height = ((WXCell) component).getHostView().getMeasuredHeight();
                     report.hasBigCell |= isBigCell(height);
+                    report.componentNumOfBigCell = num;
                 }
 
-                report.maxCellViewNum = Math.max(report.maxCellViewNum, getComponentNumOfNode(component));
             } else if(component instanceof WXEmbed) {
                 report.hasEmbed = true;
             }
