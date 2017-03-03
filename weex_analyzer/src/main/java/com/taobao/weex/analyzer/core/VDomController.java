@@ -17,9 +17,9 @@ public class VDomController implements IVDomMonitor {
     private PollingVDomMonitor mPollingVDomMonitor;
     private StandardVDomMonitor mStandardVDomMonitor;
 
-    public VDomController() {
-        mPollingVDomMonitor = new PollingVDomMonitor();
-        mStandardVDomMonitor = new StandardVDomMonitor();
+    public VDomController(@NonNull PollingVDomMonitor pollingVDomMonitor,@NonNull StandardVDomMonitor standardVDomMonitor) {
+        mPollingVDomMonitor = pollingVDomMonitor;
+        mStandardVDomMonitor = standardVDomMonitor;
     }
 
     @Override

@@ -9,5 +9,5 @@ test:
     - cp -r weex_analyzer/build/outputs $CIRCLE_ARTIFACTS/outputs
 dependencies:
   cache_directories:
-    - ~/.gradle
+    - "weex_analyzer/.gradle"
     - ~/.m2
