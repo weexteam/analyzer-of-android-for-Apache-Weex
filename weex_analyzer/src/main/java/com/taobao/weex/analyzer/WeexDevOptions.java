@@ -16,8 +16,10 @@ import com.taobao.weex.analyzer.core.DevOptionsConfig;
 import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
+import com.taobao.weex.analyzer.core.PollingVDomMonitor;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
+import com.taobao.weex.analyzer.core.StandardVDomMonitor;
 import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.utils.SDKUtils;
@@ -187,7 +189,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mVdomController = new VDomController();
+        mVdomController = new VDomController(new PollingVDomMonitor(),new StandardVDomMonitor());
     }
 
 
