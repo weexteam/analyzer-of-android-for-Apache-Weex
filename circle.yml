@@ -1,12 +1,12 @@
 machine:
   java:
     version: 'oraclejdk8'
-# test:
-#   #override:
-#   #  - cd weex_analyzer && ./run-circle-ci.sh
-#   post:
-#     - cp -r weex_analyzer/build/reports $CIRCLE_ARTIFACTS/reports
-#     - cp -r weex_analyzer/build/outputs $CIRCLE_ARTIFACTS/outputs
+test:
+  override:
+   - ./run-circle-ci.sh
+  post:
+    - cp -r weex_analyzer/build/reports $CIRCLE_ARTIFACTS/reports
+    - cp -r weex_analyzer/build/outputs $CIRCLE_ARTIFACTS/outputs
 dependencies:
   cache_directories:
     - ~/.gradle
