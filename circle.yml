@@ -3,7 +3,7 @@ machine:
     version: 'oraclejdk8'
 test:
   override:
-   - ./run-circle-ci.sh
+   - cd weex_analyzer && ./run-circle-ci.sh
   post:
     - cp -r weex_analyzer/build/reports $CIRCLE_ARTIFACTS/reports
     - cp -r weex_analyzer/build/outputs $CIRCLE_ARTIFACTS/outputs
