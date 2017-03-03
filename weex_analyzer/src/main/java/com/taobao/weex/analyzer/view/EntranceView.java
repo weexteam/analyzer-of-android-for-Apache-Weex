@@ -183,7 +183,7 @@ public class EntranceView extends AbstractAlertView {
                     if (curOption != null && curOption.listener != null) {
                         try {
                             if (curOption.isOverlayView
-                                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1
+                                    && Build.VERSION.SDK_INT >= 25
                                     && !SDKUtils.canDrawOverlays(getContext())
                                     ) {
                                 WXLogUtils.d(TAG, "we have no permission to draw overlay views.");
