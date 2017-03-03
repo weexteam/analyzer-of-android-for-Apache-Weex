@@ -1,0 +1,19 @@
+machine:
+  pre:
+    - sudo service mongodb stop
+    - sudo service mysql stop
+    - sudo service postgresql stop
+    - sudo service rabbitmq-server stop
+    - sudo service couchdb stop
+  java:
+    version: 'oraclejdk8'
+test:
+  override:
+    - cd weex_analyzer && ./run-circle-ci.sh
+  post:
+    - cp -r weex_analyzer/build/reports $CIRCLE_ARTIFACTS/reports
+    - cp -r weex_analyzer/build/outputs $CIRCLE_ARTIFACTS/outputs
+dependencies:
+  cache_directories:
+    - ~/.gradle
+    - ~/.m2
