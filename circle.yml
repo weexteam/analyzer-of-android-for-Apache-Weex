@@ -4,6 +4,7 @@ machine:
 test:
   override:
    - cd weex_analyzer && ./run-circle-ci.sh
+    timeout: 6000
   post:
     - cp -r weex_analyzer/build/reports $CIRCLE_ARTIFACTS/reports
     - cp -r weex_analyzer/build/outputs $CIRCLE_ARTIFACTS/outputs

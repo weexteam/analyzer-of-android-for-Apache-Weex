@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.core;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
@@ -22,6 +23,11 @@ public class NetworkEventSender {
 
     public NetworkEventSender(Context context) {
         mSender = LocalBroadcastManager.getInstance(context);
+    }
+
+    @VisibleForTesting
+    NetworkEventSender(LocalBroadcastManager manager) {
+        this.mSender = manager;
     }
 
     public void sendMessage(String type,String title,String desc,String body,Map<String,String> extendProps) {
