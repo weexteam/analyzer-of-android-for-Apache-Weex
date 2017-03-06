@@ -25,14 +25,14 @@ public class JSExceptionCatcher {
     private JSExceptionCatcher() {
     }
 
-
-    public static void catchException(@Nullable Context context, @Nullable WXSDKInstance instance, @Nullable String errCode, @Nullable String msg) {
+    @Nullable
+    public static AlertDialog catchException(@Nullable Context context, @Nullable WXSDKInstance instance, @Nullable String errCode, @Nullable String msg) {
         if (context == null) {
-            return;
+            return null;
         }
 
         if(errCode == null && msg == null){
-            return;
+            return null;
         }
 
         AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(context);
@@ -44,7 +44,9 @@ public class JSExceptionCatcher {
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        return dialog;
     }
 
 

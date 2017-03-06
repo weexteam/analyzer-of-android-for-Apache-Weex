@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.HashMap;
@@ -38,6 +39,10 @@ public class NetworkEventInspector {
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(context);
     }
 
+    private NetworkEventInspector(@NonNull LocalBroadcastManager manager) {
+        mLocalBroadcastManager = manager;
+    }
+
     private void setOnMessageReceivedListener(@NonNull OnMessageReceivedListener listener) {
         this.mListener = listener;
         mCoreMessageReceiver = new CoreMessageReceiver(mListener);
@@ -47,6 +52,14 @@ public class NetworkEventInspector {
 
     public static NetworkEventInspector createInstance(@NonNull Context context, @NonNull OnMessageReceivedListener listener) {
         NetworkEventInspector reporter = new NetworkEventInspector(context);
+        reporter.setOnMessageReceivedListener(listener);
+        return reporter;
+    }
+
+    @VisibleForTesting
+    @NonNull
+    static NetworkEventInspector createInstance(@NonNull LocalBroadcastManager manager, @NonNull OnMessageReceivedListener listener) {
+        NetworkEventInspector reporter = new NetworkEventInspector(manager);
         reporter.setOnMessageReceivedListener(listener);
         return reporter;
     }
