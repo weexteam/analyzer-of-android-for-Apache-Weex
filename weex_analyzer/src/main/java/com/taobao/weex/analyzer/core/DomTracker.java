@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.ui.component.WXA;
 import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
@@ -31,7 +32,6 @@ import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
-import java.lang.reflect.Field;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -189,7 +189,7 @@ public class DomTracker {
                 report.embedDescList.add(desc);
 
                 //add nested component to layeredQueue
-                WXComponent nestedRootComponent = getNestedRootComponent((WXEmbed) component);
+                WXComponent nestedRootComponent = ViewUtils.getNestedRootComponent((WXEmbed) component);
                 if(nestedRootComponent != null) {
                     LayeredNode<WXComponent> childNode = mVDomObjectPool.obtain();
                     childNode.set(nestedRootComponent, getComponentName(nestedRootComponent), layer+1);
@@ -222,23 +222,6 @@ public class DomTracker {
 
     }
 
-    @Nullable
-    private WXComponent getNestedRootComponent(@NonNull WXEmbed embed) {
-        try {
-            Class embedClazz = embed.getClass();
-            Field field = embedClazz.getDeclaredField("mNestedInstance");
-            field.setAccessible(true);
-            WXSDKInstance nestedInstance = (WXSDKInstance) field.get(embed);
-            if(nestedInstance == null) {
-                return null;
-            }
-            return nestedInstance.getRootComponent();
-
-        }catch (Exception e) {
-            WXLogUtils.e(TAG,e.getMessage());
-        }
-        return null;
-    }
 
     private int getComponentNumOfNode(@NonNull WXComponent rootNode) {
         Deque<WXComponent> deque = new ArrayDeque<>();

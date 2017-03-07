@@ -1,7 +1,16 @@
 package com.taobao.weex.analyzer.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.TypedValue;
+
+import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.component.WXEmbed;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.lang.reflect.Field;
 
 /**
  * Description:
@@ -21,6 +30,24 @@ public class ViewUtils {
 
     public static float sp2px(Context context,int sp){
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,sp,context.getResources().getDisplayMetrics());
+    }
+
+    @Nullable
+    public static WXComponent getNestedRootComponent(@NonNull WXEmbed embed) {
+        try {
+            Class embedClazz = embed.getClass();
+            Field field = embedClazz.getDeclaredField("mNestedInstance");
+            field.setAccessible(true);
+            WXSDKInstance nestedInstance = (WXSDKInstance) field.get(embed);
+            if(nestedInstance == null) {
+                return null;
+            }
+            return nestedInstance.getRootComponent();
+
+        }catch (Exception e) {
+            WXLogUtils.e(e.getMessage());
+        }
+        return null;
     }
 
     public static double findSuitableVal(double value,int step){
