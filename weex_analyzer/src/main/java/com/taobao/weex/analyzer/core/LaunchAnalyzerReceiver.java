@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.taobao.weex.analyzer.WeexDevOptions;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -30,6 +31,9 @@ import com.taobao.weex.utils.WXLogUtils;
  *       - start: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f on
  *       - stop: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f off
  *
+ *    3. launch main ui
+ *      - start: adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e launch true [from mds]
+ *
  *  notice:
  *    make sure your host app is running and interactive or the service is not started.
  *
@@ -42,6 +46,11 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
     private static final String CMD_TRACKER_STANDARD = "d";
     private static final String CMD_TRACKER_POLLING = "f";
 
+    private static final String CMD_LAUNCH_UI = "launch";
+
+    private static final String TRUE = "true";
+
+
     private static final String CMD_ON = "on";
     private static final String CMD_OFF = "off";
 
@@ -52,6 +61,13 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         }
         //性能数据
         String cmd_performance = intent.getStringExtra(CMD_PERFORMANCE);
+        //vdom调优 监听模式
+        String cmd_tracker_standard = intent.getStringExtra(CMD_TRACKER_STANDARD);
+        //vdom调优 轮询模式
+        String cmd_tracker_polling = intent.getStringExtra(CMD_TRACKER_POLLING);
+        // 启动
+        String cmd_launch_ui = intent.getStringExtra(CMD_LAUNCH_UI);
+
         if(!TextUtils.isEmpty(cmd_performance)) {
             if(CMD_ON.equals(cmd_performance)) {
                 performStart(context);
@@ -60,12 +76,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
             } else{
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e c on] to fetch performance data");
             }
-        }
-
-
-        //vdom调优 监听模式
-        String cmd_tracker_standard = intent.getStringExtra(CMD_TRACKER_STANDARD);
-        if(!TextUtils.isEmpty(cmd_tracker_standard)) {
+        } else if(!TextUtils.isEmpty(cmd_tracker_standard)) {
             if(CMD_ON.equals(cmd_tracker_standard)) {
                 VDomController.isStandardMode = true;
                 VDomController.isPollingMode = false;
@@ -74,11 +85,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
             } else {
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e d on] to start vdom tracker");
             }
-        }
-
-        //vdom调优 轮询模式
-        String cmd_tracker_polling = intent.getStringExtra(CMD_TRACKER_POLLING);
-        if(!TextUtils.isEmpty(cmd_tracker_polling)) {
+        } else if(!TextUtils.isEmpty(cmd_tracker_polling)) {
             if(CMD_ON.equals(cmd_tracker_polling)) {
                 VDomController.isPollingMode = true;
                 VDomController.isStandardMode = false;
@@ -88,6 +95,12 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
                 PollingVDomMonitor.shouldStop = true;
             } else {
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f on] to start vdom tracker(polling mode)");
+            }
+        } else if(!TextUtils.isEmpty(cmd_launch_ui)) {
+            if(TRUE.equals(cmd_launch_ui)) {
+                //启动主界面
+                String from = intent.getStringExtra(WeexDevOptions.EXTRA_FROM);
+                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from);
             }
         }
     }

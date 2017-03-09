@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
-
-    <LinearLayout
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/overlay_view_content_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,39 +11,42 @@
         android:padding="5dp"
         >
 
-        <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:orientation="horizontal">
-
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:layout_centerInParent="true"
-                    android:text="weex页面分析"
-                    android:textColor="#fff"
-                    android:textSize="14sp"/>
-
-            <TextView
-                    android:id="@+id/close"
-                    android:layout_width="40dp"
-                    android:layout_height="match_parent"
-                    android:background="#00ffffff"
-                    android:gravity="center"
-                    android:layout_alignParentRight="true"
-                    android:text="close"
-                    android:textColor="#fff"
-                    android:textSize="12sp"/>
-        </RelativeLayout>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="#fff"
-            android:textSize="12sp"
-            android:text="检测中..."/>
-    </LinearLayout>
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:text="weex页面分析"
+                android:textColor="#fff"
+                android:textSize="14sp"/>
 
-</FrameLayout>
+        <TextView
+                android:id="@+id/close"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:background="#00ffffff"
+                android:gravity="center"
+                android:layout_alignParentRight="true"
+                android:text="close"
+                android:textColor="#fff"
+                android:textSize="12sp"/>
+    </RelativeLayout>
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:id="@+id/result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#fff"
+                android:textSize="12sp"
+                android:text="检测中..."/>
+    </ScrollView>
+</LinearLayout>
