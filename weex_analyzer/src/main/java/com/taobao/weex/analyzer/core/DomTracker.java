@@ -10,33 +10,18 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
-import com.taobao.weex.ui.component.WXA;
-import com.taobao.weex.ui.component.WXBasicComponentType;
 import com.taobao.weex.ui.component.WXComponent;
-import com.taobao.weex.ui.component.WXDiv;
 import com.taobao.weex.ui.component.WXEmbed;
-import com.taobao.weex.ui.component.WXHeader;
-import com.taobao.weex.ui.component.WXImage;
-import com.taobao.weex.ui.component.WXInput;
-import com.taobao.weex.ui.component.WXLoading;
 import com.taobao.weex.ui.component.WXScroller;
-import com.taobao.weex.ui.component.WXSlider;
-import com.taobao.weex.ui.component.WXSwitch;
-import com.taobao.weex.ui.component.WXText;
 import com.taobao.weex.ui.component.WXVContainer;
-import com.taobao.weex.ui.component.WXVideo;
-import com.taobao.weex.ui.component.list.HorizontalListComponent;
 import com.taobao.weex.ui.component.list.WXCell;
 import com.taobao.weex.ui.component.list.WXListComponent;
-import com.taobao.weex.ui.view.WXEditText;
 import com.taobao.weex.utils.WXLogUtils;
 import com.taobao.weex.utils.WXViewUtils;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Description:
@@ -52,33 +37,12 @@ public class DomTracker {
 
     private static final String TAG = "VDomTracker";
 
-    private static final Map<Class, String> sVDomMap;
     private OnTrackNodeListener mOnTrackNodeListener;
 
     private static final int START_LAYER_OF_VDOM = 2;//instance为第一层，rootComponent为第二层
     private static final int START_LAYER_OF_REAL_DOM = 2;//renderContainer为第一层
 
-    static {
-        sVDomMap = new HashMap<>();
-        sVDomMap.put(WXComponent.class, "component");
-        sVDomMap.put(WXText.class, WXBasicComponentType.TEXT);
-        sVDomMap.put(WXVContainer.class, WXBasicComponentType.CONTAINER);
-        sVDomMap.put(WXDiv.class, WXBasicComponentType.DIV);
-        sVDomMap.put(WXEditText.class, WXBasicComponentType.TEXTAREA);
-        sVDomMap.put(WXA.class, WXBasicComponentType.A);
-        sVDomMap.put(WXInput.class, WXBasicComponentType.INPUT);
-        sVDomMap.put(WXLoading.class, WXBasicComponentType.LOADING);
-        sVDomMap.put(WXScroller.class, WXBasicComponentType.SCROLLER);
-        sVDomMap.put(WXSwitch.class, WXBasicComponentType.SWITCH);
-        sVDomMap.put(WXSlider.class, WXBasicComponentType.SLIDER);
-        sVDomMap.put(WXVideo.class, WXBasicComponentType.VIDEO);
-        sVDomMap.put(WXImage.class, WXBasicComponentType.IMAGE);
-        sVDomMap.put(WXHeader.class, WXBasicComponentType.HEADER);
-        sVDomMap.put(WXEmbed.class, WXBasicComponentType.EMBED);
-        sVDomMap.put(WXListComponent.class, WXBasicComponentType.LIST);
-        sVDomMap.put(HorizontalListComponent.class, WXBasicComponentType.HLIST);
-        sVDomMap.put(WXCell.class, WXBasicComponentType.CELL);
-    }
+
 
     public interface OnTrackNodeListener {
         void onTrackNode(@NonNull WXComponent component, int layer);
@@ -126,7 +90,7 @@ public class DomTracker {
         }
 
         LayeredNode<WXComponent> layeredNode = mVDomObjectPool.obtain();
-        layeredNode.set(godComponent, getComponentName(godComponent), START_LAYER_OF_VDOM);
+        layeredNode.set(godComponent, ViewUtils.getComponentName(godComponent), START_LAYER_OF_VDOM);
 
         mLayeredQueue.add(layeredNode);
 
@@ -192,7 +156,7 @@ public class DomTracker {
                 WXComponent nestedRootComponent = ViewUtils.getNestedRootComponent((WXEmbed) component);
                 if(nestedRootComponent != null) {
                     LayeredNode<WXComponent> childNode = mVDomObjectPool.obtain();
-                    childNode.set(nestedRootComponent, getComponentName(nestedRootComponent), layer+1);
+                    childNode.set(nestedRootComponent, ViewUtils.getComponentName(nestedRootComponent), layer+1);
                     mLayeredQueue.add(childNode);
 
                     //tint
@@ -203,7 +167,7 @@ public class DomTracker {
                 for (int i = 0, count = container.childCount(); i < count; i++) {
                     WXComponent child = container.getChild(i);
                     LayeredNode<WXComponent> childNode = mVDomObjectPool.obtain();
-                    childNode.set(child, getComponentName(child), layer + 1);
+                    childNode.set(child, ViewUtils.getComponentName(child), layer + 1);
 
                     //if parent is tinted,then tint it's children
                     if(!TextUtils.isEmpty(domNode.tint)) {
@@ -278,11 +242,6 @@ public class DomTracker {
         return maxHeight > WXViewUtils.getScreenHeight() * 2 / 3.0;
     }
 
-    @NonNull
-    private String getComponentName(@NonNull WXComponent component) {
-        String name = sVDomMap.get(component.getClass());
-        return TextUtils.isEmpty(name) ? "component" : name;
-    }
 
     private static class LayeredNode<T> {
         T component;

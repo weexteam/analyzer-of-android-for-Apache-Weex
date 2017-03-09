@@ -209,6 +209,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import com.alibaba.weex.commons.util.ScreenUtil;
@@ -358,6 +359,14 @@ public abstract class AbstractWeexActivity extends AppCompatActivity implements 
     if(mWxAnalyzerDelegate != null){
       mWxAnalyzerDelegate.onDestroy();
     }
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    if(mWxAnalyzerDelegate != null) {
+      mWxAnalyzerDelegate.onReceiveTouchEvent(ev);
+    }
+    return super.dispatchTouchEvent(ev);
   }
 
   @Override

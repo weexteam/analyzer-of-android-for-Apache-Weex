@@ -20,6 +20,7 @@ public class DevOptionsConfig {
     private static final String CONFIG_PERF_COMMON = "config_perf_common";//性能悬浮窗
     private static final String CONFIG_VDOM_DEPTH = "config_vdom_depth";
     private static final String CONFIG_NETWORK_INSPECTOR = "config_network_inspector";
+    private static final String CONFIG_VIEW_INSPECTOR = "config_view_inspector";
 
 
     private static final String CONFIG_LOG_OUTPUT = "config_log_output";
@@ -61,6 +62,14 @@ public class DevOptionsConfig {
 
     public boolean isVDomDepthEnabled() {
         return mSharedPreferences.getBoolean(CONFIG_VDOM_DEPTH, false);
+    }
+
+    public void setViewInspectorEnabled(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_VIEW_INSPECTOR, enabled).apply();
+    }
+
+    public boolean isViewInspectorEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_VIEW_INSPECTOR, false);
     }
 
     public boolean isNetworkInspectorEnabled() {
@@ -161,12 +170,12 @@ public class DevOptionsConfig {
         return mSharedPreferences.getInt(CONFIG_LOG_VIEW_SIZE, IResizableView.Size.MEDIUM);
     }
 
-    public void setInspectorViewSize(@IResizableView.Size int size) {
+    public void setNetworkInspectorViewSize(@IResizableView.Size int size) {
         mSharedPreferences.edit().putInt(CONFIG_INSPECTOR_VIEW_SIZE, size).apply();
     }
 
     @IResizableView.Size
-    public int getInspectorViewSize() {
+    public int getNetworkInspectorViewSize() {
         return mSharedPreferences.getInt(CONFIG_INSPECTOR_VIEW_SIZE, IResizableView.Size.MEDIUM);
     }
 

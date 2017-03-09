@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
@@ -41,6 +42,16 @@ public final class WXAnalyzerDelegate {
         }
     }
 
+    public void onReceiveTouchEvent(MotionEvent ev) {
+        if(mWXAnalyzer == null) {
+            return;
+        }
+        try {
+            Method method = mWXAnalyzer.getClass().getDeclaredMethod("onReceiveTouchEvent", MotionEvent.class);
+            method.invoke(mWXAnalyzer,ev);
+        } catch (Exception e) {
+        }
+    }
 
     public void onCreate() {
         if (mWXAnalyzer == null) {

@@ -15,6 +15,7 @@ import com.taobao.weex.ui.component.WXEmbed;
 import com.taobao.weex.ui.component.WXVContainer;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -80,6 +81,8 @@ public final class ViewInspectorManager {
                     final InspectorInfo inspectorInfo = new InspectorInfo();
                     inspectorInfo.targetView = targetView;
                     inspectorInfo.targetComponent = targetComponent;
+                    inspectorInfo.nativeViewInfo = Collections.emptyMap();
+                    inspectorInfo.virtualViewInfo = Collections.emptyMap();
 
                     if(mSupplier != null) {
                         Map<String,String> nativeViewInfo = mSupplier.supplyPropertiesFromNativeView(targetView);

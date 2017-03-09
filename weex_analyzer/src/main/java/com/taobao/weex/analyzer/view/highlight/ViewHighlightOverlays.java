@@ -42,6 +42,7 @@ abstract class ViewHighlightOverlays {
         private final MainHighlightDrawable mMainHighlightDrawable = new MainHighlightDrawable();
         private final HighlightDrawable[] mHighlightDrawables = {
                 mMainHighlightDrawable,
+                //todo type
 //                new PaddingTopHighlightDrawable(),
 //                new PaddingBottomHighlightDrawable(),
 //                new PaddingRightHighlightDrawable(),
