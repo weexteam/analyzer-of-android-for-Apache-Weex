@@ -226,6 +226,49 @@ public class WeexDevOptions implements IWXDevOptions {
                 view.show();
             }
         }));
+
+        options.add(new DevOption("视图审查", R.drawable.wxt_icon_view_inspector, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isViewInspectorEnabled()) {
+                    mConfig.setViewInspectorEnabled(false);
+                    mInspectorView.dismiss();
+                } else {
+                    mConfig.setViewInspectorEnabled(true);
+                    mInspectorView.show();
+                    mInspectorView.bindInstance(mInstance);
+                }
+            }
+        },true));
+
+        options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isVDomDepthEnabled()) {
+                    mConfig.setVdomDepthEnabled(false);
+                    mProfileDomView.dismiss();
+                } else {
+                    mConfig.setVdomDepthEnabled(true);
+                    mProfileDomView.show();
+                    mProfileDomView.bindInstance(mInstance);
+                }
+            }
+        }, true));
+
+        options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isNetworkInspectorEnabled()) {
+                    mConfig.setNetworkInspectorEnabled(false);
+                    mNetworkInspectorView.dismiss();
+                } else {
+                    mConfig.setNetworkInspectorEnabled(true);
+                    mNetworkInspectorView.setViewSize(mConfig.getNetworkInspectorViewSize());
+                    mNetworkInspectorView.show();
+                }
+            }
+        }, true));
+
         options.add(new DevOption("weex storage", R.drawable.wxt_icon_storage, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -233,6 +276,7 @@ public class WeexDevOptions implements IWXDevOptions {
                 mStorageView.show();
             }
         }));
+
         options.add(new DevOption("3d视图", R.drawable.wxt_icon_3d_rotation, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -319,48 +363,6 @@ public class WeexDevOptions implements IWXDevOptions {
                 } else {
                     mConfig.setPerfCommonEnabled(true);
                     mPerfMonitorOverlayView.show();
-                }
-            }
-        }, true));
-
-        options.add(new DevOption("视图分析", R.drawable.wxt_icon_vdom_depth, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mConfig.isVDomDepthEnabled()) {
-                    mConfig.setVdomDepthEnabled(false);
-                    mProfileDomView.dismiss();
-                } else {
-                    mConfig.setVdomDepthEnabled(true);
-                    mProfileDomView.show();
-                    mProfileDomView.bindInstance(mInstance);
-                }
-            }
-        }, true));
-
-        options.add(new DevOption("inspector", R.drawable.wxt_icon_vdom_depth, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mConfig.isViewInspectorEnabled()) {
-                    mConfig.setViewInspectorEnabled(false);
-                    mInspectorView.dismiss();
-                } else {
-                    mConfig.setViewInspectorEnabled(true);
-                    mInspectorView.show();
-                    mInspectorView.bindInstance(mInstance);
-                }
-            }
-        },true));
-
-        options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mConfig.isNetworkInspectorEnabled()) {
-                    mConfig.setNetworkInspectorEnabled(false);
-                    mNetworkInspectorView.dismiss();
-                } else {
-                    mConfig.setNetworkInspectorEnabled(true);
-                    mNetworkInspectorView.setViewSize(mConfig.getNetworkInspectorViewSize());
-                    mNetworkInspectorView.show();
                 }
             }
         }, true));
