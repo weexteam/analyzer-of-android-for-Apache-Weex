@@ -73,10 +73,10 @@ public class ViewPropertiesSupplier {
             result.put(BoxModelConstants.MARGIN_BOTTOM, String.valueOf(marginLayoutParams.bottomMargin));
         }
 
-        result.put(BoxModelConstants.BORDER_LEFT_WIDTH, String.valueOf(0));
-        result.put(BoxModelConstants.BORDER_RIGHT_WIDTH, String.valueOf(0));
-        result.put(BoxModelConstants.BORDER_TOP_WIDTH, String.valueOf(0));
-        result.put(BoxModelConstants.BORDER_BOTTOM_WIDTH, String.valueOf(0));
+        result.put(BoxModelConstants.BORDER_LEFT_WIDTH, null);
+        result.put(BoxModelConstants.BORDER_RIGHT_WIDTH, null);
+        result.put(BoxModelConstants.BORDER_TOP_WIDTH, null);
+        result.put(BoxModelConstants.BORDER_BOTTOM_WIDTH, null);
 
         //todo background color
         //text color

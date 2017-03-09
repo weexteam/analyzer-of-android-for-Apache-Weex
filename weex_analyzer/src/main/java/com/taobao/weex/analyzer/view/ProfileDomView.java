@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -15,6 +16,8 @@ import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
 import com.taobao.weex.ui.component.WXComponent;
 
+import static com.taobao.weex.analyzer.R.id.close;
+
 
 /**
  * Description:
@@ -24,6 +27,7 @@ import com.taobao.weex.ui.component.WXComponent;
 
 public class ProfileDomView extends DragSupportOverlayView{
     private SampleTask mTask;
+    private OnCloseListener mOnCloseListener;
 
     public ProfileDomView(Context application) {
         super(application);
@@ -33,7 +37,23 @@ public class ProfileDomView extends DragSupportOverlayView{
     @NonNull
     @Override
     protected View onCreateView() {
-        return View.inflate(mContext, R.layout.wxt_depth_sample_view, null);
+        View hostView = View.inflate(mContext, R.layout.wxt_depth_sample_view, null);
+        View closeBtn = hostView.findViewById(close);
+        closeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isViewAttached && mOnCloseListener != null) {
+                    mOnCloseListener.close(ProfileDomView.this);
+                    dismiss();
+                }
+            }
+        });
+
+        return hostView;
+    }
+
+    public void setOnCloseListener(@Nullable OnCloseListener listener) {
+        this.mOnCloseListener = listener;
     }
 
     @Override
@@ -98,7 +118,6 @@ public class ProfileDomView extends DragSupportOverlayView{
                 return;
             }
             final StringBuilder builder = new StringBuilder();
-            builder.append("weex-analyzer检测结果:\n");
 
             //////
             builder.append(convertResult(report.maxLayerOfRealDom<MAX_REAL_DOM_LAYER))

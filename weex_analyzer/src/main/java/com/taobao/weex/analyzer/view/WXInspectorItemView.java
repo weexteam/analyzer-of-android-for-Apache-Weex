@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.ViewInspectorManager;
 import com.taobao.weex.analyzer.core.ViewPropertiesSupplier;
-import com.taobao.weex.analyzer.utils.ViewUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -67,14 +66,9 @@ public class WXInspectorItemView extends AbstractBizItemView<ViewInspectorManage
     @Override
     protected void inflateData(ViewInspectorManager.InspectorInfo data) {
         if(TYPE_VIRTUAL_DOM.equals(mType)) {
+            mBoxView.setNative(false);
             applyInspectorInfoToBoxView(data.virtualViewInfo,mBoxView);
             StringBuilder builder = new StringBuilder();
-            if(data.targetComponent != null) {
-                builder.append("component name")
-                        .append(" : ")
-                        .append(ViewUtils.getComponentName(data.targetComponent))
-                        .append("\n");
-            }
 
             for(Map.Entry<String,String> entry : data.virtualViewInfo.entrySet()) {
                 if(!TextUtils.isEmpty(entry.getValue()) && !"0".equals(entry.getValue())) {
@@ -86,6 +80,7 @@ public class WXInspectorItemView extends AbstractBizItemView<ViewInspectorManage
             }
             mContent.setText(builder.toString());
         } else if(TYPE_NATIVE_LAYOUT.equals(mType)) {
+            mBoxView.setNative(true);
             applyInspectorInfoToBoxView(data.nativeViewInfo,mBoxView);
             StringBuilder builder = new StringBuilder();
             for(Map.Entry<String,String> entry : data.nativeViewInfo.entrySet()) {

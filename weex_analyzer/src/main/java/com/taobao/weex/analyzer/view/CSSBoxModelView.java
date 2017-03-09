@@ -39,6 +39,7 @@ public class CSSBoxModelView extends View {
 
     private static final String TEXT_UNKNOWN = "?";
     private static final String TEXT_ZERO = "0";
+    private static final String TEXT_NULL = "-";
 
 
     private final float DEFAULT_VIEW_HEIGHT = ViewUtils.dp2px(getContext(),160);
@@ -85,6 +86,8 @@ public class CSSBoxModelView extends View {
 
     private String mWidthText;
     private String mHeightText;
+
+    private boolean isNative = false;
 
 
     public CSSBoxModelView(Context context) {
@@ -240,22 +243,22 @@ public class CSSBoxModelView extends View {
         canvas.translate((mOuterBounds.width()-mBorderBounds.width())/2.0f,(mOuterBounds.height()-mBorderBounds.height())/2.0f);
         canvas.drawText(TEXT_BORDER,mTextOffsetX,(mBorderBounds.height()-mPaddingBounds.height())/4.0f+mTextOffsetY,mTextPaint);
         //border-left
-        tempText = prepareText(mBorderLeftText,TEXT_ZERO);
+        tempText = prepareText(mBorderLeftText,isNative?TEXT_NULL:TEXT_ZERO);
         mTextPaint.getTextBounds(tempText,0,tempText.length(),mCachedTextBounds);
         canvas.drawText(tempText,mBorderBounds.left+(mBorderBounds.width()-mPaddingBounds.width())/4.0f-mCachedTextBounds.width()/2.0f,
                 mBorderBounds.top+mBorderBounds.height()/2.0f+mTextOffsetY,mTextPaint);
         //border-top
-        tempText = prepareText(mBorderTopText,TEXT_ZERO);
+        tempText = prepareText(mBorderTopText,isNative?TEXT_NULL:TEXT_ZERO);
         mTextPaint.getTextBounds(tempText,0,tempText.length(),mCachedTextBounds);
         canvas.drawText(tempText,mBorderBounds.left+mBorderBounds.width()/2.0f-mCachedTextBounds.width()/2.0f,
                 mBorderBounds.top+(mBorderBounds.height()-mPaddingBounds.height())/4.0f+mTextOffsetY,mTextPaint);
         //border-right
-        tempText = prepareText(mBorderRightText,TEXT_ZERO);
+        tempText = prepareText(mBorderRightText,isNative?TEXT_NULL:TEXT_ZERO);
         mTextPaint.getTextBounds(tempText,0,tempText.length(),mCachedTextBounds);
         canvas.drawText(tempText,mBorderBounds.width()-(mBorderBounds.width()-mPaddingBounds.width())/4.0f-mCachedTextBounds.width()/2.0f,
                 mBorderBounds.top+mBorderBounds.height()/2.0f+mTextOffsetY,mTextPaint);
         //border-bottom
-        tempText = prepareText(mBorderBottomText,TEXT_ZERO);
+        tempText = prepareText(mBorderBottomText,isNative?TEXT_NULL:TEXT_ZERO);
         mTextPaint.getTextBounds(tempText,0,tempText.length(),mCachedTextBounds);
         canvas.drawText(tempText,mBorderBounds.left+mBorderBounds.width()/2.0f-mCachedTextBounds.width()/2.0f,
                 mBorderBounds.bottom-(mBorderBounds.height()-mPaddingBounds.height())/4.0f+mTextOffsetY,mTextPaint);
@@ -313,6 +316,14 @@ public class CSSBoxModelView extends View {
             }
         }
         return size;
+    }
+
+    public boolean isNative() {
+        return isNative;
+    }
+
+    public void setNative(boolean aNative) {
+        isNative = aNative;
     }
 
     public String getMarginTopText() {

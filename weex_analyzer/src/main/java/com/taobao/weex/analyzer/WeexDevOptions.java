@@ -86,6 +86,15 @@ public class WeexDevOptions implements IWXDevOptions {
         mConfig = new DevOptionsConfig(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
         mProfileDomView = new ProfileDomView(context);
+        mProfileDomView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if (host != null) {
+                    mConfig.setVdomDepthEnabled(false);
+                }
+            }
+        });
+
         mNetworkInspectorView = new NetworkInspectorView(context);
         mNetworkInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
@@ -96,13 +105,6 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mNetworkInspectorView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
-            @Override
-            public void onSizeChanged(@IResizableView.Size int size) {
-                //todo
-
-            }
-        });
         mNetworkInspectorView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
             @Override
             public void onSizeChanged(@IResizableView.Size int size) {

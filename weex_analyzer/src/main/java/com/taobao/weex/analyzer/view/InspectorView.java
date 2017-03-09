@@ -13,6 +13,7 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.ViewInspectorManager;
 import com.taobao.weex.analyzer.core.ViewPropertiesSupplier;
+import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.highlight.ViewHighlighter;
 
 import java.util.concurrent.Executors;
@@ -40,6 +41,7 @@ public class InspectorView extends DragSupportOverlayView {
     private TextView virtualDomBtn,nativeLayoutBtn;
 
     private View closeBtn;
+    private TextView mTips;
 
     private static final int BTN_ENABLED_COLOR = 0xBCCDDC39;
     private static final int BTN_DISABLED_COLOR = 0x00ffffff;
@@ -63,6 +65,7 @@ public class InspectorView extends DragSupportOverlayView {
         virtualDomBtn = (TextView) hostView.findViewById(R.id.btn_panel_virtual_dom);
         nativeLayoutBtn = (TextView) hostView.findViewById(R.id.btn_panel_native_layout);
         closeBtn = hostView.findViewById(close);
+        mTips = (TextView) hostView.findViewById(R.id.tips);
 
         virtualDomBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,6 +158,15 @@ public class InspectorView extends DragSupportOverlayView {
         mViewHighlighter.setHighlightedView(info.targetView, INSPECTOR_COLOR);
 
         //render overlay view
+
+        if(info.targetComponent != null) {
+            String tips = ViewUtils.getComponentName(info.targetComponent);
+            mTips.setText("tips:你选中了元素["+tips+"]");
+        } else {
+            if(mContext != null) {
+                mTips.setText(mContext.getString(R.string.wxt_tips_inspector_view));
+            }
+        }
 
         if(info.virtualViewInfo != null) {
             mVirtualInspectorItemView.inflateData(info);
