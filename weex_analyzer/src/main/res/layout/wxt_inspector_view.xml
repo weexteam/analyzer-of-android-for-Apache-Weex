@@ -14,14 +14,13 @@
 
         <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:orientation="horizontal">
 
             <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
                     android:gravity="center"
-                    android:layout_centerInParent="true"
+                    android:layout_height="30dp"
                     android:text="视图审查"
                     android:textColor="#fff"
                     android:textSize="14sp"/>
@@ -29,7 +28,7 @@
             <TextView
                     android:id="@+id/close"
                     android:layout_width="40dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="30dp"
                     android:background="#00ffffff"
                     android:gravity="center"
                     android:layout_alignParentRight="true"

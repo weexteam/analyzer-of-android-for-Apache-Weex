@@ -299,7 +299,7 @@ public class CSSBoxModelView extends View {
     }
 
     private String prepareText(@Nullable String text, @NonNull String placeHolder) {
-        return TextUtils.isEmpty(text) ? placeHolder : text;
+        return TextUtils.isEmpty(text) || "0".equals(text) ? placeHolder : text;
     }
 
 

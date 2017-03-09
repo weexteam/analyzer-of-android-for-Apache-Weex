@@ -161,10 +161,10 @@ public class InspectorView extends DragSupportOverlayView {
 
         if(info.targetComponent != null) {
             String tips = ViewUtils.getComponentName(info.targetComponent);
-            mTips.setText("tips:你选中了元素["+tips+"]");
+            mTips.setText("tips:你选中了weex元素["+tips+"]");
         } else {
-            if(mContext != null) {
-                mTips.setText(mContext.getString(R.string.wxt_tips_inspector_view));
+            if(mContext != null && info.targetView != null) {
+                mTips.setText("tips:你选中了native元素["+info.targetView.getClass().getSimpleName()+"]");
             }
         }
 
