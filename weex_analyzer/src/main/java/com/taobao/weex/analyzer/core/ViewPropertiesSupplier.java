@@ -1,14 +1,20 @@
 package com.taobao.weex.analyzer.core;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.taobao.weex.dom.ImmutableDomObject;
+import com.taobao.weex.dom.flex.Spacing;
 import com.taobao.weex.ui.component.WXComponent;
+import com.taobao.weex.ui.view.WXTextView;
+import com.taobao.weex.ui.view.border.BorderDrawable;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -78,11 +84,93 @@ public class ViewPropertiesSupplier {
         result.put(BoxModelConstants.BORDER_TOP_WIDTH, null);
         result.put(BoxModelConstants.BORDER_BOTTOM_WIDTH, null);
 
-        //todo background color
-        //text color
-        //text
+        if(view instanceof WXTextView) {
+            WXTextView textView = (WXTextView) view;
+            if(textView.getText() != null) {
+                result.put("value",textView.getText().toString());
+            }
+        }
+
+        if(view.getBackground() != null) {
+            Drawable drawable = view.getBackground();
+            if(drawable instanceof BorderDrawable) {
+                BorderDrawable borderDrawable = (BorderDrawable) drawable;
+                result.put(BoxModelConstants.BACKGROUND_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderDrawable.getColor()));
+                if(borderDrawable.getOpacity() != -1) {
+                    result.put(BoxModelConstants.OPACITY,borderDrawable.getOpacity()+"");
+                }
+
+//                float borderWidth = getBorderWidthNative(borderDrawable, Spacing.ALL);
+//                if(borderWidth != 0f) {
+//                    result.put(BoxModelConstants.BORDER_LEFT_WIDTH,String.valueOf(borderWidth));
+//                    result.put(BoxModelConstants.BORDER_TOP_WIDTH,String.valueOf(borderWidth));
+//                    result.put(BoxModelConstants.BORDER_RIGHT_WIDTH,String.valueOf(borderWidth));
+//                    result.put(BoxModelConstants.BORDER_BOTTOM_WIDTH,String.valueOf(borderWidth));
+//                }else {
+//                    float borderLeftWidth = getBorderWidthNative(borderDrawable, Spacing.LEFT);
+//                    if(borderLeftWidth != 0f) {
+//                        result.put(BoxModelConstants.BORDER_LEFT_WIDTH,String.valueOf(borderLeftWidth));
+//                    }
+//                    float borderRightWidth = getBorderWidthNative(borderDrawable, Spacing.RIGHT);
+//                    if(borderRightWidth != 0f) {
+//                        result.put(BoxModelConstants.BORDER_RIGHT_WIDTH,String.valueOf(borderRightWidth));
+//                    }
+//                    float borderTopWidth = getBorderWidthNative(borderDrawable, Spacing.TOP);
+//                    if(borderTopWidth != 0f) {
+//                        result.put(BoxModelConstants.BORDER_TOP_WIDTH,String.valueOf(borderTopWidth));
+//                    }
+//                    float borderBottomWidth = getBorderWidthNative(borderDrawable, Spacing.BOTTOM);
+//                    if(borderBottomWidth != 0f) {
+//                        result.put(BoxModelConstants.BORDER_BOTTOM_WIDTH,String.valueOf(borderBottomWidth));
+//                    }
+//                }
+
+                int borderColor = getBorderColorNative(borderDrawable,Spacing.ALL);
+                if(borderColor != 0) {
+                    result.put(BoxModelConstants.BORDER_LEFT_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderColor));
+                    result.put(BoxModelConstants.BORDER_TOP_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderColor));
+                    result.put(BoxModelConstants.BORDER_RIGHT_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderColor));
+                    result.put(BoxModelConstants.BORDER_BOTTOM_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderColor));
+                }else {
+                    int borderLeftColor = getBorderColorNative(borderDrawable,Spacing.LEFT);
+                    result.put(BoxModelConstants.BORDER_LEFT_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderLeftColor));
+
+                    int borderTopColor = getBorderColorNative(borderDrawable,Spacing.TOP);
+                    result.put(BoxModelConstants.BORDER_TOP_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderTopColor));
+
+                    int borderRightColor = getBorderColorNative(borderDrawable,Spacing.RIGHT);
+                    result.put(BoxModelConstants.BORDER_RIGHT_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderRightColor));
+
+                    int borderBottomColor = getBorderColorNative(borderDrawable,Spacing.BOTTOM);
+                    result.put(BoxModelConstants.BORDER_BOTTOM_COLOR,String.format(Locale.CHINA,"#%06X",0xFFFFFF & borderBottomColor));
+                }
+            }
+        }
 
         return Collections.unmodifiableMap(result);
+    }
+
+
+    private static float getBorderWidthNative(@NonNull BorderDrawable drawable, int position) {
+        try {
+            Method method = drawable.getClass().getDeclaredMethod("getBorderWidth",int.class);
+            method.setAccessible(true);
+            return (float) method.invoke(drawable,position);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0f;
+    }
+
+    private static int getBorderColorNative(@NonNull BorderDrawable drawable, int position) {
+        try {
+            Method method = drawable.getClass().getDeclaredMethod("getBorderColor",int.class);
+            method.setAccessible(true);
+            return (int) method.invoke(drawable,position);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 
