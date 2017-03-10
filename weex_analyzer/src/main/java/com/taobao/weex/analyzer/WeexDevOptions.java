@@ -94,7 +94,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
         this.mContext = context;
 
-        mConfig = new DevOptionsConfig(context);
+        mConfig = DevOptionsConfig.getInstance(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
         mProfileDomView = new ProfileDomView(context);
         mProfileDomView.setOnCloseListener(new IOverlayView.OnCloseListener() {
@@ -692,7 +692,7 @@ public class WeexDevOptions implements IWXDevOptions {
     public void onException(WXSDKInstance instance, String errCode, String msg) {
         if (mConfig != null && mConfig.isShownJSException()) {
             try {
-                JSExceptionCatcher.catchException(mContext, instance, errCode, msg);
+                JSExceptionCatcher.catchException(mContext, mConfig, instance, errCode, msg);
             } catch (Exception e) {
                 e.printStackTrace();
             }

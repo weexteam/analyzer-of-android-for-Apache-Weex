@@ -37,10 +37,6 @@
                 android:textSize="12sp"/>
     </RelativeLayout>
 
-    <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
         <TextView
                 android:id="@+id/result"
                 android:layout_width="match_parent"
@@ -48,5 +44,4 @@
                 android:textColor="#fff"
                 android:textSize="12sp"
                 android:text="检测中..."/>
-    </ScrollView>
 </LinearLayout>

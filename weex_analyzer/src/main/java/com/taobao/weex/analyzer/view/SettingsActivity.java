@@ -24,6 +24,7 @@ import com.taobao.weex.analyzer.core.RemoteDebugManager;
 public class SettingsActivity extends Activity {
 
     private CheckBox mCbJSException;
+    private CheckBox mCbExceptionNotification;
     private View mBtnConfigDebugIP;
 
 
@@ -33,16 +34,24 @@ public class SettingsActivity extends Activity {
 
         setContentView(R.layout.wxt_activity_settings);
 
-        final DevOptionsConfig config = new DevOptionsConfig(this);
+        final DevOptionsConfig config = DevOptionsConfig.getInstance(this);
 
         mCbJSException = (CheckBox) findViewById(R.id.cb_js_exception);
+        mCbExceptionNotification = (CheckBox) findViewById(R.id.cb_allow_exception_notification);
         mBtnConfigDebugIP = findViewById(R.id.btn_config_debug_ip);
 
         mCbJSException.setChecked(config.isShownJSException());
+        mCbExceptionNotification.setChecked(config.isAllowExceptionNotification());
         mCbJSException.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 config.setShownJSException(isChecked);
+            }
+        });
+        mCbExceptionNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                config.setAllowExceptionNotification(isChecked);
             }
         });
 

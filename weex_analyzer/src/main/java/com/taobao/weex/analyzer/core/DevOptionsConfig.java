@@ -25,6 +25,7 @@ public class DevOptionsConfig {
 
     private static final String CONFIG_LOG_OUTPUT = "config_log_output";
     private static final String CONFIG_JS_EXCEPTION = "config_js_exception";
+    private static final String CONFIG_EXCEPTION_NOTIFICATION = "config_exception_notification";
 
     private static final String CONFIG_MEMORY_CHART = "config_mem_chart";
     private static final String CONFIG_FPS_CHART = "config_fps_chart";
@@ -39,9 +40,20 @@ public class DevOptionsConfig {
 
     public static final String TAG = "weex-analyzer";
 
-
-    public DevOptionsConfig(@NonNull Context context) {
+    private static DevOptionsConfig sConfig;
+    private DevOptionsConfig(@NonNull Context context) {
         mSharedPreferences = context.getSharedPreferences(DEV_CONFIG_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static DevOptionsConfig getInstance(@NonNull Context context) {
+        if(sConfig == null) {
+            synchronized (DevOptionsConfig.class) {
+                if(sConfig == null) {
+                    sConfig = new DevOptionsConfig(context);
+                }
+            }
+        }
+        return sConfig;
     }
 
     /**
@@ -144,6 +156,15 @@ public class DevOptionsConfig {
     public boolean isShownJSException() {
         return mSharedPreferences.getBoolean(CONFIG_JS_EXCEPTION, true);
     }
+
+    public void setAllowExceptionNotification(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_EXCEPTION_NOTIFICATION, enabled).apply();
+    }
+
+    public boolean isAllowExceptionNotification() {
+        return mSharedPreferences.getBoolean(CONFIG_EXCEPTION_NOTIFICATION, true);
+    }
+
 
     public void setLogLevel(int level) {
         mSharedPreferences.edit().putInt(CONFIG_LOG_LEVEL, level).apply();

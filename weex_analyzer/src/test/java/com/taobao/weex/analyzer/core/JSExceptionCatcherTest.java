@@ -35,14 +35,14 @@ public class JSExceptionCatcherTest {
     public void catchException() throws Exception {
         String fakeErrCode = "fake_error_code";
         String fakeMsg = "fake_msg";
-        AlertDialog dialog = JSExceptionCatcher.catchException(RuntimeEnvironment.application,null,fakeErrCode,fakeMsg);
+        AlertDialog dialog = JSExceptionCatcher.catchException(RuntimeEnvironment.application,null,null,fakeErrCode,fakeMsg);
 
         assertNotNull(dialog);
         ShadowAlertDialog shadowAlertDialog = shadowOf(dialog);
         assertEquals(dialog.isShowing(),true);
         assertEquals(ShadowAlertDialog.getLatestAlertDialog(),dialog);
 
-        assertEquals("wx-analyzer found a JS Exception",shadowAlertDialog.getTitle());
+        assertEquals("wx-analyzer捕捉到异常",shadowAlertDialog.getTitle());
     }
 
 }

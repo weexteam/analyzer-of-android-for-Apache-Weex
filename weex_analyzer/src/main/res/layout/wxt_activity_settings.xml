@@ -47,6 +47,44 @@
         android:background="#e0e0e0"/>
 
     <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:padding="10dp">
+
+        <TextView
+                android:id="@+id/allow_exception_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="是否允许js异常通知"
+                android:textColor="#000"
+                android:textSize="16sp"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/allow_exception_notification"
+                android:layout_marginTop="4dp"
+                android:layout_toLeftOf="@+id/cb_allow_exception_notification"
+                android:paddingRight="20dp"
+                android:text="如果开启，当weex页面发生异常时，会在通知栏展示异常信息"
+                android:textColor="#BDBDBD"
+                android:textSize="14sp"/>
+
+        <CheckBox
+                android:id="@+id/cb_allow_exception_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                style="@style/WXTCheckBox"
+                />
+
+    </RelativeLayout>
+    <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e0e0e0"/>
+    <RelativeLayout
         android:id="@+id/btn_config_debug_ip"
         android:gravity="center_vertical"
         android:padding="10dp"
