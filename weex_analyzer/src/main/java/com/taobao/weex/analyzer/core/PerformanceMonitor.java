@@ -5,7 +5,9 @@ import android.support.annotation.Nullable;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.common.WXPerformance;
-import com.taobao.weex.utils.WXHack;
+import com.taobao.weex.utils.WXLogUtils;
+
+import java.lang.reflect.Field;
 
 /**
  * Description:
@@ -27,10 +29,12 @@ public class PerformanceMonitor {
         }
         WXPerformance rawPerformance = null;
         try {
-            rawPerformance = (WXPerformance) WXHack.into(WXSDKInstance.class)
-                    .field("mWXPerformance").get(instance);
-        } catch (WXHack.HackDeclaration.HackAssertionException e) {
-            e.printStackTrace();
+            Class clazz = instance.getClass();
+            Field field = clazz.getDeclaredField("mWXPerformance");
+            field.setAccessible(true);
+            rawPerformance = (WXPerformance) field.get(instance);
+        } catch (Exception e) {
+            WXLogUtils.e(e.getMessage());
         }
 
         if(rawPerformance != null){
