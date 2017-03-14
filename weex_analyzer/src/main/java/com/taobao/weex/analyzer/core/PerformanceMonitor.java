@@ -29,7 +29,7 @@ public class PerformanceMonitor {
         }
         WXPerformance rawPerformance = null;
         try {
-            Class clazz = instance.getClass();
+            Class clazz = WXSDKInstance.class;
             Field field = clazz.getDeclaredField("mWXPerformance");
             field.setAccessible(true);
             rawPerformance = (WXPerformance) field.get(instance);
