@@ -62,6 +62,11 @@ public class HealthReport {
      * */
     public int estimateContentHeight;
 
+    /**
+     * 预估屏数
+     * */
+    public String estimatePages;
+
     public List<EmbedDesc> embedDescList;
 
     public Map<String/*ref*/,ListDesc> listDescMap;
@@ -85,7 +90,7 @@ public class HealthReport {
             Log.d(Constants.TAG, "[health report] listNum:" + listDescMap.size());
             for (ListDesc desc : listDescMap.values()) {
                 Log.d(Constants.TAG, "[health report] listDesc: (ref:" + desc.ref + ",cellNum:"+desc.cellNum
-                        + ",totalHeight:" + desc.totalHeight + ")");
+                        + ",totalHeight:" + desc.totalHeight + "px)");
             }
         }
 
@@ -99,6 +104,8 @@ public class HealthReport {
 
             }
         }
+
+        Log.d(Constants.TAG,"[health report] estimateContentHeight:"+estimateContentHeight+"px"+",estimatePages:"+estimatePages);
 
 
         Log.d(Constants.TAG, "\n");

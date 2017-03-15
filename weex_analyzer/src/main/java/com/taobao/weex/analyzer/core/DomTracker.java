@@ -1,5 +1,6 @@
 package com.taobao.weex.analyzer.core;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -22,7 +23,8 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 
 /**
  * Description:
@@ -77,7 +79,7 @@ public class DomTracker {
             WXLogUtils.e(TAG, "illegal thread...");
             return null;
         }
-
+        int pageHeight = 0;
         WXComponent godComponent = mWxInstance.getRootComponent();
         if (godComponent == null) {
             WXLogUtils.e(TAG, "god component not found");
@@ -88,6 +90,7 @@ public class DomTracker {
         View hostView = godComponent.getHostView();
         if(hostView != null) {
             report.maxLayerOfRealDom = getRealDomMaxLayer(hostView);
+            pageHeight = hostView.getMeasuredHeight();
         }
 
         LayeredNode<WXComponent> layeredNode = mVDomObjectPool.obtain();
@@ -101,6 +104,8 @@ public class DomTracker {
             int layer = domNode.layer;
 
             report.maxLayer = Math.max(report.maxLayer,layer);
+            report.estimateContentHeight = Math.max(report.estimateContentHeight,
+                    ComponentHeightComputer.computeComponentContentHeight(component));
 
             //如果节点被染色，需要计算其该染色子树的最大深度
             if(!TextUtils.isEmpty(domNode.tint)) {
@@ -111,7 +116,7 @@ public class DomTracker {
                 }
             }
 
-            if (mOnTrackNodeListener != null && component != null) {
+            if (mOnTrackNodeListener != null) {
                 mOnTrackNodeListener.onTrackNode(component, layer);
             }
 
@@ -119,7 +124,7 @@ public class DomTracker {
                 report.hasList = true;
 
                 if(report.listDescMap == null) {
-                    report.listDescMap = new HashMap<>();
+                    report.listDescMap = new LinkedHashMap<>();
                 }
 
                 HealthReport.ListDesc listDesc = report.listDescMap.get(component.getRef());
@@ -199,6 +204,16 @@ public class DomTracker {
 
                 }
             }
+        }
+        Context context = mWxInstance.getContext();
+        if(context != null) {
+            pageHeight = (pageHeight == 0) ? ViewUtils.getScreenHeight(context) : pageHeight;
+        }
+
+        if(pageHeight != 0) {
+            report.estimatePages = String.format(Locale.CHINA,"%.2f",report.estimateContentHeight/(double) pageHeight);
+        } else {
+            report.estimatePages = "0";
         }
 
         long end = System.currentTimeMillis();
