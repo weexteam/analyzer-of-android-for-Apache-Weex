@@ -22,6 +22,7 @@ import com.taobao.weex.utils.WXViewUtils;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 
 /**
  * Description:
@@ -116,14 +117,34 @@ public class DomTracker {
 
             if (component instanceof WXListComponent) {
                 report.hasList = true;
+
+                if(report.listDescMap == null) {
+                    report.listDescMap = new HashMap<>();
+                }
+
+                HealthReport.ListDesc listDesc = report.listDescMap.get(component.getRef());
+                if(listDesc == null) {
+                    listDesc = new HealthReport.ListDesc();
+                }
+                listDesc.ref = component.getRef();
+                listDesc.totalHeight = ComponentHeightComputer.computeComponentContentHeight(component);
+                report.listDescMap.put(listDesc.ref,listDesc);
+
             } else if (component instanceof WXScroller) {
-                if(component.getDomObject() != null && component.getDomObject().getAttrs() != null
-                        && "vertical".equals(component.getDomObject().getAttrs().getScrollDirection())) {
+                if(ViewUtils.isVerticalScroller((WXScroller) component)) {
                     report.hasScroller = true;
                 }
 
             } else if (component instanceof WXCell) {
-                report.cellNum++;
+
+                WXVContainer parentContainer = component.getParent();
+                if(parentContainer != null && parentContainer instanceof WXListComponent && report.listDescMap != null) {
+                    HealthReport.ListDesc listDesc = report.listDescMap.get(parentContainer.getRef());
+                    if(listDesc != null) {
+                        listDesc.cellNum++;
+                    }
+                }
+
                 int num = getComponentNumOfNode(component);
                 report.maxCellViewNum = Math.max(report.maxCellViewNum, num);
 

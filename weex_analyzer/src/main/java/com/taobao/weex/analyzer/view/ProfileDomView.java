@@ -13,8 +13,11 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.DomTracker;
 import com.taobao.weex.analyzer.pojo.HealthReport;
+import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
 import com.taobao.weex.ui.component.WXComponent;
+
+import java.util.Locale;
 
 import static com.taobao.weex.analyzer.R.id.close;
 
@@ -89,6 +92,7 @@ public class ProfileDomView extends DragSupportOverlayView{
 
         static final int MAX_VDOM_LAYER = 14;
         static final int MAX_REAL_DOM_LAYER = 20;
+        private final int mScreenHeight;
 
         SampleTask(@NonNull View hostView) {
             super(false);
@@ -96,6 +100,7 @@ public class ProfileDomView extends DragSupportOverlayView{
             resultTextView = (TextView) hostView.findViewById(R.id.result);
             mViewHighlighter = MutipleViewHighlighter.newInstance();
             mViewHighlighter.setColor(Color.parseColor("#420000ff"));
+            mScreenHeight = ViewUtils.getScreenHeight(hostView.getContext());
         }
 
         void setInstance(WXSDKInstance instance){
@@ -146,11 +151,25 @@ public class ProfileDomView extends DragSupportOverlayView{
 
 
             //////
-            if(report.hasList) {
+            if(report.hasList && report.listDescMap != null) {
+                int listNum = report.listDescMap.size();
+
                 builder.append(convertResult(true));
-                builder.append("检测到该页面使用了List,cell个数为")
-                        .append(report.cellNum)
+                builder.append("检测到该页面使用了List,共")
+                        .append(listNum)
+                        .append("个")
                         .append("\n");
+
+                for(HealthReport.ListDesc desc : report.listDescMap.values()) {
+                    builder.append(convertResult(true))
+                            .append("检测到ref为'")
+                            .append(desc.ref)
+                            .append("'的list,其cell个数为")
+                            .append(desc.cellNum)
+                            .append(",预估高度为")
+                            .append(desc.totalHeight)
+                            .append("px\n");
+                }
 
                 builder.append(convertResult(!report.hasBigCell));
                 if(report.hasBigCell) {
@@ -187,6 +206,16 @@ public class ProfileDomView extends DragSupportOverlayView{
                             .append("\n");
                 }
 
+            }
+
+            if(mScreenHeight > 0) {
+                double ratio = report.estimateContentHeight/(double)mScreenHeight;
+                builder.append("检测到当前内容高度约为")
+                        .append(report.estimateContentHeight)
+                        .append("px,约等于")
+                        .append(String.format(Locale.CHINA,"%.2f",ratio))
+                        .append("屏")
+                        .append("\n");
             }
 
 

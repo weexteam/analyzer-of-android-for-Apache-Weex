@@ -74,17 +74,27 @@ public class ViewUtils {
         return TextUtils.isEmpty(name) ? "component" : name;
     }
 
-    public static float dp2px(Context context,int dp){
+    public static float dp2px(@NonNull Context context,int dp){
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,dp,context.getResources().getDisplayMetrics());
     }
 
-    public static float sp2px(Context context,int sp){
+    public static float sp2px(@NonNull Context context,int sp){
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,sp,context.getResources().getDisplayMetrics());
     }
 
-    public static float px2dp(Context context, float px){
+    public static float px2dp(@NonNull Context context, float px){
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static int getScreenHeight(@NonNull Context context) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return metrics.heightPixels;
+    }
+
+    public static boolean isVerticalScroller(@NonNull WXScroller scroller) {
+        return scroller.getDomObject() != null && scroller.getDomObject().getAttrs() != null
+                && "vertical".equals(scroller.getDomObject().getAttrs().getScrollDirection());
     }
 
     @Nullable

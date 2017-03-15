@@ -43,10 +43,10 @@ public class HealthReport {
 
     public int componentNumOfBigCell;
 
-    /**
-     * 当前cell个数
-     */
-    public int cellNum;
+//    /**
+//     * 当前cell个数
+//     */
+//    public int cellNum;
     /**
      * 扩展字段
      */
@@ -57,8 +57,14 @@ public class HealthReport {
      */
     public boolean hasEmbed;
 
+    /**
+     * 预估总高度
+     * */
+    public int estimateContentHeight;
+
     public List<EmbedDesc> embedDescList;
 
+    public Map<String/*ref*/,ListDesc> listDescMap;
 
     private String bundleUrl;
 
@@ -74,7 +80,15 @@ public class HealthReport {
         Log.d(Constants.TAG, "[health report] hasScroller:" + hasScroller);
         Log.d(Constants.TAG, "[health report] hasBigCell:" + hasBigCell);
         Log.d(Constants.TAG, "[health report] maxCellViewNum:" + maxCellViewNum);
-        Log.d(Constants.TAG, "[health report] cellNum:" + cellNum);
+
+        if(listDescMap != null && !listDescMap.isEmpty()) {
+            Log.d(Constants.TAG, "[health report] listNum:" + listDescMap.size());
+            for (ListDesc desc : listDescMap.values()) {
+                Log.d(Constants.TAG, "[health report] listDesc: (ref:" + desc.ref + ",cellNum:"+desc.cellNum
+                        + ",totalHeight:" + desc.totalHeight + ")");
+            }
+        }
+
         Log.d(Constants.TAG, "[health report] hasEmbed:" + hasEmbed);
 
 
@@ -110,4 +124,11 @@ public class HealthReport {
          */
         public int actualMaxLayer;
     }
+
+    public static class ListDesc {
+        public String ref;//list唯一标识
+        public int totalHeight;//list估计高度
+        public int cellNum;//此list的cell个数
+    }
+
 }
