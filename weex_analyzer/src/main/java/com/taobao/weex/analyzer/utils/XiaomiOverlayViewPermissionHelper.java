@@ -70,7 +70,7 @@ public class XiaomiOverlayViewPermissionHelper {
 
     private static String getProperty() {
         String property = "null";
-        if (!"Xiaomi".equals(Build.MANUFACTURER)) {
+        if (!"Xiaomi".equalsIgnoreCase(Build.MANUFACTURER)) {
             return property;
         }
         try {
