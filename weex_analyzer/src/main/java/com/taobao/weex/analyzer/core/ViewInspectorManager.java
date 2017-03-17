@@ -28,14 +28,14 @@ import java.util.concurrent.ExecutorService;
 
 public final class ViewInspectorManager {
 
-    private OnInspectorSuccessListener mListener;
+    private OnInspectorListener mListener;
     private ViewPropertiesSupplier mSupplier;
     private ExecutorService mExecutor;
     private WXSDKInstance mInstance;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private ViewInspectorManager(@NonNull ExecutorService executor, @NonNull ViewPropertiesSupplier supplier, @NonNull OnInspectorSuccessListener listener) {
+    private ViewInspectorManager(@NonNull ExecutorService executor, @NonNull ViewPropertiesSupplier supplier, @NonNull OnInspectorListener listener) {
         this.mListener = listener;
         this.mSupplier = supplier;
         this.mExecutor = executor;
@@ -46,7 +46,7 @@ public final class ViewInspectorManager {
     }
 
     @NonNull
-    public static ViewInspectorManager newInstance(@NonNull ExecutorService executor,@NonNull ViewPropertiesSupplier supplier,@NonNull OnInspectorSuccessListener listener) {
+    public static ViewInspectorManager newInstance(@NonNull ExecutorService executor,@NonNull ViewPropertiesSupplier supplier,@NonNull OnInspectorListener listener) {
         return new ViewInspectorManager(executor,supplier,listener);
     }
 
@@ -184,7 +184,7 @@ public final class ViewInspectorManager {
         }
     }
 
-    public interface OnInspectorSuccessListener {
+    public interface OnInspectorListener {
         void onInspectorSuccess(@NonNull InspectorInfo info);
         void onInspectorFailed(@NonNull String msg);
     }

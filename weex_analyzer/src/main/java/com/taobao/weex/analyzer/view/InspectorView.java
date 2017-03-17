@@ -133,7 +133,7 @@ public class InspectorView extends DragSupportOverlayView {
     @Override
     protected void onShown() {
         mInspectorManager = ViewInspectorManager.newInstance(Executors.newSingleThreadExecutor(),
-                new ViewPropertiesSupplier(), new ViewInspectorManager.OnInspectorSuccessListener() {
+                new ViewPropertiesSupplier(), new ViewInspectorManager.OnInspectorListener() {
                     @Override
                     public void onInspectorSuccess(@NonNull ViewInspectorManager.InspectorInfo info) {
                         //we should be called in main thread
