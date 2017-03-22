@@ -22,8 +22,6 @@ allprojects {
 
 
 apply plugin: 'com.android.library'
-//apply from: 'binary.gradle'
-//apply from: 'maven.gradle'
 apply from: 'jacoco.gradle'
 
 android {
@@ -54,6 +52,9 @@ android {
     }
 
 }
+
+//apply from: 'binary.gradle'
+//apply from: 'maven.gradle'
 
 dependencies {
     provided 'com.taobao.android:weex_sdk:0.9.5'
