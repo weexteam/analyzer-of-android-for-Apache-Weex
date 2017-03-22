@@ -45,7 +45,7 @@ public class JSExceptionCatcher {
         }
 
         AlertDialog.Builder builder = new CompatibleAlertDialogBuilder(context);
-        builder.setTitle("wx-analyzer捕捉到异常");
+        builder.setTitle("WeexAnalyzer捕捉到异常");
         builder.setMessage(String.format(Locale.CHINA,"errorCode : %s\nerrorMsg : %s\n",TextUtils.isEmpty(errCode) ? "unknown" : errCode, TextUtils.isEmpty(msg) ? "unknown" : msg));
         builder.setPositiveButton("okay", new DialogInterface.OnClickListener() {
             @Override
@@ -66,7 +66,7 @@ public class JSExceptionCatcher {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.wxt_icon_debug)
-                .setContentTitle("wx-analyzer捕捉到异常")
+                .setContentTitle("WeexAnalyzer捕捉到异常")
                 .setAutoCancel(true)
                 .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(String.format(Locale.CHINA,"page : %s\nerrorCode : %s\nerrorMsg : %s\n",TextUtils.isEmpty(bundleUrl) ? "unknown" : bundleUrl,

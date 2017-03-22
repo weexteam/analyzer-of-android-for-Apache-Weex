@@ -28,6 +28,7 @@ import com.taobao.weex.analyzer.core.ShakeDetector;
 import com.taobao.weex.analyzer.core.StandardVDomMonitor;
 import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
+import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
 import com.taobao.weex.analyzer.view.DevOption;
@@ -86,6 +87,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private static final String ACTION_LAUNCH = "action_launch_analyzer";
     public static final String EXTRA_FROM = "from";
+    public static final String EXTRA_DEVICE_ID = "deviceId";
 
     private LaunchUIReceiver mLaunchUIReceiver;
 
@@ -207,6 +209,8 @@ public class WeexDevOptions implements IWXDevOptions {
         mShakeDetector = new ShakeDetector(new ShakeDetector.ShakeListener() {
             @Override
             public void onShake() {
+                LaunchConfig.setFrom(null);
+                LaunchConfig.setDeviceId(null);
                 showDevOptions();
             }
         });
@@ -215,16 +219,20 @@ public class WeexDevOptions implements IWXDevOptions {
 
         mLaunchUIReceiver = new LaunchUIReceiver(new OnLaunchListener() {
             @Override
-            public void onLaunch(@NonNull String from) {
+            public void onLaunch(@NonNull String from, @Nullable String deviceId) {
+                LaunchConfig.setFrom(from);
+                LaunchConfig.setDeviceId(deviceId);
                 showDevOptions();
             }
         });
     }
 
-    public static void launchByBroadcast(@NonNull Context context, @NonNull String from) {
-        //todo 使用from字段区分来源
+    public static void launchByBroadcast(@NonNull Context context, @NonNull String from, @Nullable String deviceId) {
         Intent intent = new Intent(ACTION_LAUNCH);
         intent.putExtra(EXTRA_FROM,from);
+        if(!TextUtils.isEmpty(deviceId)) {
+            intent.putExtra(EXTRA_DEVICE_ID,deviceId);
+        }
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
@@ -681,6 +689,8 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
+            LaunchConfig.setDeviceId(null);
+            LaunchConfig.setFrom(null);
             showDevOptions();
             return true;
         }
@@ -709,15 +719,16 @@ public class WeexDevOptions implements IWXDevOptions {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction() != null && ACTION_LAUNCH.equals(intent.getAction())) {
                 String from = intent.getStringExtra(EXTRA_FROM);
+                String deviceId = intent.getStringExtra(EXTRA_DEVICE_ID);
                 if(listener != null && !TextUtils.isEmpty(from)) {
-                    listener.onLaunch(from);
+                    listener.onLaunch(from,deviceId);
                 }
             }
         }
     }
 
     interface OnLaunchListener {
-        void onLaunch(@NonNull String from);
+        void onLaunch(@NonNull String from,@Nullable String deviceId);
     }
 
 }

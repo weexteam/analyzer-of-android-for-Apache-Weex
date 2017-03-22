@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.pojo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.taobao.weex.analyzer.core.Constants;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class HealthReport {
     /**
      * 最深嵌套层级(virtual dom)
      */
+    @JSONField(name = "maxLayerOfVDom")
     public int maxLayer;
 
     /**
@@ -39,17 +41,16 @@ public class HealthReport {
     /**
      * cell下view个数
      */
+    @JSONField(serialize = false)
     public int maxCellViewNum;
 
+    @JSONField(serialize = false)
     public int componentNumOfBigCell;
 
-//    /**
-//     * 当前cell个数
-//     */
-//    public int cellNum;
     /**
      * 扩展字段
      */
+    @JSONField(serialize = false)
     public Map<String, String> extendProps;
 
     /**

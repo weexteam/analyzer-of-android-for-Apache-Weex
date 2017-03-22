@@ -16,10 +16,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.NetworkEventSender;
+import com.taobao.weex.analyzer.core.reporter.IDataReporter;
+import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
+import com.taobao.weex.analyzer.core.reporter.MDSDataReporterFactory;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 
 import java.text.SimpleDateFormat;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Description:
@@ -43,7 +46,10 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
 
     private boolean isSizeMenuOpened;
 
-    private static final String TAG = "NetworkInspectorView";
+    @Nullable
+    private IDataReporter<NetworkEventInspector.MessageBean> mDataReporter;
+
+    private AtomicInteger mCounter = new AtomicInteger(0);
 
     public NetworkInspectorView(Context application) {
         super(application);
@@ -157,6 +163,13 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
             }
         });
 
+        String from = LaunchConfig.getFrom();
+        String deviceId = LaunchConfig.getDeviceId();
+
+        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
+            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+        }
+
         return wholeView;
     }
 
@@ -168,6 +181,16 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
                 if (mAdapter != null) {
                     mAdapter.addMessage(msg);
                 }
+
+                if (mDataReporter != null && msg != null && mDataReporter.isEnabled()) {
+                    mDataReporter.report(new IDataReporter.ProcessedDataBuilder<NetworkEventInspector.MessageBean>()
+                            .sequenceId(mCounter.getAndIncrement())
+                            .data(msg)
+                            .deviceId(LaunchConfig.getDeviceId())
+                            .type(IDataReporter.TYPE_MTOP_INSPECTOR)
+                            .build()
+                    );
+                }
             }
         });
     }
@@ -178,6 +201,7 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
             mNetworkEventInspector.destroy();
             mNetworkEventInspector = null;
         }
+        mCounter.set(0);
     }
 
     private static class NetworkEventListAdapter extends RecyclerView.Adapter<ViewHolder> {
@@ -322,8 +346,11 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
 
             if (!TextUtils.isEmpty(msg.body)) {
                 try {
-                    JSONObject obj = JSON.parseObject(msg.body.trim());
-                    bodyView.setText(JSON.toJSONString(obj, true));
+                    if(msg.content != null) {
+                        bodyView.setText(JSON.toJSONString(msg.content, true));
+                    } else {
+                        bodyView.setText(msg.body);
+                    }
                 } catch (Exception e) {
                     bodyView.setText(msg.body);
                 }
