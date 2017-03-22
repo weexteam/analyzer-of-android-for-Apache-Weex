@@ -2,7 +2,6 @@ package com.taobao.weex.analyzer.core.reporter;
 
 import android.support.annotation.NonNull;
 
-import com.alibaba.fastjson.JSON;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**
@@ -27,8 +26,17 @@ class HttpDataReporter<T> implements IDataReporter<T> {
 
     @Override
     public void report(@NonNull ProcessedData<T> data) {
-        //TODO
-        WXLogUtils.e(TAG, JSON.toJSONString(data,true));
+        HttpEngine.Request request = new HttpEngine.Request();
+        request.method = "POST";
+        request.url = mRequestUrl;
+        request.rawData = data;
+
+        HttpEngine.asyncRequest(request, new HttpEngine.OnHttpCompletedListener() {
+            @Override
+            public void onHttpComplete(HttpEngine.Response response) {
+                WXLogUtils.e(TAG,response.toString());
+            }
+        });
     }
 
     @Override
