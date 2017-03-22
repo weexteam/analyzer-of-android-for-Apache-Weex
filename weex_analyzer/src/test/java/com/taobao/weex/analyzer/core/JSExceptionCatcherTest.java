@@ -42,7 +42,7 @@ public class JSExceptionCatcherTest {
         assertEquals(dialog.isShowing(),true);
         assertEquals(ShadowAlertDialog.getLatestAlertDialog(),dialog);
 
-        assertEquals("wx-analyzer捕捉到异常",shadowAlertDialog.getTitle());
+        assertEquals("WeexAnalyzer捕捉到异常",shadowAlertDialog.getTitle());
     }
 
 }
