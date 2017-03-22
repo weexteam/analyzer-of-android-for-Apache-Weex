@@ -20,6 +20,6 @@ public class MDSDataReporterFactory {
 
     @NonNull
     public static <T> IDataReporter<T> create(@NonNull String from,@NonNull String deviceId) {
-        return new HttpDataReporter<>(deviceId,String.format(Locale.CHINA,REQUEST_URL_PRE,deviceId),MDS.equals(from));
+        return new HttpDataReporter<>(String.format(Locale.CHINA,REQUEST_URL_PRE,deviceId),MDS.equals(from));
     }
 }

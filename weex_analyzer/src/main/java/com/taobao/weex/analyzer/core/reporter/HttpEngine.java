@@ -63,6 +63,7 @@ final class HttpEngine {
                         request.jsonData = "{}";
                     }
                 }
+                WXLogUtils.d("HttpDataReporter",request.jsonData);
                 return syncRequest(params[0]);
             }
 

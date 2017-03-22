@@ -13,13 +13,11 @@ import com.taobao.weex.utils.WXLogUtils;
 class HttpDataReporter<T> implements IDataReporter<T> {
 
     private String mRequestUrl;
-    private String mDeviceId;
     private boolean isEnabled;
 
     private static final String TAG = "HttpDataReporter";
 
-    HttpDataReporter(String deviceId,String requestUrl,boolean isEnabled) {
-        this.mDeviceId = deviceId;
+    HttpDataReporter(String requestUrl,boolean isEnabled) {
         this.mRequestUrl = requestUrl;
         this.isEnabled = isEnabled;
     }
@@ -34,7 +32,7 @@ class HttpDataReporter<T> implements IDataReporter<T> {
         HttpEngine.asyncRequest(request, new HttpEngine.OnHttpCompletedListener() {
             @Override
             public void onHttpComplete(HttpEngine.Response response) {
-                WXLogUtils.e(TAG,response.toString());
+                WXLogUtils.d(TAG,response.toString());
             }
         });
     }
