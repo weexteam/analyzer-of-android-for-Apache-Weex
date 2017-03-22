@@ -19,16 +19,12 @@ public class LaunchConfig {
     }
 
     public static String getFrom() {
-        //TODO
-        mFrom = "mds";
-
+//        mFrom = "mds";
         return mFrom;
     }
 
     public static String getDeviceId() {
-        //TODO
-        mDeviceId = "xk28sd";
-
+//        mDeviceId = "xk28sd";
         return mDeviceId;
     }
 }
