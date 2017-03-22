@@ -54,13 +54,6 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
     public NetworkInspectorView(Context application) {
         super(application);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
-
-        String from = LaunchConfig.getFrom();
-        String deviceId = LaunchConfig.getDeviceId();
-
-        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
-        }
     }
 
     public void setOnCloseListener(@Nullable OnCloseListener listener) {
@@ -169,6 +162,13 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
                 setViewSize(mViewSize, networkEventList, true);
             }
         });
+
+        String from = LaunchConfig.getFrom();
+        String deviceId = LaunchConfig.getDeviceId();
+
+        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
+            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+        }
 
         return wholeView;
     }

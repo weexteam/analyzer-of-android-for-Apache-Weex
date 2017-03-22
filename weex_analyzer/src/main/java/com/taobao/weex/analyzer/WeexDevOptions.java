@@ -209,6 +209,8 @@ public class WeexDevOptions implements IWXDevOptions {
         mShakeDetector = new ShakeDetector(new ShakeDetector.ShakeListener() {
             @Override
             public void onShake() {
+                LaunchConfig.setFrom(null);
+                LaunchConfig.setDeviceId(null);
                 showDevOptions();
             }
         });
@@ -687,6 +689,8 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
+            LaunchConfig.setDeviceId(null);
+            LaunchConfig.setFrom(null);
             showDevOptions();
             return true;
         }

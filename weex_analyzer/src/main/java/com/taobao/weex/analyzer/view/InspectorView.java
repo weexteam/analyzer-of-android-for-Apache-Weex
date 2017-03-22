@@ -58,13 +58,6 @@ public class InspectorView extends DragSupportOverlayView {
     public InspectorView(Context application) {
         super(application);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
-
-        String from = LaunchConfig.getFrom();
-        String deviceId = LaunchConfig.getDeviceId();
-
-        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
-        }
     }
 
     @NonNull
@@ -112,6 +105,13 @@ public class InspectorView extends DragSupportOverlayView {
                 }
             }
         });
+
+        String from = LaunchConfig.getFrom();
+        String deviceId = LaunchConfig.getDeviceId();
+
+        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
+            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+        }
 
         return hostView;
     }

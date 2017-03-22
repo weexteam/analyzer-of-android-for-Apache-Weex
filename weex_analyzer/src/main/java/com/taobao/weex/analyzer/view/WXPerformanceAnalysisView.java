@@ -43,12 +43,6 @@ public class WXPerformanceAnalysisView extends AbstractAlertView {
         super(context);
         this.mCurPerformance = curPerformance;
         this.mHistoryPerfList = historyPerfs;
-        String from = LaunchConfig.getFrom();
-        String deviceId = LaunchConfig.getDeviceId();
-
-        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
-        }
     }
 
     @Override
@@ -91,6 +85,13 @@ public class WXPerformanceAnalysisView extends AbstractAlertView {
 
             }
         });
+
+        String from = LaunchConfig.getFrom();
+        String deviceId = LaunchConfig.getDeviceId();
+
+        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
+            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+        }
     }
 
     @Override
