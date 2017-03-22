@@ -16,7 +16,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.NetworkEventSender;
@@ -347,8 +346,11 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
 
             if (!TextUtils.isEmpty(msg.body)) {
                 try {
-                    JSONObject obj = JSON.parseObject(msg.body.trim());
-                    bodyView.setText(JSON.toJSONString(obj, true));
+                    if(msg.content != null) {
+                        bodyView.setText(JSON.toJSONString(msg.content, true));
+                    } else {
+                        bodyView.setText(msg.body);
+                    }
                 } catch (Exception e) {
                     bodyView.setText(msg.body);
                 }

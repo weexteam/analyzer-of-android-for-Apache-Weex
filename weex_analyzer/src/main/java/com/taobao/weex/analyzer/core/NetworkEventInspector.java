@@ -8,6 +8,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +21,7 @@ import java.util.Map;
 /**
  * Description:
  *
- *  负责接受网络消息 并整理后发送给NetworkInspectorView
+ * 负责接受网络消息 并整理后发送给NetworkInspectorView
  *
  *
  * 1. 注册localbroadcastManager
@@ -47,7 +52,7 @@ public class NetworkEventInspector {
         this.mListener = listener;
         mCoreMessageReceiver = new CoreMessageReceiver(mListener);
         IntentFilter filter = new IntentFilter(NetworkEventSender.ACTION_NETWORK_REPORTER);
-        mLocalBroadcastManager.registerReceiver(mCoreMessageReceiver,filter);
+        mLocalBroadcastManager.registerReceiver(mCoreMessageReceiver, filter);
     }
 
     public static NetworkEventInspector createInstance(@NonNull Context context, @NonNull OnMessageReceivedListener listener) {
@@ -65,7 +70,7 @@ public class NetworkEventInspector {
     }
 
     public void destroy() {
-        if(mCoreMessageReceiver != null && mLocalBroadcastManager != null) {
+        if (mCoreMessageReceiver != null && mLocalBroadcastManager != null) {
             mLocalBroadcastManager.unregisterReceiver(mCoreMessageReceiver);
             mCoreMessageReceiver = null;
             mLocalBroadcastManager = null;
@@ -82,7 +87,7 @@ public class NetworkEventInspector {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent == null || !intent.getAction().equals(NetworkEventSender.ACTION_NETWORK_REPORTER)) {
+            if (intent == null || !intent.getAction().equals(NetworkEventSender.ACTION_NETWORK_REPORTER)) {
                 return;
             }
 
@@ -92,20 +97,28 @@ public class NetworkEventInspector {
             String desc = intent.getStringExtra(NetworkEventSender.INTENT_EXTRA_DESC);
             String body = intent.getStringExtra(NetworkEventSender.INTENT_EXTRA_BODY);
             Bundle bundle = intent.getExtras();
-            Map<String,String> extendProps = null;
-            if(bundle != null) {
+            Map<String, String> extendProps = null;
+            if (bundle != null) {
                 extendProps = new HashMap<>();
-                for(String key : bundle.keySet()) {
-                    if(NetworkEventSender.INTENT_EXTRA_TYPE.equals(key) ||
+                for (String key : bundle.keySet()) {
+                    if (NetworkEventSender.INTENT_EXTRA_TYPE.equals(key) ||
                             NetworkEventSender.INTENT_EXTRA_DESC.equals(key) || NetworkEventSender.INTENT_EXTRA_TITLE.equals(key)
                             || NetworkEventSender.INTENT_EXTRA_BODY.equals(key)) {
                         continue;
                     }
-                    extendProps.put(key,bundle.getString(key));
+                    extendProps.put(key, bundle.getString(key));
                 }
             }
-            MessageBean msg = new MessageBean(type,title,desc,extendProps,body);
-            if(listener != null) {
+            MessageBean msg = new MessageBean(type, title, desc, extendProps, body);
+
+            try {
+                if(!TextUtils.isEmpty(msg.body)) {
+                    msg.content = JSON.parseObject(msg.body.trim());
+                }
+            } catch (Exception e) {
+            }
+
+            if (listener != null) {
                 listener.onMessageReceived(msg);
             }
         }
@@ -118,9 +131,16 @@ public class NetworkEventInspector {
     public static class MessageBean {
         public String title;
         public String desc;
-        public String body;
         public String type;
-        public Map<String,String> extendProps;
+
+        @JSONField(serialize = false)
+        public String body;
+
+        public JSONObject content;
+
+        @JSONField(serialize = false)
+        public Map<String, String> extendProps;
+
 
         public MessageBean(String type, String title, String desc, Map<String, String> extendProps, String body) {
             this.type = type;
@@ -128,17 +148,6 @@ public class NetworkEventInspector {
             this.desc = desc;
             this.extendProps = extendProps;
             this.body = body;
-        }
-
-        @Override
-        public String toString() {
-            return "MessageBean{" +
-                    "title='" + title + '\'' +
-                    ", desc='" + desc + '\'' +
-                    ", body='" + body + '\'' +
-                    ", type='" + type + '\'' +
-                    ", extendProps=" + extendProps +
-                    '}';
         }
     }
 }
