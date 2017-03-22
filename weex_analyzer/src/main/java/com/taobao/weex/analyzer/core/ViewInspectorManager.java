@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.ui.component.WXComponent;
@@ -83,6 +84,12 @@ public final class ViewInspectorManager {
                     inspectorInfo.targetComponent = targetComponent;
                     inspectorInfo.nativeViewInfo = Collections.emptyMap();
                     inspectorInfo.virtualViewInfo = Collections.emptyMap();
+
+                    if(targetComponent != null) {
+                        inspectorInfo.simpleName = ViewUtils.getComponentName(targetComponent);
+                    } else {
+                        inspectorInfo.simpleName = targetView.getClass().getSimpleName();
+                    }
 
                     if(mSupplier != null) {
                         Map<String,String> nativeViewInfo = mSupplier.supplyPropertiesFromNativeView(targetView);
@@ -193,8 +200,11 @@ public final class ViewInspectorManager {
     public static class InspectorInfo {
         public Map<String,String> virtualViewInfo;
         public Map<String,String> nativeViewInfo;
+        @JSONField(serialize = false)
         public WXComponent targetComponent;
+        @JSONField(serialize = false)
         public View targetView;
+        public String simpleName;
 
         @Override
         public String toString() {
@@ -203,6 +213,7 @@ public final class ViewInspectorManager {
                     ", nativeViewInfo=" + nativeViewInfo +
                     ", targetComponent=" + targetComponent +
                     ", targetView=" + targetView +
+                    ", simpleName='" + simpleName + '\'' +
                     '}';
         }
     }

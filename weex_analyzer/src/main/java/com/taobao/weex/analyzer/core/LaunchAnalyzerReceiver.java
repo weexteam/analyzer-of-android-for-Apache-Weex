@@ -100,7 +100,8 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
             if(TRUE.equals(cmd_launch_ui)) {
                 //启动主界面
                 String from = intent.getStringExtra(WeexDevOptions.EXTRA_FROM);
-                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from);
+                String deviceId = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
+                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
             }
         }
     }

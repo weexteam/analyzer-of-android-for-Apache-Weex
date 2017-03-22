@@ -12,9 +12,11 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.MemorySampler;
 import com.taobao.weex.analyzer.core.MemoryTaskEntity;
+import com.taobao.weex.analyzer.core.reporter.IDataReporter;
+import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
+import com.taobao.weex.analyzer.core.reporter.ReportSupportLoopTask;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -40,7 +42,7 @@ public class MemorySampleView extends DragSupportOverlayView {
         mHeight = (int) ViewUtils.dp2px(application, 150);
     }
 
-    public void setOnCloseListener(@Nullable OnCloseListener listener){
+    public void setOnCloseListener(@Nullable OnCloseListener listener) {
         this.mOnCloseListener = listener;
     }
 
@@ -65,7 +67,7 @@ public class MemorySampleView extends DragSupportOverlayView {
                 .maxX(20)
                 .numYLabels(5)
                 .minY(0)
-                .maxY(ViewUtils.findSuitableVal(maxY,4))//step = verticalLabelsNum-1
+                .maxY(ViewUtils.findSuitableVal(maxY, 4))//step = verticalLabelsNum-1
                 .labelFormatter(new TimestampLabelFormatter())
                 .maxDataPoints(20 + 2)
                 .build();
@@ -81,7 +83,7 @@ public class MemorySampleView extends DragSupportOverlayView {
         closeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mOnCloseListener != null && isViewAttached){
+                if (mOnCloseListener != null && isViewAttached) {
                     mOnCloseListener.close(MemorySampleView.this);
                     dismiss();
                 }
@@ -97,7 +99,7 @@ public class MemorySampleView extends DragSupportOverlayView {
 
     @Override
     protected void onShown() {
-        if(mTask != null){
+        if (mTask != null) {
             mTask.stop();
             mTask = null;
         }
@@ -114,7 +116,7 @@ public class MemorySampleView extends DragSupportOverlayView {
         }
     }
 
-    private static class SampleMemoryTask extends AbstractLoopTask {
+    private static class SampleMemoryTask extends ReportSupportLoopTask<Double> {
 
         private DynamicChartViewController mController;
         private int mAxisXValue = -1;
@@ -124,7 +126,7 @@ public class MemorySampleView extends DragSupportOverlayView {
         private MemoryTaskEntity mEntity;
 
         SampleMemoryTask(@NonNull DynamicChartViewController controller, boolean isDebug) {
-            super(false,1000);
+            super(false, 1000);
             this.mController = controller;
             this.isDebug = isDebug;
 
@@ -143,9 +145,18 @@ public class MemorySampleView extends DragSupportOverlayView {
             }
             mAxisXValue++;
             final double memoryUsed = mEntity.onTaskRun();
-            if(isDebug) {
-                Log.d("weex-analyzer", "memory usage : "+ memoryUsed + "MB");
+            if (isDebug) {
+                Log.d("weex-analyzer", "memory usage : " + memoryUsed + "MB");
             }
+
+            reportIfNeeded(new IDataReporter.ProcessedDataBuilder<Double>()
+                    .sequenceId(generateSequenceId())
+                    .deviceId(LaunchConfig.getDeviceId())
+                    .type(IDataReporter.TYPE_MEMORY)
+                    .data((Math.round(memoryUsed*100)/100.0))
+                    .build()
+            );
+
             runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
@@ -164,6 +175,7 @@ public class MemorySampleView extends DragSupportOverlayView {
 
         @Override
         protected void onStop() {
+            super.onStop();
             mEntity.onTaskStop();
             mController = null;
         }
