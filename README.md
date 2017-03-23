@@ -1,7 +1,7 @@
 # Weex Analyzer
 
 ---
-![](https://circleci.com/gh/weexteam/weex-analyzer-android/tree/tb_release_0.1.0.9.svg?style=shield&circle-token=cbceec1ca63c4f5dd758c55ec3f5a9c566d54514)[ ![Download](https://api.bintray.com/packages/rowandjj/maven/weex_analyzer/images/download.svg) ](https://bintray.com/rowandjj/maven/weex_analyzer/_latestVersion)[![GitHub release](https://img.shields.io/badge/release-v0.1.0.4-brightgreen.svg)](https://github.com/weexteam/weex-analyzer-android/releases/latest) [![GitHub release](https://img.shields.io/badge/license-%20Apache--2.0-yellowgreen.svg)](https://github.com/weexteam/weex-analyzer-android/blob/master/LICENSE)
+![](https://circleci.com/gh/weexteam/weex-analyzer-android/tree/tb_release_0.1.0.9.svg?style=shield&circle-token=cbceec1ca63c4f5dd758c55ec3f5a9c566d54514)[ ![Download](https://api.bintray.com/packages/rowandjj/maven/weex_analyzer/images/download.svg) ](https://bintray.com/rowandjj/maven/weex_analyzer/_latestVersion)[![GitHub release](https://img.shields.io/badge/release-0.1.0.9-green.svg)](https://github.com/weexteam/weex-analyzer-android/releases/latest) [![GitHub release](https://img.shields.io/badge/license-%20Apache--2.0-yellowgreen.svg)](https://github.com/weexteam/weex-analyzer-android/blob/master/LICENSE)
 
 `Weex Analyzer`是一款运行在手机客户端上辅助开发者进行[weex开发](https://github.com/alibaba/weex)的小工具。
 接入此工具后，开发者可以在debug包中通过摇一摇打开功能选项。目前实现的功能有:
@@ -13,9 +13,10 @@
 5. 流量监控
 6. cpu/内存/fps 实时折线图
 7. 页面3d视图
-8. js报错时弹框提醒
+8. js报错实时通知
 9. 远程调试js。(依赖[weex dev tool](https://github.com/weexteam/weex-devtools-android))
-10. **vdom层级检查**
+10. 渲染性能分析(如自动分析页面嵌套层级，深层嵌套高亮透出);
+11. 视图审查(点击查看任意元素样式)
 
 ### 接入
 
@@ -27,8 +28,7 @@ debugCompile 'com.taobao.android:weex_analyzer:${latest version}'
 
 #### 代码集成
 
-目前集成过程有点繁琐，需要复写`WeexActivity`所有生命周期函数. 具体请参考`commons`module下`WXAnalyzerDelegate`、`AbstractWeexActivity`.
-
+具体请参考`commons`module下`WXAnalyzerDelegate`、`AbstractWeexActivity`.
 
 #### 使用手册
 
@@ -99,15 +99,22 @@ debugCompile 'com.taobao.android:weex_analyzer:${latest version}'
 此功能方便没有集成【扫一扫】功能的app，或者是无法使用【扫一扫】的场景(如模拟器)。
 
 
-##### 10. vdom层级查看
+##### 10. 渲染性能分析
 
-点击【vdom层级】按钮，即可开启。
+点击【渲染性能分析】按钮，即可开启。
 
 注:
 
-1. 展示的是vdom层级，而不是真实的native层级(同devtool)。
-2. 默认还会展示页面是否使用list/scroller组件
+1. 支持同时展示native层级与vdom层级，对于vdom层级超过14层的，会自动高亮透出;
+2. 支持检查页面是否存在list/scroller，预估屏数等;
 
-![日志](./art/08.png)
+![渲染性能分析](./art/08.png)
+
+
+##### 11. 视图审查
+
+点击任意元素，查看其视觉样式。
+
+![视图审查](./art/08.png)
 
 
