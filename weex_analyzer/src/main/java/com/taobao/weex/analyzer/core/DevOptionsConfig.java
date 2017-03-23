@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.taobao.weex.analyzer.view.LogView;
+import com.taobao.weex.analyzer.view.IResizableView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +19,13 @@ public class DevOptionsConfig {
     private static final String DEV_CONFIG_NAME = "weex_dev_config";
     private static final String CONFIG_PERF_COMMON = "config_perf_common";//性能悬浮窗
     private static final String CONFIG_VDOM_DEPTH = "config_vdom_depth";
+    private static final String CONFIG_NETWORK_INSPECTOR = "config_network_inspector";
+    private static final String CONFIG_VIEW_INSPECTOR = "config_view_inspector";
+
 
     private static final String CONFIG_LOG_OUTPUT = "config_log_output";
     private static final String CONFIG_JS_EXCEPTION = "config_js_exception";
+    private static final String CONFIG_EXCEPTION_NOTIFICATION = "config_exception_notification";
 
     private static final String CONFIG_MEMORY_CHART = "config_mem_chart";
     private static final String CONFIG_FPS_CHART = "config_fps_chart";
@@ -32,12 +36,24 @@ public class DevOptionsConfig {
     private static final String CONFIG_LOG_LEVEL = "config_log_level";
     private static final String CONFIG_LOG_FILTER = "config_log_filter";
     private static final String CONFIG_LOG_VIEW_SIZE = "config_log_view_size";
+    private static final String CONFIG_INSPECTOR_VIEW_SIZE = "config_inspector_view_size";
 
     public static final String TAG = "weex-analyzer";
 
-
-    public DevOptionsConfig(@NonNull Context context) {
+    private static DevOptionsConfig sConfig;
+    private DevOptionsConfig(@NonNull Context context) {
         mSharedPreferences = context.getSharedPreferences(DEV_CONFIG_NAME, Context.MODE_PRIVATE);
+    }
+
+    public static DevOptionsConfig getInstance(@NonNull Context context) {
+        if(sConfig == null) {
+            synchronized (DevOptionsConfig.class) {
+                if(sConfig == null) {
+                    sConfig = new DevOptionsConfig(context);
+                }
+            }
+        }
+        return sConfig;
     }
 
     /**
@@ -58,6 +74,22 @@ public class DevOptionsConfig {
 
     public boolean isVDomDepthEnabled() {
         return mSharedPreferences.getBoolean(CONFIG_VDOM_DEPTH, false);
+    }
+
+    public void setViewInspectorEnabled(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_VIEW_INSPECTOR, enabled).apply();
+    }
+
+    public boolean isViewInspectorEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_VIEW_INSPECTOR, false);
+    }
+
+    public boolean isNetworkInspectorEnabled() {
+        return mSharedPreferences.getBoolean(CONFIG_NETWORK_INSPECTOR, false);
+    }
+
+    public void setNetworkInspectorEnabled(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_NETWORK_INSPECTOR, enabled).apply();
     }
 
     /**
@@ -125,6 +157,15 @@ public class DevOptionsConfig {
         return mSharedPreferences.getBoolean(CONFIG_JS_EXCEPTION, true);
     }
 
+    public void setAllowExceptionNotification(boolean enabled) {
+        mSharedPreferences.edit().putBoolean(CONFIG_EXCEPTION_NOTIFICATION, enabled).apply();
+    }
+
+    public boolean isAllowExceptionNotification() {
+        return mSharedPreferences.getBoolean(CONFIG_EXCEPTION_NOTIFICATION, true);
+    }
+
+
     public void setLogLevel(int level) {
         mSharedPreferences.edit().putInt(CONFIG_LOG_LEVEL, level).apply();
     }
@@ -141,14 +182,22 @@ public class DevOptionsConfig {
         return mSharedPreferences.getString(CONFIG_LOG_FILTER, null);
     }
 
-    public void setLogViewSize(@LogView.Size int size) {
+    public void setLogViewSize(@IResizableView.Size int size) {
         mSharedPreferences.edit().putInt(CONFIG_LOG_VIEW_SIZE, size).apply();
     }
 
-    public
-    @LogView.Size
-    int getLogViewSize() {
-        return mSharedPreferences.getInt(CONFIG_LOG_VIEW_SIZE, LogView.Size.MEDIUM);
+    @IResizableView.Size
+    public int getLogViewSize() {
+        return mSharedPreferences.getInt(CONFIG_LOG_VIEW_SIZE, IResizableView.Size.MEDIUM);
+    }
+
+    public void setNetworkInspectorViewSize(@IResizableView.Size int size) {
+        mSharedPreferences.edit().putInt(CONFIG_INSPECTOR_VIEW_SIZE, size).apply();
+    }
+
+    @IResizableView.Size
+    public int getNetworkInspectorViewSize() {
+        return mSharedPreferences.getInt(CONFIG_INSPECTOR_VIEW_SIZE, IResizableView.Size.MEDIUM);
     }
 
 

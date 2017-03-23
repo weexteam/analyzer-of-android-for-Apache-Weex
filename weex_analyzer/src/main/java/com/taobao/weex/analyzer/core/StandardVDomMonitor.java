@@ -68,7 +68,7 @@ public class StandardVDomMonitor implements IVDomMonitor, Handler.Callback {
     public boolean handleMessage(Message msg) {
         if(msg.what == TRACK) {
             try {
-                VDomTracker tracker = new VDomTracker((WXSDKInstance) msg.obj);//todo 此处需优化
+                DomTracker tracker = new DomTracker((WXSDKInstance) msg.obj);//todo 此处需优化
                 HealthReport report = tracker.traverse();
                 if(report != null) {
                     report.writeToConsole();

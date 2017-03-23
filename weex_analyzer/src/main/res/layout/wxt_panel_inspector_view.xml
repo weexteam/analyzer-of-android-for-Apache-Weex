@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:id="@+id/overlay_view_content_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            >
+
+        <TextView
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_toLeftOf="@+id/box_model"
+                android:textColor="#fff"
+                android:textSize="12sp"
+                android:paddingRight="10dp"
+                android:text="{}"
+                android:layout_height="wrap_content"/>
+
+        <com.taobao.weex.analyzer.view.CSSBoxModelView
+                android:id="@+id/box_model"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/result"
+                />
+
+    </RelativeLayout>
+</LinearLayout>

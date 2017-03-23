@@ -1,13 +1,19 @@
 package com.taobao.weex.analyzer;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,36 +22,38 @@ import com.taobao.weex.analyzer.core.DevOptionsConfig;
 import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
+import com.taobao.weex.analyzer.core.PollingVDomMonitor;
 import com.taobao.weex.analyzer.core.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
+import com.taobao.weex.analyzer.core.StandardVDomMonitor;
 import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
+import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
 import com.taobao.weex.analyzer.view.DevOption;
 import com.taobao.weex.analyzer.view.EntranceView;
 import com.taobao.weex.analyzer.view.FpsSampleView;
 import com.taobao.weex.analyzer.view.IOverlayView;
+import com.taobao.weex.analyzer.view.IResizableView;
+import com.taobao.weex.analyzer.view.InspectorView;
 import com.taobao.weex.analyzer.view.LogView;
 import com.taobao.weex.analyzer.view.MemorySampleView;
+import com.taobao.weex.analyzer.view.NetworkInspectorView;
 import com.taobao.weex.analyzer.view.PerfSampleOverlayView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
 import com.taobao.weex.analyzer.view.TrafficSampleView;
-import com.taobao.weex.analyzer.view.VDomDepthSampleView;
+import com.taobao.weex.analyzer.view.ProfileDomView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description:
- * <p>
- * Created by rowandjj(chuyi)<br/>
- * Date: 2016/11/5<br/>
- * Time: 下午3:25<br/>
+ * Description: <p> Created by rowandjj(chuyi)<br/> Date: 2016/11/5<br/> Time: 下午3:25<br/>
  */
 
 public class WeexDevOptions implements IWXDevOptions {
@@ -65,7 +73,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private ScalpelViewController mScalpelViewController;
     private PerfSampleOverlayView mPerfMonitorOverlayView;
-    private VDomDepthSampleView mVDomDepthSampleView;
+    private ProfileDomView mProfileDomView;
+    private InspectorView mInspectorView;
+
+    private NetworkInspectorView mNetworkInspectorView;
 
     private boolean shown = false;
     private List<DevOption> mExtraOptions = null;
@@ -74,13 +85,45 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private WXSDKInstance mInstance;
 
-    public WeexDevOptions(@NonNull Context context){
+    private static final String ACTION_LAUNCH = "action_launch_analyzer";
+    public static final String EXTRA_FROM = "from";
+    public static final String EXTRA_DEVICE_ID = "deviceId";
+
+    private LaunchUIReceiver mLaunchUIReceiver;
+
+
+    public WeexDevOptions(@NonNull Context context) {
 
         this.mContext = context;
 
-        mConfig = new DevOptionsConfig(context);
+        mConfig = DevOptionsConfig.getInstance(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
-        mVDomDepthSampleView = new VDomDepthSampleView(context);
+        mProfileDomView = new ProfileDomView(context);
+        mProfileDomView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if (host != null) {
+                    mConfig.setVdomDepthEnabled(false);
+                }
+            }
+        });
+
+        mNetworkInspectorView = new NetworkInspectorView(context);
+        mNetworkInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if (host != null) {
+                    mConfig.setNetworkInspectorEnabled(false);
+                }
+            }
+        });
+
+        mNetworkInspectorView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
+            @Override
+            public void onSizeChanged(@IResizableView.Size int size) {
+                mConfig.setNetworkInspectorViewSize(size);
+            }
+        });
 
         mLogView = new LogView(context);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {
@@ -102,9 +145,11 @@ public class WeexDevOptions implements IWXDevOptions {
             public void onLogFilterChanged(String filterName) {
                 mConfig.setLogFilter(filterName);
             }
+        });
 
+        mLogView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
             @Override
-            public void onLogSizeChanged(@LogView.Size int size) {
+            public void onSizeChanged(@IResizableView.Size int size) {
                 mConfig.setLogViewSize(size);
             }
         });
@@ -124,7 +169,7 @@ public class WeexDevOptions implements IWXDevOptions {
         mCpuSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
-                if(host != null){
+                if (host != null) {
                     mConfig.setCpuChartEnabled(false);
                 }
             }
@@ -134,7 +179,7 @@ public class WeexDevOptions implements IWXDevOptions {
         mTrafficSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
-                if(host != null){
+                if (host != null) {
                     mConfig.setTrafficChartEnabled(false);
                 }
             }
@@ -150,15 +195,45 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
+        mInspectorView = new InspectorView(context);
+        mInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
+            @Override
+            public void close(IOverlayView host) {
+                if (host != null) {
+                    mConfig.setViewInspectorEnabled(false);
+                }
+            }
+        });
+
         //prepare shake detector
         mShakeDetector = new ShakeDetector(new ShakeDetector.ShakeListener() {
             @Override
             public void onShake() {
+                LaunchConfig.setFrom(null);
+                LaunchConfig.setDeviceId(null);
                 showDevOptions();
             }
         });
 
-        mVdomController = new VDomController();
+        mVdomController = new VDomController(new PollingVDomMonitor(), new StandardVDomMonitor());
+
+        mLaunchUIReceiver = new LaunchUIReceiver(new OnLaunchListener() {
+            @Override
+            public void onLaunch(@NonNull String from, @Nullable String deviceId) {
+                LaunchConfig.setFrom(from);
+                LaunchConfig.setDeviceId(deviceId);
+                showDevOptions();
+            }
+        });
+    }
+
+    public static void launchByBroadcast(@NonNull Context context, @NonNull String from, @Nullable String deviceId) {
+        Intent intent = new Intent(ACTION_LAUNCH);
+        intent.putExtra(EXTRA_FROM,from);
+        if(!TextUtils.isEmpty(deviceId)) {
+            intent.putExtra(EXTRA_DEVICE_ID,deviceId);
+        }
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 
@@ -176,14 +251,57 @@ public class WeexDevOptions implements IWXDevOptions {
                 Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
                 List<Performance> list = WXPerfStorage.getInstance().getPerformanceList(mCurPageName);
 
-                if(performance == null){
+                if (performance == null) {
                     return;
                 }
 
-                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext,performance,list);
+                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext, performance, list);
                 view.show();
             }
         }));
+
+        options.add(new DevOption("视图审查", R.drawable.wxt_icon_view_inspector, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isViewInspectorEnabled()) {
+                    mConfig.setViewInspectorEnabled(false);
+                    mInspectorView.dismiss();
+                } else {
+                    mConfig.setViewInspectorEnabled(true);
+                    mInspectorView.show();
+                    mInspectorView.bindInstance(mInstance);
+                }
+            }
+        },true));
+
+        options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isVDomDepthEnabled()) {
+                    mConfig.setVdomDepthEnabled(false);
+                    mProfileDomView.dismiss();
+                } else {
+                    mConfig.setVdomDepthEnabled(true);
+                    mProfileDomView.show();
+                    mProfileDomView.bindInstance(mInstance);
+                }
+            }
+        }, true));
+
+        options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mConfig.isNetworkInspectorEnabled()) {
+                    mConfig.setNetworkInspectorEnabled(false);
+                    mNetworkInspectorView.dismiss();
+                } else {
+                    mConfig.setNetworkInspectorEnabled(true);
+                    mNetworkInspectorView.setViewSize(mConfig.getNetworkInspectorViewSize());
+                    mNetworkInspectorView.show();
+                }
+            }
+        }, true));
+
         options.add(new DevOption("weex storage", R.drawable.wxt_icon_storage, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -191,6 +309,7 @@ public class WeexDevOptions implements IWXDevOptions {
                 mStorageView.show();
             }
         }));
+
         options.add(new DevOption("3d视图", R.drawable.wxt_icon_3d_rotation, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -198,7 +317,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mScalpelViewController.toggleScalpelEnabled();
                 }
             }
-        },true));
+        }, true));
         options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -213,7 +332,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mLogView.show();
                 }
             }
-        },true));
+        }, true));
         options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -225,7 +344,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mMemorySampleView.show();
                 }
             }
-        },true));
+        }, true));
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -237,7 +356,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mCpuSampleView.show();
                 }
             }
-        },true));
+        }, true));
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -254,7 +373,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mFpsSampleView.show();
                 }
             }
-        },true));
+        }, true));
         options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -266,7 +385,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mTrafficSampleView.show();
                 }
             }
-        },true));
+        }, true));
 
         options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
             @Override
@@ -279,22 +398,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mPerfMonitorOverlayView.show();
                 }
             }
-        },true));
-
-        options.add(new DevOption("vDom层级", R.drawable.wxt_icon_vdom_depth, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mConfig.isVDomDepthEnabled()) {
-                    mConfig.setVdomDepthEnabled(false);
-                    mVDomDepthSampleView.dismiss();
-                } else {
-                    mConfig.setVdomDepthEnabled(true);
-                    mVDomDepthSampleView.show();
-                    mVDomDepthSampleView.bindInstance(mInstance
-                    );
-                }
-            }
-        },true));
+        }, true));
 
 
         options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
@@ -313,23 +417,23 @@ public class WeexDevOptions implements IWXDevOptions {
         return options;
     }
 
-    private void showDevOptions(){
-        if(shown){
+    private void showDevOptions() {
+        if (shown) {
             return;
         }
 
-        if(mContext == null){
+        if (mContext == null) {
             return;
         }
 
-        if((mContext instanceof Activity) && ((Activity)mContext).isFinishing()){
+        if ((mContext instanceof Activity) && ((Activity) mContext).isFinishing()) {
             return;
         }
 
         EntranceView.Creator creator = new EntranceView.Creator(mContext)
                 .injectOptions(registerDefaultOptions());
 
-        if(mExtraOptions != null && !mExtraOptions.isEmpty()) {
+        if (mExtraOptions != null && !mExtraOptions.isEmpty()) {
             creator.injectOptions(mExtraOptions);
         }
 
@@ -347,21 +451,21 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @SuppressWarnings("unused")
     public void registerExtraOption(@NonNull DevOption option) {
-        if(mExtraOptions == null) {
+        if (mExtraOptions == null) {
             mExtraOptions = new ArrayList<>();
         }
         mExtraOptions.add(option);
     }
 
     @SuppressWarnings("unused")
-    public void registerExtraOption(@NonNull String optionName, int iconRes,@NonNull final Runnable runnable) {
+    public void registerExtraOption(@NonNull String optionName, int iconRes, @NonNull final Runnable runnable) {
         DevOption option = new DevOption();
         option.listener = new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
                 try {
                     runnable.run();
-                }catch (Exception e) {
+                } catch (Exception e) {
                     Log.e(DevOptionsConfig.TAG, e.getMessage());
                 }
             }
@@ -383,8 +487,20 @@ public class WeexDevOptions implements IWXDevOptions {
     }
 
     @Override
+    public void onReceiveTouchEvent(MotionEvent ev) {
+        if(ev == null) {
+            return;
+        }
+        if(mInspectorView != null && mConfig.isViewInspectorEnabled()) {
+            mInspectorView.receiveTouchEvent(ev);
+        }
+    }
+
+
+    @Override
     public void onResume() {
         mShakeDetector.start((SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE));
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(mLaunchUIReceiver,new IntentFilter(ACTION_LAUNCH));
 
         if (mConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.show();
@@ -392,11 +508,25 @@ public class WeexDevOptions implements IWXDevOptions {
             mPerfMonitorOverlayView.dismiss();
         }
 
-        if(mConfig.isVDomDepthEnabled()) {
-            mVDomDepthSampleView.show();
-            mVDomDepthSampleView.bindInstance(mInstance);
+        if (mConfig.isVDomDepthEnabled()) {
+            mProfileDomView.show();
+            mProfileDomView.bindInstance(mInstance);
         } else {
-            mVDomDepthSampleView.dismiss();
+            mProfileDomView.dismiss();
+        }
+
+        if(mConfig.isViewInspectorEnabled()) {
+            mInspectorView.show();
+            mInspectorView.bindInstance(mInstance);
+        } else {
+            mInspectorView.dismiss();
+        }
+
+        if (mConfig.isNetworkInspectorEnabled()) {
+            mNetworkInspectorView.setViewSize(mConfig.getNetworkInspectorViewSize());
+            mNetworkInspectorView.show();
+        } else {
+            mNetworkInspectorView.dismiss();
         }
 
         if (mConfig.isLogOutputEnabled()) {
@@ -414,9 +544,9 @@ public class WeexDevOptions implements IWXDevOptions {
             mMemorySampleView.dismiss();
         }
 
-        if(mConfig.isCPUChartEnabled()){
+        if (mConfig.isCPUChartEnabled()) {
             mCpuSampleView.show();
-        }else{
+        } else {
             mCpuSampleView.dismiss();
         }
 
@@ -426,13 +556,13 @@ public class WeexDevOptions implements IWXDevOptions {
             mFpsSampleView.dismiss();
         }
 
-        if(mConfig.isTrafficChartEnabled()) {
+        if (mConfig.isTrafficChartEnabled()) {
             mTrafficSampleView.show();
         } else {
             mTrafficSampleView.dismiss();
         }
 
-        if(mScalpelViewController != null){
+        if (mScalpelViewController != null) {
             mScalpelViewController.resume();
         }
     }
@@ -440,13 +570,22 @@ public class WeexDevOptions implements IWXDevOptions {
     @Override
     public void onPause() {
         mShakeDetector.stop();
+        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mLaunchUIReceiver);
 
         if (mConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.dismiss();
         }
 
-        if(mConfig.isVDomDepthEnabled()) {
-            mVDomDepthSampleView.dismiss();
+        if (mConfig.isVDomDepthEnabled()) {
+            mProfileDomView.dismiss();
+        }
+
+        if(mConfig.isViewInspectorEnabled()) {
+            mInspectorView.dismiss();
+        }
+
+        if (mConfig.isNetworkInspectorEnabled()) {
+            mNetworkInspectorView.dismiss();
         }
 
         if (mConfig.isLogOutputEnabled()) {
@@ -469,7 +608,7 @@ public class WeexDevOptions implements IWXDevOptions {
             mTrafficSampleView.dismiss();
         }
 
-        if(mScalpelViewController != null){
+        if (mScalpelViewController != null) {
             mScalpelViewController.pause();
         }
     }
@@ -480,7 +619,7 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onDestroy() {
-        if(mVdomController != null) {
+        if (mVdomController != null) {
             mVdomController.destroy();
             mVdomController = null;
         }
@@ -495,12 +634,16 @@ public class WeexDevOptions implements IWXDevOptions {
         this.mInstance = instance;
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
 
-        if(mVdomController != null) {
+        if (mVdomController != null) {
             mVdomController.monitor(instance);
         }
 
-        if(mVDomDepthSampleView != null) {
-            mVDomDepthSampleView.bindInstance(instance);
+        if (mProfileDomView != null) {
+            mProfileDomView.bindInstance(instance);
+        }
+
+        if(mInspectorView != null) {
+            mInspectorView.bindInstance(instance);
         }
     }
 
@@ -546,6 +689,8 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
+            LaunchConfig.setDeviceId(null);
+            LaunchConfig.setFrom(null);
             showDevOptions();
             return true;
         }
@@ -557,12 +702,33 @@ public class WeexDevOptions implements IWXDevOptions {
     public void onException(WXSDKInstance instance, String errCode, String msg) {
         if (mConfig != null && mConfig.isShownJSException()) {
             try {
-                JSExceptionCatcher.catchException(mContext, instance, errCode, msg);
-            }catch (Exception e) {
+                JSExceptionCatcher.catchException(mContext, mConfig, instance, errCode, msg);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    static class LaunchUIReceiver extends BroadcastReceiver {
+        private OnLaunchListener listener;
+        public LaunchUIReceiver(@NonNull OnLaunchListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction() != null && ACTION_LAUNCH.equals(intent.getAction())) {
+                String from = intent.getStringExtra(EXTRA_FROM);
+                String deviceId = intent.getStringExtra(EXTRA_DEVICE_ID);
+                if(listener != null && !TextUtils.isEmpty(from)) {
+                    listener.onLaunch(from,deviceId);
+                }
+            }
+        }
+    }
+
+    interface OnLaunchListener {
+        void onLaunch(@NonNull String from,@Nullable String deviceId);
+    }
 
 }

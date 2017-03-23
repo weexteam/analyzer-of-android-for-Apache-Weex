@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:padding="5dp"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+
+    <!--top-->
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp">
+
+        <TextView
+                android:id="@+id/type"
+                tools:text="REQUEST"
+                android:textColor="#fff"
+                android:textSize="18sp"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_height="match_parent"/>
+
+        <TextView
+                android:id="@+id/title"
+                android:textSize="14sp"
+                android:layout_marginTop="5dp"
+                android:textColor="#fff"
+                android:layout_toRightOf="@id/type"
+                tools:text="mtop.common.getTimestamp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
+        <TextView
+                android:id="@+id/desc"
+                tools:text="Method(GET)"
+                android:textColor="#fff"
+                android:layout_toRightOf="@id/type"
+                android:textSize="12sp"
+                android:layout_below="@id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:id="@+id/timestamp"
+                tools:text="2017.2.9 2:55:0"
+                android:textColor="#fff"
+                android:textSize="12sp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/desc"
+                android:layout_marginRight="20dp"
+                android:layout_below="@id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        <View
+                android:id="@+id/line"
+                android:background="#c6e0e0e0"
+                android:layout_toRightOf="@id/type"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+    </RelativeLayout>
+
+    <!--bottom-->
+    <TextView
+            android:id="@+id/body"
+            android:textSize="12sp"
+            android:textColor="#fff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+    <View
+            android:layout_marginTop="2dp"
+            android:background="#c6e0e0e0"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
+</LinearLayout>

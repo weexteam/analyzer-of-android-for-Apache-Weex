@@ -1,8 +1,10 @@
 package com.taobao.weex.analyzer.view;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.view.Choreographer;
 import android.view.View;
 import android.widget.TextView;
 
@@ -70,20 +72,22 @@ public class PerfSampleOverlayView extends DragSupportOverlayView {
 
         private int mTotalFrameDropped = 0;
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         InvalidateUITask(@NonNull View hostView) {
             super(false);
             mDelayMillis = 1000;
-            this.mFpsChecker = new FPSSampler();
+            this.mFpsChecker = new FPSSampler(Choreographer.getInstance());
             this.mMemoryText = (TextView) hostView.findViewById(R.id.memory_usage);
             this.mFpsValueText = (TextView) hostView.findViewById(R.id.fps_value);
             this.mFrameSkippedText = (TextView) hostView.findViewById(R.id.frame_skiped);
         }
 
         @Override
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         protected void onStart() {
             super.onStart();
             if (mFpsChecker == null) {
-                mFpsChecker = new FPSSampler();
+                mFpsChecker = new FPSSampler(Choreographer.getInstance());
             }
             mFpsChecker.reset();
             mFpsChecker.start();

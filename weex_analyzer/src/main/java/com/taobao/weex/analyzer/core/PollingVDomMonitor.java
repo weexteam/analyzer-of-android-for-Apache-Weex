@@ -70,7 +70,7 @@ public class PollingVDomMonitor implements IVDomMonitor{
             }
 
             try {
-                VDomTracker tracker = new VDomTracker(instance);//todo 此处需优化
+                DomTracker tracker = new DomTracker(instance);//todo 此处需优化
                 HealthReport report = tracker.traverse();
                 if(report != null) {
                     report.writeToConsole();

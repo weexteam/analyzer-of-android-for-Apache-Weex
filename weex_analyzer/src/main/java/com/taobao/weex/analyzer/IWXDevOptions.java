@@ -2,16 +2,13 @@ package com.taobao.weex.analyzer;
 
 import android.support.annotation.Nullable;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
 
 /**
- * Description:
- * <p>
- * Created by rowandjj(chuyi)<br/>
- * Date: 2016/10/27<br/>
- * Time: 下午4:56<br/>
+ * Description: <p> Created by rowandjj(chuyi)<br/> Date: 2016/10/27<br/> Time: 下午4:56<br/>
  */
 
 public interface IWXDevOptions {
@@ -34,4 +31,6 @@ public interface IWXDevOptions {
     boolean onKeyUp(int keyCode, KeyEvent event);
 
     void onException(WXSDKInstance instance, String errCode, String msg);
+
+    public void onReceiveTouchEvent(MotionEvent ev);
 }

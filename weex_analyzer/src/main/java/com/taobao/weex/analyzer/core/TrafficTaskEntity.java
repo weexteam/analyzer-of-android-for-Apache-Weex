@@ -46,8 +46,8 @@ public class TrafficTaskEntity implements TaskEntity<TrafficTaskEntity.TrafficIn
         if(mCachedTrafficInfo == null) {
             mCachedTrafficInfo = new TrafficInfo();
         }
-        mCachedTrafficInfo.rxSpeed = rxSpeed;
-        mCachedTrafficInfo.txSpeed = txSpeed;
+        mCachedTrafficInfo.rxSpeed = (Math.round(rxSpeed*100)/100.0);
+        mCachedTrafficInfo.txSpeed = (Math.round(txSpeed*100)/100.0);
 
         //update
         mTotalRxKBytes = rxKBytes;

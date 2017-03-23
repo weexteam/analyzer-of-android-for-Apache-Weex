@@ -58,7 +58,7 @@ public class WXPerfStorage {
         Performance performance = PerformanceMonitor.monitor(instance);
         if (performance != null) {
             pageName = WXPerfStorage.fetchPageName(instance, performance);
-            WXPerfStorage.getInstance().put(pageName, performance);
+            put(pageName, performance);
         }
 
         return pageName;

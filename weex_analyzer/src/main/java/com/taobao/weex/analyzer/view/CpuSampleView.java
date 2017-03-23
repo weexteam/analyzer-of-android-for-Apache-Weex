@@ -12,8 +12,10 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.CpuTaskEntity;
+import com.taobao.weex.analyzer.core.reporter.IDataReporter;
+import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
+import com.taobao.weex.analyzer.core.reporter.ReportSupportLoopTask;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -110,7 +112,7 @@ public class CpuSampleView extends DragSupportOverlayView {
         }
     }
 
-    private static class SampleCpuTask extends AbstractLoopTask {
+    private static class SampleCpuTask extends ReportSupportLoopTask<Double> {
         private int mAxisXValue = -1;
         private DynamicChartViewController mController;
         private boolean isDebug = false;
@@ -142,6 +144,14 @@ public class CpuSampleView extends DragSupportOverlayView {
                 Log.d("weex-analyzer", "cpu usage:" + pidCpuUsage + "% [user " + pidUserCpuUsage + ",kernel " + pidKernelCpuUsage + "]");
             }
 
+            reportIfNeeded(new IDataReporter.ProcessedDataBuilder<Double>()
+                    .sequenceId(generateSequenceId())
+                    .deviceId(LaunchConfig.getDeviceId())
+                    .type(IDataReporter.TYPE_CPU)
+                    .data((Math.round(pidCpuUsage*100)/100.0))
+                    .build()
+            );
+
             mAxisXValue++;
             runOnUIThread(new Runnable() {
                 @Override
@@ -161,6 +171,7 @@ public class CpuSampleView extends DragSupportOverlayView {
 
         @Override
         protected void onStop() {
+            super.onStop();
             mEntity.onTaskStop();
         }
     }

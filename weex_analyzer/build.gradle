@@ -12,21 +12,21 @@ buildscript {
 
 allprojects {
     repositories {
+        jcenter()
+
         maven {
             url "http://mvnrepo.alibaba-inc.com/mvn/repository"
         }
-        jcenter()
     }
 }
 
 
 apply plugin: 'com.android.library'
-apply from: 'binary.gradle'
-apply from: 'maven.gradle'
+apply from: 'jacoco.gradle'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 14
@@ -42,11 +42,32 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled = true
+        }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
+
+//apply from: 'binary.gradle'
+//apply from: 'maven.gradle'
 
 dependencies {
     provided 'com.taobao.android:weex_sdk:0.9.5'
-    provided 'com.android.support:recyclerview-v7:25.0.1'
+    provided 'com.android.support:recyclerview-v7:25.3.0'
     provided 'com.alibaba:fastjson:1.1.46.android'
+    provided 'com.android.support:support-v4:25.3.0'
+    testCompile 'junit:junit:4.12'
+
+    testCompile 'org.mockito:mockito-core:1.9.5'
+
+    testCompile "org.robolectric:robolectric:3.1.4"
+    testCompile "org.robolectric:shadows-support-v4:3.1.4"
+    testCompile "org.powermock:powermock-module-junit4:1.6.4"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.4"
+    testCompile "org.powermock:powermock-api-mockito:1.6.4"
 }

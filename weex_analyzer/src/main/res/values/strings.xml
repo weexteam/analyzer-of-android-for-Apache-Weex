@@ -27,5 +27,6 @@
     <string name="wxt_current_keyword">current keyword:</string>
     <string name="wxt_current_keyword_format">current keyword:%s</string>
     <string name="wxt_dev_tool">Weex-Analyzer</string>
+    <string name="wxt_tips_inspector_view">tips:点击选择你要审查的元素</string>
 
 </resources>
