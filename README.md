@@ -115,6 +115,6 @@ debugCompile 'com.taobao.android:weex_analyzer:${latest version}'
 
 点击任意元素，查看其视觉样式。
 
-![视图审查](./art/08.png)
+![视图审查](./art/09.png)
 
 
