@@ -41,12 +41,12 @@ import com.taobao.weex.analyzer.view.LogView;
 import com.taobao.weex.analyzer.view.MemorySampleView;
 import com.taobao.weex.analyzer.view.NetworkInspectorView;
 import com.taobao.weex.analyzer.view.PerfSampleOverlayView;
+import com.taobao.weex.analyzer.view.ProfileDomView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
 import com.taobao.weex.analyzer.view.StorageView;
 import com.taobao.weex.analyzer.view.TrafficSampleView;
-import com.taobao.weex.analyzer.view.ProfileDomView;
 import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
 
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class WeexDevOptions implements IWXDevOptions {
     private Context mContext;
 
     private ShakeDetector mShakeDetector;
-    private DevOptionsConfig mConfig;
+    private DevOptionsConfig mDevOptionsConfig;
 
     private LogView mLogView;
 
@@ -93,17 +93,37 @@ public class WeexDevOptions implements IWXDevOptions {
 
 
     public WeexDevOptions(@NonNull Context context) {
+        init(context,null);
+    }
 
+    public WeexDevOptions(@NonNull Context context, @Nullable Config config) {
         this.mContext = context;
+        init(context, config);
+    }
 
-        mConfig = DevOptionsConfig.getInstance(context);
+
+    private Config provideDefaultConfig() {
+        return new Config.Builder()
+                .enableShake(true)
+//                .ignoreOption(Config.TYPE_ALL_PERFORMANCE)
+//                .ignoreOption(Config.TYPE_3D)
+                .build();
+    }
+
+    private void init(@NonNull Context context, @Nullable Config config) {
+
+        if(config == null) {
+            config = provideDefaultConfig();
+        }
+
+        mDevOptionsConfig = DevOptionsConfig.getInstance(context);
         mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
         mProfileDomView = new ProfileDomView(context);
         mProfileDomView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setVdomDepthEnabled(false);
+                    mDevOptionsConfig.setVdomDepthEnabled(false);
                 }
             }
         });
@@ -113,7 +133,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setNetworkInspectorEnabled(false);
+                    mDevOptionsConfig.setNetworkInspectorEnabled(false);
                 }
             }
         });
@@ -121,7 +141,7 @@ public class WeexDevOptions implements IWXDevOptions {
         mNetworkInspectorView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
             @Override
             public void onSizeChanged(@IResizableView.Size int size) {
-                mConfig.setNetworkInspectorViewSize(size);
+                mDevOptionsConfig.setNetworkInspectorViewSize(size);
             }
         });
 
@@ -130,7 +150,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setLogOutputEnabled(false);
+                    mDevOptionsConfig.setLogOutputEnabled(false);
                 }
             }
         });
@@ -138,19 +158,19 @@ public class WeexDevOptions implements IWXDevOptions {
         mLogView.setOnLogConfigChangedListener(new LogView.OnLogConfigChangedListener() {
             @Override
             public void onLogLevelChanged(int level) {
-                mConfig.setLogLevel(level);
+                mDevOptionsConfig.setLogLevel(level);
             }
 
             @Override
             public void onLogFilterChanged(String filterName) {
-                mConfig.setLogFilter(filterName);
+                mDevOptionsConfig.setLogFilter(filterName);
             }
         });
 
         mLogView.setOnSizeChangedListener(new IResizableView.OnSizeChangedListener() {
             @Override
             public void onSizeChanged(@IResizableView.Size int size) {
-                mConfig.setLogViewSize(size);
+                mDevOptionsConfig.setLogViewSize(size);
             }
         });
 
@@ -160,7 +180,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setMemoryChartEnabled(false);
+                    mDevOptionsConfig.setMemoryChartEnabled(false);
                 }
             }
         });
@@ -170,7 +190,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setCpuChartEnabled(false);
+                    mDevOptionsConfig.setCpuChartEnabled(false);
                 }
             }
         });
@@ -180,7 +200,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setTrafficChartEnabled(false);
+                    mDevOptionsConfig.setTrafficChartEnabled(false);
                 }
             }
         });
@@ -190,7 +210,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setFpsChartEnabled(false);
+                    mDevOptionsConfig.setFpsChartEnabled(false);
                 }
             }
         });
@@ -200,7 +220,7 @@ public class WeexDevOptions implements IWXDevOptions {
             @Override
             public void close(IOverlayView host) {
                 if (host != null) {
-                    mConfig.setViewInspectorEnabled(false);
+                    mDevOptionsConfig.setViewInspectorEnabled(false);
                 }
             }
         });
@@ -226,8 +246,6 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
     }
-
-
 
     public static void launchByBroadcast(@NonNull Context context, @NonNull String from, @Nullable String deviceId) {
         Intent intent = new Intent(ACTION_LAUNCH);
@@ -265,11 +283,11 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("视图审查", R.drawable.wxt_icon_view_inspector, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isViewInspectorEnabled()) {
-                    mConfig.setViewInspectorEnabled(false);
+                if (mDevOptionsConfig.isViewInspectorEnabled()) {
+                    mDevOptionsConfig.setViewInspectorEnabled(false);
                     mInspectorView.dismiss();
                 } else {
-                    mConfig.setViewInspectorEnabled(true);
+                    mDevOptionsConfig.setViewInspectorEnabled(true);
                     mInspectorView.show();
                     mInspectorView.bindInstance(mInstance);
                 }
@@ -279,11 +297,11 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isVDomDepthEnabled()) {
-                    mConfig.setVdomDepthEnabled(false);
+                if (mDevOptionsConfig.isVDomDepthEnabled()) {
+                    mDevOptionsConfig.setVdomDepthEnabled(false);
                     mProfileDomView.dismiss();
                 } else {
-                    mConfig.setVdomDepthEnabled(true);
+                    mDevOptionsConfig.setVdomDepthEnabled(true);
                     mProfileDomView.show();
                     mProfileDomView.bindInstance(mInstance);
                 }
@@ -293,12 +311,12 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isNetworkInspectorEnabled()) {
-                    mConfig.setNetworkInspectorEnabled(false);
+                if (mDevOptionsConfig.isNetworkInspectorEnabled()) {
+                    mDevOptionsConfig.setNetworkInspectorEnabled(false);
                     mNetworkInspectorView.dismiss();
                 } else {
-                    mConfig.setNetworkInspectorEnabled(true);
-                    mNetworkInspectorView.setViewSize(mConfig.getNetworkInspectorViewSize());
+                    mDevOptionsConfig.setNetworkInspectorEnabled(true);
+                    mNetworkInspectorView.setViewSize(mDevOptionsConfig.getNetworkInspectorViewSize());
                     mNetworkInspectorView.show();
                 }
             }
@@ -323,14 +341,14 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isLogOutputEnabled()) {
-                    mConfig.setLogOutputEnabled(false);
+                if (mDevOptionsConfig.isLogOutputEnabled()) {
+                    mDevOptionsConfig.setLogOutputEnabled(false);
                     mLogView.dismiss();
                 } else {
-                    mConfig.setLogOutputEnabled(true);
-                    mLogView.setLogLevel(mConfig.getLogLevel());
-                    mLogView.setFilterName(mConfig.getLogFilter());
-                    mLogView.setViewSize(mConfig.getLogViewSize());
+                    mDevOptionsConfig.setLogOutputEnabled(true);
+                    mLogView.setLogLevel(mDevOptionsConfig.getLogLevel());
+                    mLogView.setFilterName(mDevOptionsConfig.getLogFilter());
+                    mLogView.setViewSize(mDevOptionsConfig.getLogViewSize());
                     mLogView.show();
                 }
             }
@@ -338,11 +356,11 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isMemoryChartEnabled()) {
-                    mConfig.setMemoryChartEnabled(false);
+                if (mDevOptionsConfig.isMemoryChartEnabled()) {
+                    mDevOptionsConfig.setMemoryChartEnabled(false);
                     mMemorySampleView.dismiss();
                 } else {
-                    mConfig.setMemoryChartEnabled(true);
+                    mDevOptionsConfig.setMemoryChartEnabled(true);
                     mMemorySampleView.show();
                 }
             }
@@ -350,11 +368,11 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isCPUChartEnabled()) {
-                    mConfig.setCpuChartEnabled(false);
+                if (mDevOptionsConfig.isCPUChartEnabled()) {
+                    mDevOptionsConfig.setCpuChartEnabled(false);
                     mCpuSampleView.dismiss();
                 } else {
-                    mConfig.setCpuChartEnabled(true);
+                    mDevOptionsConfig.setCpuChartEnabled(true);
                     mCpuSampleView.show();
                 }
             }
@@ -367,11 +385,11 @@ public class WeexDevOptions implements IWXDevOptions {
                     return;
                 }
 
-                if (mConfig.isFpsChartEnabled()) {
-                    mConfig.setFpsChartEnabled(false);
+                if (mDevOptionsConfig.isFpsChartEnabled()) {
+                    mDevOptionsConfig.setFpsChartEnabled(false);
                     mFpsSampleView.dismiss();
                 } else {
-                    mConfig.setFpsChartEnabled(true);
+                    mDevOptionsConfig.setFpsChartEnabled(true);
                     mFpsSampleView.show();
                 }
             }
@@ -379,11 +397,11 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isTrafficChartEnabled()) {
-                    mConfig.setTrafficChartEnabled(false);
+                if (mDevOptionsConfig.isTrafficChartEnabled()) {
+                    mDevOptionsConfig.setTrafficChartEnabled(false);
                     mTrafficSampleView.dismiss();
                 } else {
-                    mConfig.setTrafficChartEnabled(true);
+                    mDevOptionsConfig.setTrafficChartEnabled(true);
                     mTrafficSampleView.show();
                 }
             }
@@ -392,11 +410,11 @@ public class WeexDevOptions implements IWXDevOptions {
         options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                if (mConfig.isPerfCommonEnabled()) {
-                    mConfig.setPerfCommonEnabled(false);
+                if (mDevOptionsConfig.isPerfCommonEnabled()) {
+                    mDevOptionsConfig.setPerfCommonEnabled(false);
                     mPerfMonitorOverlayView.dismiss();
                 } else {
-                    mConfig.setPerfCommonEnabled(true);
+                    mDevOptionsConfig.setPerfCommonEnabled(true);
                     mPerfMonitorOverlayView.show();
                 }
             }
@@ -493,7 +511,7 @@ public class WeexDevOptions implements IWXDevOptions {
         if(ev == null) {
             return;
         }
-        if(mInspectorView != null && mConfig.isViewInspectorEnabled()) {
+        if(mInspectorView != null && mDevOptionsConfig.isViewInspectorEnabled()) {
             mInspectorView.receiveTouchEvent(ev);
         }
     }
@@ -504,61 +522,61 @@ public class WeexDevOptions implements IWXDevOptions {
         mShakeDetector.start((SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE));
         LocalBroadcastManager.getInstance(mContext).registerReceiver(mLaunchUIReceiver,new IntentFilter(ACTION_LAUNCH));
 
-        if (mConfig.isPerfCommonEnabled()) {
+        if (mDevOptionsConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.show();
         } else {
             mPerfMonitorOverlayView.dismiss();
         }
 
-        if (mConfig.isVDomDepthEnabled()) {
+        if (mDevOptionsConfig.isVDomDepthEnabled()) {
             mProfileDomView.show();
             mProfileDomView.bindInstance(mInstance);
         } else {
             mProfileDomView.dismiss();
         }
 
-        if(mConfig.isViewInspectorEnabled()) {
+        if(mDevOptionsConfig.isViewInspectorEnabled()) {
             mInspectorView.show();
             mInspectorView.bindInstance(mInstance);
         } else {
             mInspectorView.dismiss();
         }
 
-        if (mConfig.isNetworkInspectorEnabled()) {
-            mNetworkInspectorView.setViewSize(mConfig.getNetworkInspectorViewSize());
+        if (mDevOptionsConfig.isNetworkInspectorEnabled()) {
+            mNetworkInspectorView.setViewSize(mDevOptionsConfig.getNetworkInspectorViewSize());
             mNetworkInspectorView.show();
         } else {
             mNetworkInspectorView.dismiss();
         }
 
-        if (mConfig.isLogOutputEnabled()) {
-            mLogView.setLogLevel(mConfig.getLogLevel());
-            mLogView.setFilterName(mConfig.getLogFilter());
-            mLogView.setViewSize(mConfig.getLogViewSize());
+        if (mDevOptionsConfig.isLogOutputEnabled()) {
+            mLogView.setLogLevel(mDevOptionsConfig.getLogLevel());
+            mLogView.setFilterName(mDevOptionsConfig.getLogFilter());
+            mLogView.setViewSize(mDevOptionsConfig.getLogViewSize());
             mLogView.show();
         } else {
             mLogView.dismiss();
         }
 
-        if (mConfig.isMemoryChartEnabled()) {
+        if (mDevOptionsConfig.isMemoryChartEnabled()) {
             mMemorySampleView.show();
         } else {
             mMemorySampleView.dismiss();
         }
 
-        if (mConfig.isCPUChartEnabled()) {
+        if (mDevOptionsConfig.isCPUChartEnabled()) {
             mCpuSampleView.show();
         } else {
             mCpuSampleView.dismiss();
         }
 
-        if (mConfig.isFpsChartEnabled()) {
+        if (mDevOptionsConfig.isFpsChartEnabled()) {
             mFpsSampleView.show();
         } else {
             mFpsSampleView.dismiss();
         }
 
-        if (mConfig.isTrafficChartEnabled()) {
+        if (mDevOptionsConfig.isTrafficChartEnabled()) {
             mTrafficSampleView.show();
         } else {
             mTrafficSampleView.dismiss();
@@ -574,39 +592,39 @@ public class WeexDevOptions implements IWXDevOptions {
         mShakeDetector.stop();
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mLaunchUIReceiver);
 
-        if (mConfig.isPerfCommonEnabled()) {
+        if (mDevOptionsConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.dismiss();
         }
 
-        if (mConfig.isVDomDepthEnabled()) {
+        if (mDevOptionsConfig.isVDomDepthEnabled()) {
             mProfileDomView.dismiss();
         }
 
-        if(mConfig.isViewInspectorEnabled()) {
+        if(mDevOptionsConfig.isViewInspectorEnabled()) {
             mInspectorView.dismiss();
         }
 
-        if (mConfig.isNetworkInspectorEnabled()) {
+        if (mDevOptionsConfig.isNetworkInspectorEnabled()) {
             mNetworkInspectorView.dismiss();
         }
 
-        if (mConfig.isLogOutputEnabled()) {
+        if (mDevOptionsConfig.isLogOutputEnabled()) {
             mLogView.dismiss();
         }
 
-        if (mConfig.isMemoryChartEnabled()) {
+        if (mDevOptionsConfig.isMemoryChartEnabled()) {
             mMemorySampleView.dismiss();
         }
 
-        if (mConfig.isFpsChartEnabled()) {
+        if (mDevOptionsConfig.isFpsChartEnabled()) {
             mFpsSampleView.dismiss();
         }
 
-        if (mConfig.isCPUChartEnabled()) {
+        if (mDevOptionsConfig.isCPUChartEnabled()) {
             mCpuSampleView.dismiss();
         }
 
-        if (mConfig.isTrafficChartEnabled()) {
+        if (mDevOptionsConfig.isTrafficChartEnabled()) {
             mTrafficSampleView.dismiss();
         }
 
@@ -702,9 +720,9 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onException(WXSDKInstance instance, String errCode, String msg) {
-        if (mConfig != null && mConfig.isShownJSException()) {
+        if (mDevOptionsConfig != null && mDevOptionsConfig.isShownJSException()) {
             try {
-                JSExceptionCatcher.catchException(mContext, mConfig, instance, errCode, msg);
+                JSExceptionCatcher.catchException(mContext, mDevOptionsConfig, instance, errCode, msg);
             } catch (Exception e) {
                 e.printStackTrace();
             }

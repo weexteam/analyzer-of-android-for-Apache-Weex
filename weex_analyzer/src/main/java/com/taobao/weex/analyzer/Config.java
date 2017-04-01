@@ -1,10 +1,12 @@
 package com.taobao.weex.analyzer;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,8 +59,12 @@ public class Config {
         return enableShake;
     }
 
+    @NonNull
     public List<String> getIgnoreOptions() {
-        return ignoreOptions;
+        if(ignoreOptions == null || ignoreOptions.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Collections.unmodifiableList(ignoreOptions);
     }
 
     public Config() {
