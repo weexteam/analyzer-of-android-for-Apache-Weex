@@ -4,7 +4,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.taobao.weex.analyzer.Config;
+import com.taobao.weex.analyzer.IPermissionHandler;
 
 /**
  * Description:
@@ -14,7 +18,7 @@ import android.support.annotation.Nullable;
  * Time: 上午11:21<br/>
  */
 
-public class ShakeDetector implements SensorEventListener {
+public class ShakeDetector implements SensorEventListener,IPermissionHandler{
 
     private static final int MAX_SAMPLES = 25;
     private static final int MIN_TIME_BETWEEN_SAMPLES_MS = 20;
@@ -33,14 +37,17 @@ public class ShakeDetector implements SensorEventListener {
     @Nullable
     private long[] mTimestamps;
 
+    private Config mConfig;
 
-    public ShakeDetector(@Nullable ShakeListener listener) {
+
+    public ShakeDetector(@Nullable ShakeListener listener,@Nullable Config config) {
         mShakeListener = listener;
+        this.mConfig = config;
     }
 
 
     public void start(@Nullable SensorManager manager) {
-        if (manager == null) {
+        if (manager == null || (mConfig != null && !isPermissionGranted(mConfig))) {
             return;
         }
         Sensor accelerometer = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -110,6 +117,11 @@ public class ShakeDetector implements SensorEventListener {
         if (((double) numOverThreshold) / total > PERCENT_OVER_THRESHOLD_FOR_SHAKE / 100.0 && mShakeListener != null) {
             mShakeListener.onShake();
         }
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return config.isEnableShake();
     }
 
     public interface ShakeListener {

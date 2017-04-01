@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.View;
 
+import com.taobao.weex.analyzer.Config;
+import com.taobao.weex.analyzer.IPermissionHandler;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 
 /**
@@ -21,7 +23,7 @@ import com.taobao.weex.analyzer.utils.ViewUtils;
  * Time: 上午11:40<br/>
  */
 
-public class ScalpelViewController {
+public class ScalpelViewController implements IPermissionHandler{
 
     private boolean isScalpelEnabled = false;
     private boolean isDrawId = false;
@@ -36,9 +38,11 @@ public class ScalpelViewController {
     private ScalpelFrameLayout.OnDrawViewNameListener mOnDrawViewNameListener;
 
     private Context mContext;
+    private Config mConfig;
 
-    public ScalpelViewController(Context context) {
+    public ScalpelViewController(Context context, Config config) {
         this(false, false, true, context);
+        this.mConfig = config;
     }
 
     /**
@@ -77,6 +81,11 @@ public class ScalpelViewController {
         if (view == null) {
             return null;
         }
+
+        if(mConfig != null && !isPermissionGranted(mConfig)){
+            return view;
+        }
+
         mScalpelLayout = new ScalpelFrameLayout(view.getContext());
         mScalpelLayout.setDrawIds(isDrawId);
         mScalpelLayout.setDrawViewNames(isDrawViewName);
@@ -95,6 +104,9 @@ public class ScalpelViewController {
     }
 
     public void setScalpelEnabled(boolean enabled) {
+        if(mConfig != null && !isPermissionGranted(mConfig)) {
+            return;
+        }
         this.isScalpelEnabled = enabled;
         if (mScalpelLayout != null) {
             mScalpelLayout.setLayerInteractionEnabled(isScalpelEnabled);
@@ -135,6 +147,9 @@ public class ScalpelViewController {
     }
 
     public void toggleScalpelEnabled() {
+        if(mConfig != null && !isPermissionGranted(mConfig)) {
+            return;
+        }
         this.isScalpelEnabled = !isScalpelEnabled;
         if (mScalpelLayout == null) {
             return;
@@ -143,15 +158,26 @@ public class ScalpelViewController {
     }
 
     public void pause() {
+        if(mConfig != null && !isPermissionGranted(mConfig)) {
+            return;
+        }
         if(mSwitchView != null && isScalpelEnabled){
             mSwitchView.dismiss();
         }
     }
 
     public void resume(){
+        if(mConfig != null && !isPermissionGranted(mConfig)) {
+            return;
+        }
         if(mSwitchView != null && isScalpelEnabled){
             mSwitchView.show();
         }
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_3D);
     }
 
     public interface OnToggleListener {

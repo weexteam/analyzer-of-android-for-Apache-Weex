@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 
 /**
@@ -14,13 +15,13 @@ import com.taobao.weex.analyzer.utils.ViewUtils;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public abstract class AbstractResizableOverlayView extends DragSupportOverlayView implements IResizableView {
+public abstract class AbstractResizableOverlayView extends PermissionOverlayView implements IResizableView {
 
     private OnSizeChangedListener mOnSizeChangedListener;
     protected int mViewSize = LogView.Size.MEDIUM;
 
-    public AbstractResizableOverlayView(Context application) {
-        super(application);
+    public AbstractResizableOverlayView(Context application, Config config) {
+        super(application,true,config);
     }
 
     public void setOnSizeChangedListener(@NonNull OnSizeChangedListener listener) {

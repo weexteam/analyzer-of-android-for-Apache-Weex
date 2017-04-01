@@ -29,7 +29,7 @@ import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class TrafficSampleView extends DragSupportOverlayView {
+public class TrafficSampleView extends PermissionOverlayView {
 
     private SampleTrafficTask mSampleTrafficTask;
 
@@ -41,11 +41,16 @@ public class TrafficSampleView extends DragSupportOverlayView {
         this.mOnCloseListener = listener;
     }
 
-    public TrafficSampleView(Context application) {
-        super(application);
+    public TrafficSampleView(Context application,Config config) {
+        super(application,true,config);
 
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
         mHeight = (int) ViewUtils.dp2px(application, 150);
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_TRAFFIC);
     }
 
     @NonNull

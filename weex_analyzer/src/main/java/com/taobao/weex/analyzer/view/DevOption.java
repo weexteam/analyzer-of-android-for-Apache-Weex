@@ -15,25 +15,25 @@ public class DevOption {
     @DrawableRes public int iconRes;
     public OnOptionClickListener listener;
     public boolean isOverlayView;
+    public boolean isPermissionGranted = true;
 
     public DevOption(){
     }
 
-    public DevOption(String optionName,int iconRes){
-        this.optionName = optionName;
-        this.iconRes = iconRes;
-    }
-
     public DevOption(String optionName,int iconRes, OnOptionClickListener listener){
-        this(optionName,iconRes);
-        this.listener = listener;
+        this(optionName,iconRes,listener,false);
     }
 
     public DevOption(String optionName, int iconRes, OnOptionClickListener listener, boolean isOverlayView) {
+        this(optionName,iconRes,listener,isOverlayView,true);
+    }
+
+    public DevOption(String optionName, int iconRes, OnOptionClickListener listener, boolean isOverlayView, boolean isPermissionGranted) {
         this.optionName = optionName;
         this.iconRes = iconRes;
         this.listener = listener;
         this.isOverlayView = isOverlayView;
+        this.isPermissionGranted = isPermissionGranted;
     }
 
     public interface OnOptionClickListener {

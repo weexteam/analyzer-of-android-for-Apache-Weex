@@ -8,6 +8,7 @@ import android.view.Choreographer;
 import android.view.View;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.MemorySampler;
@@ -27,12 +28,12 @@ import java.util.Locale;
  * Time: 下午8:55<br/>
  */
 
-public class PerfSampleOverlayView extends DragSupportOverlayView {
+public class PerfSampleOverlayView extends PermissionOverlayView {
 
     private InvalidateUITask mTask;
 
-    public PerfSampleOverlayView(Context application) {
-        super(application);
+    public PerfSampleOverlayView(Context application, Config config) {
+        super(application,true,config);
     }
 
     @NonNull
@@ -62,6 +63,11 @@ public class PerfSampleOverlayView extends DragSupportOverlayView {
             mTask.stop();
             mTask = null;
         }
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_ALL_PERFORMANCE);
     }
 
 

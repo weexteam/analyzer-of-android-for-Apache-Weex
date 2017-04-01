@@ -29,7 +29,7 @@ import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
  * Time: 下午12:20<br/>
  */
 
-public class CpuSampleView extends DragSupportOverlayView {
+public class CpuSampleView extends PermissionOverlayView {
 
     private SampleCpuTask mSampleCpuTask;
     private DynamicChartViewController mChartViewController;
@@ -40,8 +40,8 @@ public class CpuSampleView extends DragSupportOverlayView {
         this.mOnCloseListener = listener;
     }
 
-    public CpuSampleView(Context application) {
-        super(application);
+    public CpuSampleView(Context application,Config config) {
+        super(application,true,config);
 
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
         mHeight = (int) ViewUtils.dp2px(application, 150);
@@ -111,6 +111,11 @@ public class CpuSampleView extends DragSupportOverlayView {
             mSampleCpuTask.stop();
             mSampleCpuTask = null;
         }
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_CPU);
     }
 
     private static class SampleCpuTask extends ReportSupportLoopTask<Double> {

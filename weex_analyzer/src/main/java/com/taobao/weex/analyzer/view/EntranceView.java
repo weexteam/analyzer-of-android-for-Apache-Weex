@@ -103,7 +103,12 @@ public class EntranceView extends AbstractAlertView {
         if (mDevOptions == null) {
             mDevOptions = new ArrayList<>();
         }
-        mDevOptions.addAll(options);
+
+        for(DevOption option : options) {
+            if(option.isPermissionGranted) {
+                mDevOptions.add(option);
+            }
+        }
     }
 
     public static class Creator {

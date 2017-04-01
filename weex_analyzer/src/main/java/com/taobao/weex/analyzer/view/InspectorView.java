@@ -32,7 +32,7 @@ import static com.taobao.weex.analyzer.R.id.close;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class InspectorView extends DragSupportOverlayView {
+public class InspectorView extends PermissionOverlayView {
 
     private ViewHighlighter mViewHighlighter;
     private GestureDetector mGestureDetector;
@@ -56,9 +56,14 @@ public class InspectorView extends DragSupportOverlayView {
     private IDataReporter<ViewInspectorManager.InspectorInfo> mDataReporter;
     private AtomicInteger mCounter = new AtomicInteger(0);
 
-    public InspectorView(Context application) {
-        super(application);
+    public InspectorView(Context application, Config config) {
+        super(application,true,config);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_VIEW_INSPECTOR);
     }
 
     @NonNull

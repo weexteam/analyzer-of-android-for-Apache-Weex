@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Time: 下午4:25<br/>
  */
 
-public class WXPerformanceAnalysisView extends AbstractAlertView {
+public class WXPerformanceAnalysisView extends PermissionAlertView {
 
     private WXPerfItemView mPerfItemView;
     private WXPerfHistoryItemView mPerfHistoryItemView;
@@ -40,8 +40,8 @@ public class WXPerformanceAnalysisView extends AbstractAlertView {
 
     private AtomicInteger mCounter = new AtomicInteger(0);
 
-    public WXPerformanceAnalysisView(Context context, @NonNull Performance curPerformance, @NonNull List<Performance> historyPerfs) {
-        super(context);
+    public WXPerformanceAnalysisView(Context context, @NonNull Performance curPerformance, @NonNull List<Performance> historyPerfs, Config config) {
+        super(context,config);
         this.mCurPerformance = curPerformance;
         this.mHistoryPerfList = historyPerfs;
     }
@@ -115,5 +115,10 @@ public class WXPerformanceAnalysisView extends AbstractAlertView {
     @Override
     protected int getLayoutResId() {
         return R.layout.wxt_weex_perf_analysis_view;
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
     }
 }

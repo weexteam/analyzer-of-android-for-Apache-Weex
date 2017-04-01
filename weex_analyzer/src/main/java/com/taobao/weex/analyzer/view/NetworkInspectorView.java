@@ -52,8 +52,8 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
 
     private AtomicInteger mCounter = new AtomicInteger(0);
 
-    public NetworkInspectorView(Context application) {
-        super(application);
+    public NetworkInspectorView(Context application, Config config) {
+        super(application, config);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
     }
 
@@ -203,6 +203,11 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
             mNetworkEventInspector = null;
         }
         mCounter.set(0);
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_MTOP_INSPECTOR);
     }
 
     private static class NetworkEventListAdapter extends RecyclerView.Adapter<ViewHolder> {

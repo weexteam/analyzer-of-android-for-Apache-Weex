@@ -91,13 +91,13 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private LaunchUIReceiver mLaunchUIReceiver;
 
+    private Config mConfig;
 
     public WeexDevOptions(@NonNull Context context) {
         init(context,null);
     }
 
     public WeexDevOptions(@NonNull Context context, @Nullable Config config) {
-        this.mContext = context;
         init(context, config);
     }
 
@@ -105,20 +105,34 @@ public class WeexDevOptions implements IWXDevOptions {
     private Config provideDefaultConfig() {
         return new Config.Builder()
                 .enableShake(true)
-//                .ignoreOption(Config.TYPE_ALL_PERFORMANCE)
+                .ignoreOption(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
+                .ignoreOption(Config.TYPE_VIEW_INSPECTOR)
+                .ignoreOption(Config.TYPE_RENDER_ANALYSIS)
+                .ignoreOption(Config.TYPE_MTOP_INSPECTOR)
+//                .ignoreOption(Config.TYPE_STORAGE)
 //                .ignoreOption(Config.TYPE_3D)
+//                .ignoreOption(Config.TYPE_LOG)
+//                .ignoreOption(Config.TYPE_MEMORY)
+                .ignoreOption(Config.TYPE_CPU)
+                .ignoreOption(Config.TYPE_FPS)
+                .ignoreOption(Config.TYPE_TRAFFIC)
+                .ignoreOption(Config.TYPE_ALL_PERFORMANCE)
+                .ignoreOption(Config.TYPE_DEBUG)
+
                 .build();
     }
 
     private void init(@NonNull Context context, @Nullable Config config) {
-
+        this.mContext = context;
         if(config == null) {
             config = provideDefaultConfig();
         }
+        this.mConfig = config;
+
 
         mDevOptionsConfig = DevOptionsConfig.getInstance(context);
-        mPerfMonitorOverlayView = new PerfSampleOverlayView(context);
-        mProfileDomView = new ProfileDomView(context);
+        mPerfMonitorOverlayView = new PerfSampleOverlayView(context,config);
+        mProfileDomView = new ProfileDomView(context,config);
         mProfileDomView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -128,7 +142,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mNetworkInspectorView = new NetworkInspectorView(context);
+        mNetworkInspectorView = new NetworkInspectorView(context,config);
         mNetworkInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -145,7 +159,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mLogView = new LogView(context);
+        mLogView = new LogView(context,config);
         mLogView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -175,7 +189,7 @@ public class WeexDevOptions implements IWXDevOptions {
         });
 
 
-        mMemorySampleView = new MemorySampleView(context);
+        mMemorySampleView = new MemorySampleView(context,config);
         mMemorySampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -185,7 +199,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mCpuSampleView = new CpuSampleView(context);
+        mCpuSampleView = new CpuSampleView(context,config);
         mCpuSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -195,7 +209,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mTrafficSampleView = new TrafficSampleView(context);
+        mTrafficSampleView = new TrafficSampleView(context,config);
         mTrafficSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -205,7 +219,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mFpsSampleView = new FpsSampleView(context);
+        mFpsSampleView = new FpsSampleView(context,config);
         mFpsSampleView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -215,7 +229,7 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         });
 
-        mInspectorView = new InspectorView(context);
+        mInspectorView = new InspectorView(context,config);
         mInspectorView.setOnCloseListener(new IOverlayView.OnCloseListener() {
             @Override
             public void close(IOverlayView host) {
@@ -233,7 +247,7 @@ public class WeexDevOptions implements IWXDevOptions {
                 LaunchConfig.setDeviceId(null);
                 showDevOptions();
             }
-        });
+        },config);
 
         mVdomController = new VDomController(new PollingVDomMonitor(), new StandardVDomMonitor());
 
@@ -275,10 +289,10 @@ public class WeexDevOptions implements IWXDevOptions {
                     return;
                 }
 
-                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext, performance, list);
+                WXPerformanceAnalysisView view = new WXPerformanceAnalysisView(mContext, performance, list,mConfig);
                 view.show();
             }
-        }));
+        },false,!mConfig.getIgnoreOptions().contains(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)));
 
         options.add(new DevOption("视图审查", R.drawable.wxt_icon_view_inspector, new DevOption.OnOptionClickListener() {
             @Override
@@ -292,7 +306,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mInspectorView.bindInstance(mInstance);
                 }
             }
-        },true));
+        },true,mInspectorView.isPermissionGranted(mConfig)));
 
         options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
             @Override
@@ -306,7 +320,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mProfileDomView.bindInstance(mInstance);
                 }
             }
-        }, true));
+        }, true,mProfileDomView.isPermissionGranted(mConfig)));
 
         options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
             @Override
@@ -320,15 +334,15 @@ public class WeexDevOptions implements IWXDevOptions {
                     mNetworkInspectorView.show();
                 }
             }
-        }, true));
+        }, true,mNetworkInspectorView.isPermissionGranted(mConfig)));
 
         options.add(new DevOption("weex storage", R.drawable.wxt_icon_storage, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
-                StorageView mStorageView = new StorageView(mContext);
+                StorageView mStorageView = new StorageView(mContext,mConfig);
                 mStorageView.show();
             }
-        }));
+        },false,!mConfig.getIgnoreOptions().contains(Config.TYPE_STORAGE)));
 
         options.add(new DevOption("3d视图", R.drawable.wxt_icon_3d_rotation, new DevOption.OnOptionClickListener() {
             @Override
@@ -337,7 +351,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mScalpelViewController.toggleScalpelEnabled();
                 }
             }
-        }, true));
+        }, true, mScalpelViewController != null && mScalpelViewController.isPermissionGranted(mConfig)));
         options.add(new DevOption("日志", R.drawable.wxt_icon_log, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -352,7 +366,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mLogView.show();
                 }
             }
-        }, true));
+        }, true,mLogView.isPermissionGranted(mConfig)));
         options.add(new DevOption("内存", R.drawable.wxt_icon_memory, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -364,7 +378,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mMemorySampleView.show();
                 }
             }
-        }, true));
+        }, true, mMemorySampleView.isPermissionGranted(mConfig)));
         options.add(new DevOption("CPU", R.drawable.wxt_icon_cpu, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -376,7 +390,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mCpuSampleView.show();
                 }
             }
-        }, true));
+        }, true, mCpuSampleView.isPermissionGranted(mConfig)));
         options.add(new DevOption("fps", R.drawable.wxt_icon_fps, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -393,7 +407,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mFpsSampleView.show();
                 }
             }
-        }, true));
+        }, true, mFpsSampleView.isPermissionGranted(mConfig)));
         options.add(new DevOption("流量", R.drawable.wxt_icon_traffic, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -405,7 +419,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mTrafficSampleView.show();
                 }
             }
-        }, true));
+        }, true, mTrafficSampleView.isPermissionGranted(mConfig)));
 
         options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
             @Override
@@ -418,7 +432,7 @@ public class WeexDevOptions implements IWXDevOptions {
                     mPerfMonitorOverlayView.show();
                 }
             }
-        }, true));
+        }, true,mPerfMonitorOverlayView.isPermissionGranted(mConfig)));
 
 
         options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
@@ -438,11 +452,7 @@ public class WeexDevOptions implements IWXDevOptions {
     }
 
     private void showDevOptions() {
-        if (shown) {
-            return;
-        }
-
-        if (mContext == null) {
+        if (shown || mContext == null) {
             return;
         }
 
@@ -677,7 +687,7 @@ public class WeexDevOptions implements IWXDevOptions {
             return view;
         }
 
-        mScalpelViewController = new ScalpelViewController(mContext);
+        mScalpelViewController = new ScalpelViewController(mContext,mConfig);
         mScalpelViewController.setOnToggleListener(new ScalpelViewController.OnToggleListener() {
             @Override
             public void onToggle(View view, boolean isScalpelEnabled) {

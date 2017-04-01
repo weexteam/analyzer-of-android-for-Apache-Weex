@@ -18,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.LogcatDumpBuilder;
 import com.taobao.weex.analyzer.core.LogcatDumper;
@@ -81,9 +82,14 @@ public class LogView extends AbstractResizableOverlayView {
         void onExpanded();
     }
 
-    public LogView(Context application) {
-        super(application);
+    public LogView(Context application, Config config) {
+        super(application,config);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_LOG);
     }
 
     public void setOnCloseListener(@Nullable OnCloseListener listener) {

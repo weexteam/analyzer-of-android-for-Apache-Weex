@@ -15,6 +15,7 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.StorageHacker;
 import com.taobao.weex.analyzer.utils.SDKUtils;
@@ -30,15 +31,15 @@ import java.util.List;
  * Time: 上午10:06<br/>
  */
 
-public class StorageView extends AbstractAlertView {
+public class StorageView extends PermissionAlertView {
 
     private PerformanceViewAdapter mAdapter;
     private StorageHacker mStorageHacker;
 
     private RecyclerView mStorageList;
 
-    public StorageView(Context context) {
-        super(context);
+    public StorageView(Context context,Config config) {
+        super(context,config);
     }
 
 
@@ -88,6 +89,11 @@ public class StorageView extends AbstractAlertView {
     @Override
     protected int getLayoutResId() {
         return R.layout.wxt_storage_view;
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_STORAGE);
     }
 
 

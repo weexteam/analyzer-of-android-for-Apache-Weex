@@ -28,13 +28,18 @@ import static com.taobao.weex.analyzer.R.id.close;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class ProfileDomView extends DragSupportOverlayView{
+public class ProfileDomView extends PermissionOverlayView{
     private SampleTask mTask;
     private OnCloseListener mOnCloseListener;
 
-    public ProfileDomView(Context application) {
-        super(application);
+    public ProfileDomView(Context application,Config config) {
+        super(application,true,config);
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_RENDER_ANALYSIS);
     }
 
     @NonNull

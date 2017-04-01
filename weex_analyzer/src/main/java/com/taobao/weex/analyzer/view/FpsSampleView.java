@@ -30,18 +30,23 @@ import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
  * Time: 下午3:29<br/>
  */
 
-public class FpsSampleView extends DragSupportOverlayView {
+public class FpsSampleView extends PermissionOverlayView {
 
     private SampleFPSTask mTask;
     private DynamicChartViewController mChartViewController;
 
     private OnCloseListener mOnCloseListener;
 
-    public FpsSampleView(Context application) {
-        super(application);
+    public FpsSampleView(Context application,Config config) {
+        super(application,true,config);
 
         mWidth = WindowManager.LayoutParams.MATCH_PARENT;
         mHeight = (int) ViewUtils.dp2px(application, 150);
+    }
+
+    @Override
+    public boolean isPermissionGranted(@NonNull Config config) {
+        return !config.getIgnoreOptions().contains(Config.TYPE_FPS);
     }
 
     public void setOnCloseListener(@Nullable OnCloseListener listener) {

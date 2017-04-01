@@ -32,7 +32,7 @@ public class ShakeDetectorTest {
 
         ShakeDetector.ShakeListener mockListener = mock(ShakeDetector.ShakeListener.class);
         Sensor sensor = mock(Sensor.class);
-        ShakeDetector detector = new ShakeDetector(mockListener);
+        ShakeDetector detector = new ShakeDetector(mockListener,null);
         when(mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)).thenReturn(sensor);
 
         detector.start(mSensorManager);
