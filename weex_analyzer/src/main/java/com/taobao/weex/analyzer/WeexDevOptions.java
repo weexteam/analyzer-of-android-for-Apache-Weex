@@ -227,6 +227,8 @@ public class WeexDevOptions implements IWXDevOptions {
         });
     }
 
+
+
     public static void launchByBroadcast(@NonNull Context context, @NonNull String from, @Nullable String deviceId) {
         Intent intent = new Intent(ACTION_LAUNCH);
         intent.putExtra(EXTRA_FROM,from);

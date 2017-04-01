@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.TrafficTaskEntity;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
@@ -164,7 +165,7 @@ public class TrafficSampleView extends DragSupportOverlayView {
             reportIfNeeded(new IDataReporter.ProcessedDataBuilder<TrafficTaskEntity.TrafficInfo>()
                     .sequenceId(generateSequenceId())
                     .deviceId(LaunchConfig.getDeviceId())
-                    .type(IDataReporter.TYPE_TRAFFIC)
+                    .type(Config.TYPE_TRAFFIC)
                     .data(info)
                     .build()
             );

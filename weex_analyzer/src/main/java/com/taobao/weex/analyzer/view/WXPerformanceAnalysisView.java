@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
@@ -104,7 +105,7 @@ public class WXPerformanceAnalysisView extends AbstractAlertView {
                     .sequenceId(mCounter.getAndIncrement())
                     .data(mCurPerformance)
                     .deviceId(LaunchConfig.getDeviceId())
-                    .type(IDataReporter.TYPE_WEEX_PERFORMANCE_STATISTICS)
+                    .type(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
                     .build()
 
             );

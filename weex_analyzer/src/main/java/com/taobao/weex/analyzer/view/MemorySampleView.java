@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.MemorySampler;
 import com.taobao.weex.analyzer.core.MemoryTaskEntity;
@@ -152,7 +153,7 @@ public class MemorySampleView extends DragSupportOverlayView {
             reportIfNeeded(new IDataReporter.ProcessedDataBuilder<Double>()
                     .sequenceId(generateSequenceId())
                     .deviceId(LaunchConfig.getDeviceId())
-                    .type(IDataReporter.TYPE_MEMORY)
+                    .type(Config.TYPE_MEMORY)
                     .data((Math.round(memoryUsed*100)/100.0))
                     .build()
             );

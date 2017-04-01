@@ -6,6 +6,15 @@ import android.support.annotation.StringDef;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import static com.taobao.weex.analyzer.Config.TYPE_CPU;
+import static com.taobao.weex.analyzer.Config.TYPE_FPS;
+import static com.taobao.weex.analyzer.Config.TYPE_MEMORY;
+import static com.taobao.weex.analyzer.Config.TYPE_MTOP_INSPECTOR;
+import static com.taobao.weex.analyzer.Config.TYPE_RENDER_ANALYSIS;
+import static com.taobao.weex.analyzer.Config.TYPE_TRAFFIC;
+import static com.taobao.weex.analyzer.Config.TYPE_VIEW_INSPECTOR;
+import static com.taobao.weex.analyzer.Config.TYPE_WEEX_PERFORMANCE_STATISTICS;
+
 /**
  * Description:
  *
@@ -14,14 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 
 public interface IDataReporter<T> {
 
-    String TYPE_WEEX_PERFORMANCE_STATISTICS = "weex_performance_statistics";
-    String TYPE_VIEW_INSPECTOR = "view_inspector";
-    String TYPE_RENDER_ANALYSIS = "render_analysis";
-    String TYPE_MTOP_INSPECTOR = "mtop_inspector";
-    String TYPE_MEMORY = "memory";
-    String TYPE_CPU = "cpu";
-    String TYPE_FPS = "fps";
-    String TYPE_TRAFFIC = "traffic";
+
 
     String API_VERSION = "1";
 

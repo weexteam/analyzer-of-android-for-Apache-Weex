@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.CpuTaskEntity;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
@@ -147,7 +148,7 @@ public class CpuSampleView extends DragSupportOverlayView {
             reportIfNeeded(new IDataReporter.ProcessedDataBuilder<Double>()
                     .sequenceId(generateSequenceId())
                     .deviceId(LaunchConfig.getDeviceId())
-                    .type(IDataReporter.TYPE_CPU)
+                    .type(Config.TYPE_CPU)
                     .data((Math.round(pidCpuUsage*100)/100.0))
                     .build()
             );

@@ -16,6 +16,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.NetworkEventSender;
@@ -187,7 +188,7 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
                             .sequenceId(mCounter.getAndIncrement())
                             .data(msg)
                             .deviceId(LaunchConfig.getDeviceId())
-                            .type(IDataReporter.TYPE_MTOP_INSPECTOR)
+                            .type(Config.TYPE_MTOP_INSPECTOR)
                             .build()
                     );
                 }

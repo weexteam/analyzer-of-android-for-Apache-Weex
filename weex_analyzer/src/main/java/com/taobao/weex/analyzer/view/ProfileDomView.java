@@ -9,6 +9,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.DomTracker;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
@@ -124,7 +125,7 @@ public class ProfileDomView extends DragSupportOverlayView{
             reportIfNeeded(new IDataReporter.ProcessedDataBuilder<HealthReport>()
                     .sequenceId(generateSequenceId())
                     .deviceId(LaunchConfig.getDeviceId())
-                    .type(IDataReporter.TYPE_RENDER_ANALYSIS)
+                    .type(Config.TYPE_RENDER_ANALYSIS)
                     .data(report)
                     .build()
             );

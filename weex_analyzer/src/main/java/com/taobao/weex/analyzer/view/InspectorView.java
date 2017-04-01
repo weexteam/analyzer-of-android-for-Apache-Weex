@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.ViewInspectorManager;
 import com.taobao.weex.analyzer.core.ViewPropertiesSupplier;
@@ -160,7 +161,7 @@ public class InspectorView extends DragSupportOverlayView {
                                     .sequenceId(mCounter.getAndIncrement())
                                     .data(info)
                                     .deviceId(LaunchConfig.getDeviceId())
-                                    .type(IDataReporter.TYPE_VIEW_INSPECTOR)
+                                    .type(Config.TYPE_VIEW_INSPECTOR)
                                     .build()
                             );
                         }
