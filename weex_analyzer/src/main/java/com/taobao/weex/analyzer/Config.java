@@ -51,10 +51,6 @@ public class Config {
         this.ignoreOptions = ignoreOptions;
     }
 
-    public static String getTypeWeexPerformanceStatistics() {
-        return TYPE_WEEX_PERFORMANCE_STATISTICS;
-    }
-
     public boolean isEnableShake() {
         return enableShake;
     }
