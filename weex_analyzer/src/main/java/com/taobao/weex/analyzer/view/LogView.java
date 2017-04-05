@@ -3,6 +3,7 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.LogcatDumpBuilder;
 import com.taobao.weex.analyzer.core.LogcatDumper;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.analyzer.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +60,8 @@ public class LogView extends AbstractResizableOverlayView {
     private boolean isSizeMenuOpened;
 
     private String mCurKeyword;
+
+    private String mCustomRuleName;
 
 
     static {
@@ -135,6 +139,102 @@ public class LogView extends AbstractResizableOverlayView {
 
         final TextView sizeBtn = (TextView) wholeView.findViewById(R.id.size);
         final ViewGroup sizeContent = (ViewGroup) wholeView.findViewById(R.id.size_content);
+
+        //config
+        View logLevelPanel = wholeView.findViewById(R.id.log_level_panel);
+        View logFilterPanel = wholeView.findViewById(R.id.log_filter_panel);
+        View searchPanel = wholeView.findViewById(R.id.search_panel);
+        View customFilterPanel = wholeView.findViewById(R.id.custom_filter_panel);
+
+        RadioGroup customFilterGroup = (RadioGroup) wholeView.findViewById(R.id.custom_filter_group);
+
+        if(mConfig != null && mConfig.getLogConfig() != null) {
+            LogConfig logConfig = mConfig.getLogConfig();
+
+            if(logConfig.isShowLogLevelPanel()) {
+                logLevelPanel.setVisibility(View.VISIBLE);
+            } else {
+                logLevelPanel.setVisibility(View.GONE);
+            }
+
+            if(logConfig.isShowLogFilterPanel()) {
+                logFilterPanel.setVisibility(View.VISIBLE);
+            } else {
+                logFilterPanel.setVisibility(View.GONE);
+            }
+
+            if(logConfig.isShowSearchPanel()) {
+                searchPanel.setVisibility(View.VISIBLE);
+            } else {
+                searchPanel.setVisibility(View.GONE);
+            }
+
+            //custom rule
+            List<String> customRule = new ArrayList<>();
+            if(logConfig.getCustomRule() != null) {
+                customRule.addAll(logConfig.getCustomRule());
+            }
+            customRule.add(0,FILTER_ALL);
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            if(!customRule.isEmpty() && customRule.size() > 1) {
+                customFilterPanel.setVisibility(View.VISIBLE);
+                final int[] ids = new int[customRule.size()];
+                final LogcatDumper.Rule[] rules = new LogcatDumper.Rule[customRule.size()];
+                RadioButton[] btns = new RadioButton[customRule.size()];
+
+                for(int i = 0; i < customRule.size(); i++) {
+                    String ruleStr = customRule.get(i);
+                    if(TextUtils.isEmpty(ruleStr)) {
+                        continue;
+                    }
+                    if(FILTER_ALL.equals(ruleStr)) {
+                        rules[i] = sDefaultRules.get(FILTER_ALL);
+                    } else {
+                        rules[i] = new LogcatDumper.Rule(ruleStr,ruleStr);
+                    }
+                    RadioButton btn = (RadioButton) inflater.inflate(R.layout.wxt_styleable_radio_btn,customFilterGroup,false);
+                    btns[i] = btn;
+                    ids[i] = ViewUtils.generateViewId();
+                    btn.setId(ids[i]);
+                    btn.setText(ruleStr);
+                    customFilterGroup.addView(btn);
+                }
+                btns[0].setChecked(true);
+
+                customFilterGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                        if (mLogcatDumper == null) {
+                            return;
+                        }
+
+                        if (mLogAdapter != null) {
+                            mLogAdapter.clear();
+                        }
+                        mLogcatDumper.removeAllRule();
+
+                        for(int i = 0; i < ids.length; i++) {
+                            int id = ids[i];
+                            if(id == checkedId) {
+                                String ruleName = rules[i].getFilter();
+                                if(ruleName != null && !ruleName.equals(mCustomRuleName)) {
+                                    mCustomRuleName = ruleName;
+                                    mLogcatDumper.addRule(rules[i]);
+                                    mLogcatDumper.findCachedLogByNewFilters();
+                                }
+                                break;
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                customFilterPanel.setVisibility(View.GONE);
+            }
+        } else {
+            customFilterPanel.setVisibility(View.GONE);
+        }
+
 
         sizeBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -3,6 +3,8 @@ package com.taobao.weex.analyzer;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
+import com.taobao.weex.analyzer.view.LogConfig;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class Config {
 
     private boolean enableShake;
     private List<String> ignoreOptions;
+    private LogConfig logConfig;
 
     public void setEnableShake(boolean enableShake) {
         this.enableShake = enableShake;
@@ -53,6 +56,14 @@ public class Config {
 
     public boolean isEnableShake() {
         return enableShake;
+    }
+
+    public LogConfig getLogConfig() {
+        return logConfig;
+    }
+
+    public void setLogConfig(LogConfig logConfig) {
+        this.logConfig = logConfig;
     }
 
     @NonNull
@@ -70,6 +81,7 @@ public class Config {
     public static class Builder {
         private boolean enableShake;
         private List<String> ignoreOptions;
+        private LogConfig logConfig;
         public Builder() {
             this.ignoreOptions = new ArrayList<>();
         }
@@ -86,10 +98,16 @@ public class Config {
             return this;
         }
 
+        public Builder logConfig(LogConfig config) {
+            this.logConfig = config;
+            return this;
+        }
+
         public Config build() {
             Config config = new Config();
             config.setEnableShake(enableShake);
             config.setIgnoreOptions(ignoreOptions);
+            config.setLogConfig(logConfig);
             return config;
         }
     }

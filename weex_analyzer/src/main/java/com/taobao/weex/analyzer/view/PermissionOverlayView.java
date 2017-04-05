@@ -12,7 +12,7 @@ import com.taobao.weex.analyzer.IPermissionHandler;
  */
 
 public abstract class PermissionOverlayView extends DragSupportOverlayView implements IPermissionHandler{
-    private Config mConfig;
+    protected Config mConfig;
 
     public PermissionOverlayView(Context application) {
         super(application);

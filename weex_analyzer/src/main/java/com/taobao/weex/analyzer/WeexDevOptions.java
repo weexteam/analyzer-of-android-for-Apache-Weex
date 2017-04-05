@@ -105,20 +105,6 @@ public class WeexDevOptions implements IWXDevOptions {
     private Config provideDefaultConfig() {
         return new Config.Builder()
                 .enableShake(true)
-//                .ignoreOption(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
-//                .ignoreOption(Config.TYPE_VIEW_INSPECTOR)
-//                .ignoreOption(Config.TYPE_RENDER_ANALYSIS)
-//                .ignoreOption(Config.TYPE_MTOP_INSPECTOR)
-////                .ignoreOption(Config.TYPE_STORAGE)
-////                .ignoreOption(Config.TYPE_3D)
-////                .ignoreOption(Config.TYPE_LOG)
-////                .ignoreOption(Config.TYPE_MEMORY)
-//                .ignoreOption(Config.TYPE_CPU)
-//                .ignoreOption(Config.TYPE_FPS)
-//                .ignoreOption(Config.TYPE_TRAFFIC)
-//                .ignoreOption(Config.TYPE_ALL_PERFORMANCE)
-//                .ignoreOption(Config.TYPE_DEBUG)
-
                 .build();
     }
 
