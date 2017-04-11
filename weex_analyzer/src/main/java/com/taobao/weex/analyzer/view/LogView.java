@@ -216,7 +216,7 @@ public class LogView extends AbstractResizableOverlayView {
                         for(int i = 0; i < ids.length; i++) {
                             int id = ids[i];
                             if(id == checkedId) {
-                                String ruleName = rules[i].getFilter();
+                                String ruleName = rules[i].getName();
                                 if(ruleName != null && !ruleName.equals(mCustomRuleName)) {
                                     mCustomRuleName = ruleName;
                                     mLogcatDumper.addRule(rules[i]);
