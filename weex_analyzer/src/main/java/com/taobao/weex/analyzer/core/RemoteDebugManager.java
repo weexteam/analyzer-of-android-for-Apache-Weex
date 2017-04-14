@@ -120,8 +120,9 @@ public class RemoteDebugManager {
                 isEnabled = false;
                 return;
             }
-
+            WXEnvironment.sRemoteDebugMode = true;
             WXSDKEngine.reload();
+            isEnabled = true;
             Toast.makeText(context, context.getString(R.string.wxt_opened), Toast.LENGTH_SHORT).show();
         }catch (Exception e) {
             e.printStackTrace();
