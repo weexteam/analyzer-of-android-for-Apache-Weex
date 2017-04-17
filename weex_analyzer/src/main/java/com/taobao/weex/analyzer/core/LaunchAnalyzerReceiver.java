@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.taobao.weex.analyzer.WeexDevOptions;
+import com.taobao.weex.analyzer.core.debug.DebugTool;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -50,12 +51,15 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
 
     private static final String TRUE = "true";
 
+    private static final String CMD_WX_SERVER = "wx_server";
+
 
     private static final String CMD_ON = "on";
     private static final String CMD_OFF = "off";
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        WXLogUtils.e("CHUYI","called");
         if (!ACTION.equals(intent.getAction())) {
             return;
         }
@@ -67,6 +71,8 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         String cmd_tracker_polling = intent.getStringExtra(CMD_TRACKER_POLLING);
         // 启动
         String cmd_launch_ui = intent.getStringExtra(CMD_LAUNCH_UI);
+
+        String cmd_wx_server = intent.getStringExtra(CMD_WX_SERVER);
 
         if(!TextUtils.isEmpty(cmd_performance)) {
             if(CMD_ON.equals(cmd_performance)) {
@@ -103,6 +109,8 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
                 String deviceId = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
                 WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
             }
+        } else if(!TextUtils.isEmpty(cmd_wx_server)) {
+            DebugTool.startRemoteDebug(cmd_wx_server);
         }
     }
 

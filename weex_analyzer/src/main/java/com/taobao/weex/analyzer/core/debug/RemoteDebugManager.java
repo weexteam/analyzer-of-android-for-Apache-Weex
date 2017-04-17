@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.core.debug;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -8,13 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.taobao.weex.WXEnvironment;
-import com.taobao.weex.WXSDKEngine;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
-import com.taobao.weex.bridge.WXBridgeManager;
 
-import java.lang.reflect.Method;
 import java.util.Locale;
 
 /**
@@ -112,16 +108,16 @@ public class RemoteDebugManager {
     }
 
     private void startRemoteJSDebug(Context context) {
+        String remoteDebugProxyUrl = null;
         try {
             if (!TextUtils.isEmpty(mServerIP)) {
-                WXEnvironment.sRemoteDebugProxyUrl = String.format(Locale.CHINA, sRemoteUrlTemplate, mServerIP);
+                remoteDebugProxyUrl = String.format(Locale.CHINA, sRemoteUrlTemplate, mServerIP);
             } else {
                 requestDebugServer(context, true);
                 isEnabled = false;
                 return;
             }
-            WXEnvironment.sRemoteDebugMode = true;
-            WXSDKEngine.reload();
+            DebugTool.startRemoteDebug(remoteDebugProxyUrl);
             isEnabled = true;
             Toast.makeText(context, context.getString(R.string.wxt_opened), Toast.LENGTH_SHORT).show();
         }catch (Exception e) {
@@ -130,14 +126,9 @@ public class RemoteDebugManager {
     }
 
     private void stopRemoteJSDebug(Context context) {
-        try {
-            WXBridgeManager manager = WXBridgeManager.getInstance();
-            Method method = manager.getClass().getDeclaredMethod("stopRemoteDebug");
-            method.setAccessible(true);
-            method.invoke(manager);
+        if(DebugTool.stopRemoteDebug()) {
             Toast.makeText(context, "close success", Toast.LENGTH_SHORT).show();
-        }catch (Exception e) {
-            e.printStackTrace();
+        } else {
             Toast.makeText(context, "close failed", Toast.LENGTH_SHORT).show();
         }
     }

@@ -23,7 +23,7 @@ import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.PollingVDomMonitor;
-import com.taobao.weex.analyzer.core.RemoteDebugManager;
+import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
 import com.taobao.weex.analyzer.core.StandardVDomMonitor;
 import com.taobao.weex.analyzer.core.VDomController;

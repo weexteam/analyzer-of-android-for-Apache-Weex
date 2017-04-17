@@ -11,7 +11,7 @@ import android.widget.CompoundButton;
 
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.DevOptionsConfig;
-import com.taobao.weex.analyzer.core.RemoteDebugManager;
+import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
 
 /**
  * Description:
