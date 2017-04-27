@@ -38,7 +38,7 @@ public abstract class ReportSupportLoopTask<T> extends AbstractLoopTask {
         String deviceId = LaunchConfig.getDeviceId();
 
         if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            return MDSDataReporterFactory.create(from, deviceId);
+            return DataReporterFactory.createHttpReporter(from, deviceId);
         } else {
             return null;
         }

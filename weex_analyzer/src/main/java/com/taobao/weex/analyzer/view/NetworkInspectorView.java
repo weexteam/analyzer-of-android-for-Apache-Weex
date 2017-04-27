@@ -22,7 +22,7 @@ import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.NetworkEventSender;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
 import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.MDSDataReporterFactory;
+import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 
 import java.text.SimpleDateFormat;
@@ -168,7 +168,7 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
         String deviceId = LaunchConfig.getDeviceId();
 
         if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+            mDataReporter = DataReporterFactory.createHttpReporter(from, deviceId);
         }
 
         return wholeView;

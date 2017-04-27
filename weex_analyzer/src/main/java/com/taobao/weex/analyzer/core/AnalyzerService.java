@@ -8,11 +8,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.taobao.weex.analyzer.Config;
+import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
+import com.taobao.weex.analyzer.core.reporter.IDataReporter;
+import com.taobao.weex.analyzer.core.reporter.LogReporter;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Description:
@@ -23,6 +28,12 @@ import java.util.List;
 public class AnalyzerService extends Service {
 
     private TaskImpl mTask;
+
+    @Nullable
+    private IDataReporter reporter;
+
+    public static final String ATS = "ats";
+    public static final String MDS = "mds";
 
     @Nullable
     @Override
@@ -39,9 +50,16 @@ public class AnalyzerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(Constants.TAG, "service start success");
+        String from = intent.getStringExtra("from");
         if (mTask == null) {
             createTask();
         }
+        if(ATS.equals(from)) {
+            reporter = DataReporterFactory.createLogReporter(true);
+        } else if(MDS.equals(from)) {
+            //TODO
+        }
+        mTask.setReporter(reporter);
         mTask.start();
         return START_REDELIVER_INTENT;
     }
@@ -56,15 +74,17 @@ public class AnalyzerService extends Service {
     }
 
     private void createTask() {
-        mTask = new TaskImpl(this, 1000);
+        mTask = new TaskImpl(this, 1000, reporter);
     }
 
     private static class TaskImpl extends AbstractLoopTask {
         private WeakReference<Context> mHostRef;
 
         private List<TaskEntity> mTaskEntities;
+        @Nullable
+        private IDataReporter mReporter;
 
-        TaskImpl(@NonNull Context context, int delayMillis) {
+        TaskImpl(@NonNull Context context, int delayMillis,@Nullable IDataReporter reporter) {
             super(false, delayMillis);
             mHostRef = new WeakReference<>(context);
 
@@ -75,7 +95,12 @@ public class AnalyzerService extends Service {
             if(FPSSampler.isSupported()) {
                 mTaskEntities.add(new FpsTaskEntity());
             }
+            this.mReporter = reporter;
 
+        }
+
+        void setReporter(@Nullable IDataReporter reporter) {
+            this.mReporter = reporter;
         }
 
         @Override
@@ -115,17 +140,31 @@ public class AnalyzerService extends Service {
                 }
             }
 
-            if (cpuInfo != null) {
-                Log.d(Constants.TAG, "cpu usage(total :" + String.format("%.2f", cpuInfo.pidCpuUsage) +
-                        "% user : " + String.format("%.2f", cpuInfo.pidUserCpuUsage) + "% kernel : " + String.format("%.2f", cpuInfo.pidKernelCpuUsage) + "%)\r\n");
+            if(mReporter == null || !mReporter.isEnabled()) {
+                return;
             }
-            Log.d(Constants.TAG, "memory usage : " + String.format("%.2f", memoryUsage) + "MB\r\n");
-            Log.d(Constants.TAG, "fps : " + String.format("%.2f", fps) + "\r\n");
 
-            if (trafficInfo != null) {
-                Log.d(Constants.TAG, "traffic speed(rx :" +
-                        String.format("%.2f", trafficInfo.rxSpeed) + "kb/s tx : " + String.format("%.2f", trafficInfo.txSpeed) + "kb/s)\r\n\r\n");
+            if(mReporter instanceof LogReporter) {
+                if (cpuInfo != null) {
+                    String cpuStr = "cpu usage(total :" + String.format(Locale.CHINA,"%.2f", cpuInfo.pidCpuUsage) +
+                            "% user : " + String.format(Locale.CHINA,"%.2f", cpuInfo.pidUserCpuUsage) + "% kernel : " + String.format(Locale.CHINA,"%.2f", cpuInfo.pidKernelCpuUsage) + "%)\r\n";
+                    ((LogReporter) mReporter).report(new IDataReporter.ProcessedDataBuilder<String>().type(Config.TYPE_CPU).data(cpuStr).build());
+                }
+
+                String memStr = "memory usage : " + String.format(Locale.CHINA,"%.2f", memoryUsage) + "MB\r\n";
+                ((LogReporter) mReporter).report(new IDataReporter.ProcessedDataBuilder<String>().type(Config.TYPE_MEMORY).data(memStr).build());
+
+                String fpsStr = "fps : " + String.format(Locale.CHINA,"%.2f", fps) + "\r\n";
+                ((LogReporter) mReporter).report(new IDataReporter.ProcessedDataBuilder<String>().type(Config.TYPE_FPS).data(fpsStr).build());
+
+
+                if (trafficInfo != null) {
+                    String trafficStr = "traffic speed(rx :" +
+                            String.format(Locale.CHINA,"%.2f", trafficInfo.rxSpeed) + "kb/s tx : " + String.format(Locale.CHINA,"%.2f", trafficInfo.txSpeed) + "kb/s)\r\n\r\n";
+                    ((LogReporter) mReporter).report(new IDataReporter.ProcessedDataBuilder<String>().type(Config.TYPE_TRAFFIC).data(trafficStr).build());
+                }
             }
+
         }
 
         @Override

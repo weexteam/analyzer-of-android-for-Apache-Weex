@@ -17,7 +17,7 @@ import com.taobao.weex.analyzer.core.ViewInspectorManager;
 import com.taobao.weex.analyzer.core.ViewPropertiesSupplier;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
 import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.MDSDataReporterFactory;
+import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.highlight.ViewHighlighter;
 
@@ -116,7 +116,7 @@ public class InspectorView extends PermissionOverlayView {
         String deviceId = LaunchConfig.getDeviceId();
 
         if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+            mDataReporter = DataReporterFactory.createHttpReporter(from, deviceId);
         }
 
         return hostView;

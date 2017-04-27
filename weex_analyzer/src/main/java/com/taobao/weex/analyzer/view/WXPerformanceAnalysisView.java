@@ -14,7 +14,7 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.reporter.IDataReporter;
 import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.MDSDataReporterFactory;
+import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -91,7 +91,7 @@ public class WXPerformanceAnalysisView extends PermissionAlertView {
         String deviceId = LaunchConfig.getDeviceId();
 
         if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = MDSDataReporterFactory.create(from, deviceId);
+            mDataReporter = DataReporterFactory.createHttpReporter(from, deviceId);
         }
     }
 

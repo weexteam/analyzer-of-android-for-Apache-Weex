@@ -121,6 +121,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         }
         WXLogUtils.d(Constants.TAG,"analyzer service will start...");
         Intent intent = new Intent(context,AnalyzerService.class);
+        intent.putExtra("from",AnalyzerService.ATS);
         context.startService(intent);
     }
 
