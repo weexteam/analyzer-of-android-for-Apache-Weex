@@ -13,6 +13,8 @@ public class LogConfig {
     private boolean showLogFilterPanel = true;
     private boolean showSearchPanel = true;
 
+    private int viewSize = -1;
+
     private List<String> mCustomRule;
 
     public boolean isShowLogLevelPanel() {
@@ -45,5 +47,13 @@ public class LogConfig {
 
     public void setCustomRule(List<String> customRule) {
         this.mCustomRule = customRule;
+    }
+
+    public int getViewSize() {
+        return viewSize;
+    }
+
+    public void setViewSize(@IResizableView.Size int viewSize) {
+        this.viewSize = viewSize;
     }
 }

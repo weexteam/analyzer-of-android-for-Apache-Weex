@@ -169,6 +169,10 @@ public class LogView extends AbstractResizableOverlayView {
                 searchPanel.setVisibility(View.GONE);
             }
 
+            if(logConfig.getViewSize() != -1) {
+                this.mViewSize = logConfig.getViewSize();
+            }
+
             //custom rule
             List<String> customRule = new ArrayList<>();
             if(logConfig.getCustomRule() != null) {

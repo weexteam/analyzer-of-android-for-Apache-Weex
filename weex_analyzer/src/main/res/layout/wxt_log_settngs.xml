@@ -178,7 +178,7 @@
             android:layout_height="wrap_content"
             android:background="#8e000000"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
         <LinearLayout
                 android:id="@+id/log_level_panel"
