@@ -47,6 +47,8 @@ public interface IDataReporter<T> {
         private String type;
         private T data;
 
+        ///TODO 当前页面
+
         public int getSequenceId() {
             return sequenceId;
         }
