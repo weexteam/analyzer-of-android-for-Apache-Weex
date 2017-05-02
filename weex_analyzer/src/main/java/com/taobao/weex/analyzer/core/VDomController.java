@@ -11,8 +11,8 @@ import com.taobao.weex.WXSDKInstance;
  */
 
 public class VDomController implements IVDomMonitor {
-    static boolean isPollingMode = false;
-    static boolean isStandardMode = false;
+    public static boolean isPollingMode = false;
+    public static boolean isStandardMode = false;
 
     private PollingVDomMonitor mPollingVDomMonitor;
     private StandardVDomMonitor mStandardVDomMonitor;

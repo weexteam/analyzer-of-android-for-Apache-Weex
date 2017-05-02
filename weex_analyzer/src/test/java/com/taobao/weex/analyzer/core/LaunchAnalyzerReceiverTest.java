@@ -3,6 +3,8 @@ package com.taobao.weex.analyzer.core;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 
+import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

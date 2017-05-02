@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.core.DevOptionsConfig;
 import com.taobao.weex.analyzer.core.FPSSampler;
@@ -28,6 +29,7 @@ import com.taobao.weex.analyzer.core.StandardVDomMonitor;
 import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
+import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
 import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
@@ -649,6 +651,14 @@ public class WeexDevOptions implements IWXDevOptions {
         }
         this.mInstance = instance;
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
+
+        if(mCurPageName != null) {
+            Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+            Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
+            intent.putExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS, JSON.toJSONString(performance));
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        }
+
 
         if (mVdomController != null) {
             mVdomController.monitor(instance);

@@ -15,16 +15,16 @@ import com.taobao.weex.utils.WXLogUtils;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class WebSocketReporter implements IDataReporter,IWebSocketBridge,WebSocketClient.Callback {
+class WebSocketReporter implements IDataReporter {
     private boolean isEnabled;
 
     @Nullable
     private WebSocketClient mSocketClient = null;
     private static final String TAG = "WebSocketReporter";
 
-    public WebSocketReporter(boolean enabled) {
+    WebSocketReporter(boolean enabled, IWebSocketBridge bridge) {
         this.isEnabled = enabled;
-        mSocketClient = WebSocketClientFactory.create(this);
+        mSocketClient = WebSocketClientFactory.create(bridge);
     }
 
     @Override
@@ -32,11 +32,13 @@ public class WebSocketReporter implements IDataReporter,IWebSocketBridge,WebSock
         if(mSocketClient != null && mSocketClient.isOpen()) {
             mSocketClient.sendText(JSON.toJSONString(data));
         }
+        //SHOULD REMOVED LATER
+        WXLogUtils.d(TAG,JSON.toJSONString(data));
     }
 
-    public void connect(String url) {
+    public void connect(String url, WebSocketClient.Callback callback) {
         if(mSocketClient != null) {
-            mSocketClient.connect(url, this);
+            mSocketClient.connect(url, callback);
         }
     }
 
@@ -49,25 +51,5 @@ public class WebSocketReporter implements IDataReporter,IWebSocketBridge,WebSock
     @Override
     public boolean isEnabled() {
         return isEnabled;
-    }
-
-    @Override
-    public void handleMessage(String message) {
-        WXLogUtils.v(TAG,message);
-    }
-
-    @Override
-    public void onOpen(String response) {
-
-    }
-
-    @Override
-    public void onFailure(Throwable cause) {
-
-    }
-
-    @Override
-    public void onClose(int code, String reason) {
-
     }
 }

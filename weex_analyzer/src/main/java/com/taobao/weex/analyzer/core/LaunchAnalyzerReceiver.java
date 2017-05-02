@@ -9,8 +9,12 @@ import android.util.Log;
 
 import com.taobao.weex.analyzer.WeexDevOptions;
 import com.taobao.weex.analyzer.core.debug.DebugTool;
+import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Description:
@@ -59,7 +63,6 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        WXLogUtils.e("CHUYI","called");
         if (!ACTION.equals(intent.getAction())) {
             return;
         }
@@ -76,7 +79,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
 
         if(!TextUtils.isEmpty(cmd_performance)) {
             if(CMD_ON.equals(cmd_performance)) {
-                performStart(context);
+                performStart(context,AnalyzerService.ATS, null);
             } else if(CMD_OFF.equals(cmd_performance)) {
                 performStop(context);
             } else{
@@ -107,21 +110,31 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
                 //启动主界面
                 String from = intent.getStringExtra(WeexDevOptions.EXTRA_FROM);
                 String deviceId = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
-                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
+//                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
+                Map<String,String> extras = new HashMap<>();
+                extras.put("deviceId", deviceId);
+                performStart(context,from,extras);
+
             }
         } else if(!TextUtils.isEmpty(cmd_wx_server)) {
             DebugTool.startRemoteDebug(cmd_wx_server);
         }
     }
 
-    private void performStart(@NonNull Context context) {
+    private void performStart(@NonNull Context context, String from, Map<String,String> extras) {
         if(!SDKUtils.isHostRunning(context) || !SDKUtils.isInteractive(context)) {
             Log.d(Constants.TAG,"service start failed(host app is not in foreground,is your app running?)");
             return;
         }
         WXLogUtils.d(Constants.TAG,"analyzer service will start...");
         Intent intent = new Intent(context,AnalyzerService.class);
-        intent.putExtra("from",AnalyzerService.ATS);
+        intent.putExtra("from",from);
+        if(extras != null) {
+            for(Map.Entry<String,String> me : extras.entrySet()) {
+                intent.putExtra(me.getKey(),me.getValue());
+            }
+        }
+
         context.startService(intent);
     }
 

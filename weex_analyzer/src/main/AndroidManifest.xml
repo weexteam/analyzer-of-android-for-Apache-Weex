@@ -17,7 +17,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".core.AnalyzerService"
+        <service android:name=".core.reporter.AnalyzerService"
                 android:exported="false">
         </service>
     </application>
