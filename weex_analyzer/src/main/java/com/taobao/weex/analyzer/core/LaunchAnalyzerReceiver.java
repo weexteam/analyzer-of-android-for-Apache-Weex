@@ -110,9 +110,14 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
                 //启动主界面
                 String from = intent.getStringExtra(WeexDevOptions.EXTRA_FROM);
                 String deviceId = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
+                String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);
+
+                WXLogUtils.d(Constants.TAG,"from:"+from+",deviceId:"+deviceId+",wxurl:"+wsUrl);
+
 //                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
                 Map<String,String> extras = new HashMap<>();
-                extras.put("deviceId", deviceId);
+                extras.put(WeexDevOptions.EXTRA_DEVICE_ID, deviceId);
+                extras.put(WeexDevOptions.EXTRA_WS_URL,wsUrl);
                 performStart(context,from,extras);
 
             }

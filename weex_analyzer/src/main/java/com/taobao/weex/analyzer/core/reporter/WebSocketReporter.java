@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.weex.analyzer.core.Constants;
 import com.taobao.weex.analyzer.core.reporter.ws.IWebSocketBridge;
 import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
 import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClientFactory;
@@ -33,7 +34,7 @@ class WebSocketReporter implements IDataReporter {
             mSocketClient.sendText(JSON.toJSONString(data));
         }
         //SHOULD REMOVED LATER
-        WXLogUtils.d(TAG,JSON.toJSONString(data));
+        WXLogUtils.d(Constants.TAG,JSON.toJSONString(data));
     }
 
     public void connect(String url, WebSocketClient.Callback callback) {

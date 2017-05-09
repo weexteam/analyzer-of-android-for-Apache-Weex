@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.analyzer.Config;
+import com.taobao.weex.analyzer.WeexDevOptions;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.Constants;
 import com.taobao.weex.analyzer.core.CpuTaskEntity;
@@ -21,6 +22,7 @@ import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.FpsTaskEntity;
 import com.taobao.weex.analyzer.core.MemoryTaskEntity;
 import com.taobao.weex.analyzer.core.NetworkEventInspector;
+import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.TaskEntity;
 import com.taobao.weex.analyzer.core.TrafficTaskEntity;
 import com.taobao.weex.analyzer.core.reporter.ws.IWebSocketBridge;
@@ -82,9 +84,12 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         if (ATS.equals(from)) {
             reporter = DataReporterFactory.createLogReporter(true);
         } else if (MDS.equals(from)) {
-            String id = intent.getStringExtra("deviceId");
-            if (!TextUtils.isEmpty(id)) {
-                reporter = DataReporterFactory.createWSReporter(MDS, id, this, this);
+
+            String id = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
+            String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);
+
+            if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(wsUrl)) {
+                reporter = DataReporterFactory.createWSReporter(MDS, id, wsUrl ,this, this);
                 mTask.setDeviceId(id);
 
                 if(mDispatchReceiver != null) {
@@ -151,6 +156,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
 
     @Override
     public void onOpen(String response) {
+        WXLogUtils.d(Constants.TAG,"onOpen:"+response);
     }
 
     @Override
@@ -199,6 +205,8 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         } else if (Config.TYPE_RENDER_ANALYSIS.equals(type)) {
             WSConfig.isRenderAnalysisEnabled = status;
 //            VDomController.isPollingMode = true;
+            //TODO not support yet
+
         } else if (Config.TYPE_MTOP_INSPECTOR.equals(type)) {
             config.isNetworkInspectorEnabled = status;
         }
@@ -238,10 +246,11 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
             }
 
             String weex_performance = intent.getStringExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
+            Performance performance = JSON.parseObject(weex_performance,Performance.class);
             if(!TextUtils.isEmpty(weex_performance) && config.isPerformanceEnabled) {
-                reporter.report(new IDataReporter.ProcessedDataBuilder<String>()
+                reporter.report(new IDataReporter.ProcessedDataBuilder<Performance>()
                                     .deviceId(deviceId)
-                                    .data(weex_performance)
+                                    .data(performance)
                                     .type(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
                                     .build()
                 );

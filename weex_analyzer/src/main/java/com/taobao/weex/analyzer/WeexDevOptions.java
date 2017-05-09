@@ -90,6 +90,7 @@ public class WeexDevOptions implements IWXDevOptions {
     private static final String ACTION_LAUNCH = "action_launch_analyzer";
     public static final String EXTRA_FROM = "from";
     public static final String EXTRA_DEVICE_ID = "deviceId";
+    public static final String EXTRA_WS_URL = "wsUrl";
 
     private LaunchUIReceiver mLaunchUIReceiver;
 
