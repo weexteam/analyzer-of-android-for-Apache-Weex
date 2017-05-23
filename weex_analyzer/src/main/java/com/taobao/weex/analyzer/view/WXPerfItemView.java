@@ -11,7 +11,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.Performance;
@@ -27,13 +26,15 @@ import java.util.List;
  * Time: 下午5:05<br/>
  */
 
-public class WXPerfItemView extends AbstractBizItemView<Performance> implements View.OnLongClickListener{
+public class WXPerfItemView extends AbstractBizItemView<Performance>{
 
-    private TextView totalTimeView;
+    private TextView jsfmVersionView;
     private TextView sdkVersionView;
     private TextView renderTimeView;
     private TextView sdkInitTime;
     private TextView networkTime;
+    private TextView pageNameView;
+    private TextView jsTemplateSizeView;
 
     private RecyclerView mPerformanceList;
 
@@ -51,17 +52,13 @@ public class WXPerfItemView extends AbstractBizItemView<Performance> implements 
 
     @Override
     protected void prepareView() {
-        totalTimeView = (TextView) findViewById(R.id.text_total_time);
+        jsfmVersionView = (TextView) findViewById(R.id.text_jsfm_version);
         sdkVersionView = (TextView) findViewById(R.id.text_version_sdk);
         renderTimeView = (TextView) findViewById(R.id.text_screen_render_time);
         sdkInitTime = (TextView) findViewById(R.id.text_sdk_init_time);
         networkTime = (TextView) findViewById(R.id.text_network_time);
-
-        totalTimeView.setOnLongClickListener(this);
-        renderTimeView.setOnLongClickListener(this);
-        sdkVersionView.setOnLongClickListener(this);
-        sdkInitTime.setOnLongClickListener(this);
-        networkTime.setOnLongClickListener(this);
+        pageNameView = (TextView) findViewById(R.id.page_name);
+        jsTemplateSizeView = (TextView) findViewById(R.id.text_template_size);
 
         mPerformanceList = (RecyclerView) findViewById(R.id.overlay_list);
         mPerformanceList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -74,36 +71,15 @@ public class WXPerfItemView extends AbstractBizItemView<Performance> implements 
 
     @Override
     protected void inflateData(Performance data) {
-        totalTimeView.setText("totalTime : " + data.totalTime + "ms");
-        sdkVersionView.setText("weex sdk version : " + data.WXSDKVersion + "");
-        renderTimeView.setText("firstScreenRenderTime : " + data.screenRenderTime + "ms");
-        sdkInitTime.setText("sdk init time : " + data.sdkInitTime + "ms(only once)");
-        networkTime.setText("networkTime : "+ data.networkTime + "ms");
+        pageNameView.setText("页面名称: " + data.pageName + "");
+        sdkVersionView.setText("Weex Sdk版本: " + data.WXSDKVersion + "");
+        sdkInitTime.setText("Weex SDK初始化时间 : " + data.sdkInitTime + "ms");
+        jsfmVersionView.setText("JSFramework版本 : " + data.JSLibVersion+"");
+        renderTimeView.setText("首屏时间 : " + data.screenRenderTime + "ms");
+        networkTime.setText("网络时间 : "+ data.networkTime + "ms");
+        jsTemplateSizeView.setText("jsBundle大小 : " + data.JSTemplateSize + "KB");
         PerformanceViewAdapter adapter = new PerformanceViewAdapter(getContext(), data);
         mPerformanceList.setAdapter(adapter);
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        Context context = v.getContext();
-        if(context == null){
-            return false;
-        }
-        int id = v.getId();
-
-        if(id == R.id.text_total_time){
-            Toast.makeText(context,context.getString(R.string.wxt_explain_total_time),Toast.LENGTH_LONG).show();
-        }else if(id == R.id.text_screen_render_time){
-            Toast.makeText(context,context.getString(R.string.wxt_explain_scr_time),Toast.LENGTH_LONG).show();
-        }else if(id == R.id.text_version_sdk){
-            Toast.makeText(context,context.getString(R.string.wxt_explain_wx_sdk_ver),Toast.LENGTH_LONG).show();
-        }else if(id == R.id.text_sdk_init_time){
-            Toast.makeText(context,context.getString(R.string.wxt_explain_sdk_init),Toast.LENGTH_LONG).show();
-        }else if(id == R.id.text_network_time){
-            Toast.makeText(context,context.getString(R.string.wxt_explain_network_time),Toast.LENGTH_LONG).show();
-        }
-
-        return true;
     }
 
 

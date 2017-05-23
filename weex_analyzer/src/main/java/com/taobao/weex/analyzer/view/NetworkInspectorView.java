@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Description:
@@ -43,8 +42,6 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
     private OnCloseListener mOnCloseListener;
 
     private boolean isSizeMenuOpened;
-
-    private AtomicInteger mCounter = new AtomicInteger(0);
 
     public NetworkInspectorView(Context application, Config config) {
         super(application, config);
@@ -179,7 +176,6 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
             mNetworkEventInspector.destroy();
             mNetworkEventInspector = null;
         }
-        mCounter.set(0);
     }
 
     @Override

@@ -12,7 +12,6 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.Performance;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Description:
@@ -29,8 +28,6 @@ public class WXPerformanceAnalysisView extends PermissionAlertView {
 
     private List<Performance> mHistoryPerfList;
     private Performance mCurPerformance;
-
-    private AtomicInteger mCounter = new AtomicInteger(0);
 
     public WXPerformanceAnalysisView(Context context, @NonNull Performance curPerformance, @NonNull List<Performance> historyPerfs, Config config) {
         super(context,config);

@@ -30,7 +30,7 @@
                 android:layout_alignParentRight="true"
                 android:includeFontPadding="false"
                 android:padding="5dp"
-                android:text="@string/wxt_close"
+                android:text="关闭"
                 android:textColor="#000"
                 android:textSize="12sp"/>
 
@@ -59,7 +59,7 @@
                 android:layout_weight="1"
                 android:background="#03A9F4"
                 android:gravity="center"
-                android:text="current performance"
+                android:text="当前页面性能"
                 android:textColor="#fff"
                 android:textSize="12sp"/>
 
@@ -69,7 +69,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="history performance"
+                android:text="历史性能分析"
                 android:textColor="#000"
                 android:textSize="12sp"/>
         </LinearLayout>

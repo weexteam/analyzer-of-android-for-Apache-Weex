@@ -94,12 +94,12 @@ public class WXPerfHistoryItemView extends AbstractBizItemView<List<Performance>
         for (int i = 0; i < sampleSize; i++) {
             Performance p = data.get(i);
             ctPoints[i] = new DataPoint(i,p.communicateTime);
-            ttPoints[i] = new DataPoint(i,p.totalTime);
+            ttPoints[i] = new DataPoint(i,p.screenRenderTime);
             nwtPoints[i] = new DataPoint(i,p.networkTime);
             maxY = Math.max(Math.max(p.totalTime,p.networkTime),Math.max(p.communicateTime,maxY));
 
             fsrTotal += p.communicateTime;
-            ttTotal += p.totalTime;
+            ttTotal += p.screenRenderTime;
             nwTotal += p.networkTime;
         }
 
@@ -124,9 +124,9 @@ public class WXPerfHistoryItemView extends AbstractBizItemView<List<Performance>
         LineGraphSeries<DataPoint> ttSeries = new LineGraphSeries<>(ttPoints);
         LineGraphSeries<DataPoint> nwtSeries = new LineGraphSeries<>(nwtPoints);
 
-        ctSeries.setTitle("communicateTime");
-        ttSeries.setTitle("totalTime");
-        nwtSeries.setTitle("networkTime");
+        ctSeries.setTitle("createInstance时间");
+        ttSeries.setTitle("首屏时间");
+        nwtSeries.setTitle("网络时间");
 
         ctSeries.setOnDataPointTapListener(this);
         ttSeries.setOnDataPointTapListener(this);

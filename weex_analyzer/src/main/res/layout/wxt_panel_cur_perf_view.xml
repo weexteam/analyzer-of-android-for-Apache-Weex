@@ -8,20 +8,49 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#e0e0e0"
         android:orientation="vertical"
-        android:paddingBottom="15dp">
+        >
+
+        <TextView
+                android:text="基本信息"
+                android:textColor="#000"
+                android:textSize="14sp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:background="#e0e0e0"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"/>
+
+        <TextView
+                android:id="@+id/page_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|left"
+                android:paddingLeft="15dp"
+                android:textColor="#000"
+                android:textSize="14sp"
+                tools:text="page name:???"/>
 
         <TextView
             android:id="@+id/text_version_sdk"
             android:layout_width="match_parent"
             android:layout_height="20dp"
-            android:layout_marginTop="10dp"
             android:gravity="center_vertical|left"
             android:paddingLeft="15dp"
             android:textColor="#000"
             android:textSize="14sp"
             tools:text="weex sdk version:???"/>
+
+        <TextView
+                android:id="@+id/text_jsfm_version"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:gravity="center_vertical|left"
+                android:paddingLeft="15dp"
+                android:textColor="#000"
+                android:textSize="14sp"
+                tools:text="jsfm version:?ms"/>
 
         <TextView
             android:id="@+id/text_sdk_init_time"
@@ -33,16 +62,17 @@
             android:textSize="14sp"
             tools:text="sdk init time:?ms"/>
 
-
         <TextView
-            android:id="@+id/text_total_time"
-            android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:gravity="center_vertical|left"
-            android:paddingLeft="15dp"
-            android:textColor="#000"
-            android:textSize="14sp"
-            tools:text="totalTime:?ms"/>
+                android:text="核心指标"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="#000"
+                android:textSize="14sp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:background="#e0e0e0"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"/>
 
         <TextView
             android:id="@+id/text_screen_render_time"
@@ -50,7 +80,7 @@
             android:layout_height="20dp"
             android:gravity="center_vertical|left"
             android:paddingLeft="15dp"
-            android:textColor="#000"
+            android:textColor="#6200EA"
             android:textSize="14sp"
             tools:text="firstScreenRenderTime:?ms"/>
 
@@ -60,9 +90,30 @@
             android:layout_height="20dp"
             android:gravity="center_vertical|left"
             android:paddingLeft="15dp"
-            android:textColor="#000"
+            android:textColor="#6200EA"
             android:textSize="14sp"
             tools:text="networktime:?ms"/>
+
+        <TextView
+                android:id="@+id/text_template_size"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:gravity="center_vertical|left"
+                android:paddingLeft="15dp"
+                android:textColor="#6200EA"
+                android:textSize="14sp"
+                tools:text="templatesize:?kb"/>
+
+        <TextView
+                android:text="完整数据"
+                android:textColor="#000"
+                android:textSize="14sp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:background="#e0e0e0"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"/>
 
     </LinearLayout>
 
@@ -75,7 +126,7 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="10dp"
-        android:scrollbars="none"
+        android:scrollbars="vertical"
         />
 
 </LinearLayout>

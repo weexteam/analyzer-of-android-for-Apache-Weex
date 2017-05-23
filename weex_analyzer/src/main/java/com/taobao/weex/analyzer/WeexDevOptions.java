@@ -256,6 +256,34 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         },false,!mConfig.getIgnoreOptions().contains(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)));
 
+        options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mDevOptionsConfig.isVDomDepthEnabled()) {
+                    mDevOptionsConfig.setVdomDepthEnabled(false);
+                    mProfileDomView.dismiss();
+                } else {
+                    mDevOptionsConfig.setVdomDepthEnabled(true);
+                    mProfileDomView.show();
+                    mProfileDomView.bindInstance(mInstance);
+                }
+            }
+        }, true,mProfileDomView.isPermissionGranted(mConfig)));
+
+
+        options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mDevOptionsConfig.isPerfCommonEnabled()) {
+                    mDevOptionsConfig.setPerfCommonEnabled(false);
+                    mPerfMonitorOverlayView.dismiss();
+                } else {
+                    mDevOptionsConfig.setPerfCommonEnabled(true);
+                    mPerfMonitorOverlayView.show();
+                }
+            }
+        }, true,mPerfMonitorOverlayView.isPermissionGranted(mConfig)));
+
         options.add(new DevOption("视图审查", R.drawable.wxt_icon_view_inspector, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -270,19 +298,6 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         },true,mInspectorView.isPermissionGranted(mConfig)));
 
-        options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mDevOptionsConfig.isVDomDepthEnabled()) {
-                    mDevOptionsConfig.setVdomDepthEnabled(false);
-                    mProfileDomView.dismiss();
-                } else {
-                    mDevOptionsConfig.setVdomDepthEnabled(true);
-                    mProfileDomView.show();
-                    mProfileDomView.bindInstance(mInstance);
-                }
-            }
-        }, true,mProfileDomView.isPermissionGranted(mConfig)));
 
         options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
             @Override
@@ -383,18 +398,6 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         }, true, mTrafficSampleView.isPermissionGranted(mConfig)));
 
-        options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mDevOptionsConfig.isPerfCommonEnabled()) {
-                    mDevOptionsConfig.setPerfCommonEnabled(false);
-                    mPerfMonitorOverlayView.dismiss();
-                } else {
-                    mDevOptionsConfig.setPerfCommonEnabled(true);
-                    mPerfMonitorOverlayView.show();
-                }
-            }
-        }, true,mPerfMonitorOverlayView.isPermissionGranted(mConfig)));
 
 
         options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
