@@ -20,9 +20,6 @@ import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.NetworkEventSender;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 
 import java.text.SimpleDateFormat;
@@ -46,9 +43,6 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
     private OnCloseListener mOnCloseListener;
 
     private boolean isSizeMenuOpened;
-
-    @Nullable
-    private IDataReporter<NetworkEventInspector.MessageBean> mDataReporter;
 
     private AtomicInteger mCounter = new AtomicInteger(0);
 
@@ -164,13 +158,6 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
             }
         });
 
-        String from = LaunchConfig.getFrom();
-        String deviceId = LaunchConfig.getDeviceId();
-
-        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = DataReporterFactory.createHttpReporter(from, deviceId);
-        }
-
         return wholeView;
     }
 
@@ -181,16 +168,6 @@ public class NetworkInspectorView extends AbstractResizableOverlayView {
             public void onMessageReceived(NetworkEventInspector.MessageBean msg) {
                 if (mAdapter != null) {
                     mAdapter.addMessage(msg);
-                }
-
-                if (mDataReporter != null && msg != null && mDataReporter.isEnabled()) {
-                    mDataReporter.report(new IDataReporter.ProcessedDataBuilder<NetworkEventInspector.MessageBean>()
-                            .sequenceId(mCounter.getAndIncrement())
-                            .data(msg)
-                            .deviceId(LaunchConfig.getDeviceId())
-                            .type(Config.TYPE_MTOP_INSPECTOR)
-                            .build()
-                    );
                 }
             }
         });

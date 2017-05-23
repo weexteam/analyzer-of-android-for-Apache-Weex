@@ -3,7 +3,6 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,14 +14,10 @@ import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.ViewInspectorManager;
 import com.taobao.weex.analyzer.core.ViewPropertiesSupplier;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.highlight.ViewHighlighter;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.taobao.weex.analyzer.R.id.close;
 
@@ -51,10 +46,6 @@ public class InspectorView extends PermissionOverlayView {
 
     private static final int BTN_ENABLED_COLOR = 0xBCCDDC39;
     private static final int BTN_DISABLED_COLOR = 0x00ffffff;
-
-    @Nullable
-    private IDataReporter<ViewInspectorManager.InspectorInfo> mDataReporter;
-    private AtomicInteger mCounter = new AtomicInteger(0);
 
     public InspectorView(Context application, Config config) {
         super(application,true,config);
@@ -112,13 +103,6 @@ public class InspectorView extends PermissionOverlayView {
             }
         });
 
-        String from = LaunchConfig.getFrom();
-        String deviceId = LaunchConfig.getDeviceId();
-
-        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = DataReporterFactory.createHttpReporter(from, deviceId);
-        }
-
         return hostView;
     }
 
@@ -160,16 +144,6 @@ public class InspectorView extends PermissionOverlayView {
                     public void onInspectorSuccess(@NonNull ViewInspectorManager.InspectorInfo info) {
                         //we should be called in main thread
                         notifyOnInspectorSuccess(info);
-
-                        if (mDataReporter != null && mDataReporter.isEnabled()) {
-                            mDataReporter.report(new IDataReporter.ProcessedDataBuilder<ViewInspectorManager.InspectorInfo>()
-                                    .sequenceId(mCounter.getAndIncrement())
-                                    .data(info)
-                                    .deviceId(LaunchConfig.getDeviceId())
-                                    .type(Config.TYPE_VIEW_INSPECTOR)
-                                    .build()
-                            );
-                        }
                     }
 
                     @Override
@@ -214,7 +188,6 @@ public class InspectorView extends PermissionOverlayView {
     @Override
     protected void onDismiss() {
         mGestureDetector = null;
-        mCounter.set(0);
         if (mInspectorManager != null) {
             mInspectorManager.destroy();
             mInspectorManager = null;

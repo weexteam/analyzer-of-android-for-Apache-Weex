@@ -27,7 +27,6 @@ import com.taobao.weex.analyzer.core.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.CpuSampleView;
 import com.taobao.weex.analyzer.view.DevOption;
@@ -227,8 +226,6 @@ public class WeexDevOptions implements IWXDevOptions {
         mShakeDetector = new ShakeDetector(new ShakeDetector.ShakeListener() {
             @Override
             public void onShake() {
-                LaunchConfig.setFrom(null);
-                LaunchConfig.setDeviceId(null);
                 showDevOptions();
             }
         },config);
@@ -691,8 +688,6 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            LaunchConfig.setDeviceId(null);
-            LaunchConfig.setFrom(null);
             showDevOptions();
             return true;
         }

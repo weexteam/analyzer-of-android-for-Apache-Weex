@@ -7,8 +7,6 @@ import com.taobao.weex.analyzer.core.Constants;
 import com.taobao.weex.analyzer.core.reporter.ws.IWebSocketBridge;
 import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
 
-import java.util.Locale;
-
 /**
  * Description:
  *
@@ -18,17 +16,10 @@ import java.util.Locale;
 public class DataReporterFactory {
     private DataReporterFactory(){}
 
-    private static final String REQUEST_URL_PRE = "http://pre.mds.alibaba-inc.com/api/debug/weexAnalyzer/%s/logs";
-    private static final String REQUEST_URL_ONLINE = "http://mds.alibaba-inc.com/api/debug/weexAnalyzer/%s/logs";
-
     private static final String WS_SERVER = "ws://mds.alibaba-inc.com/api/device/%s/weexAnaylzerws";
 
     private static final String MDS = "mds";
 
-    @NonNull
-    public static <T> IDataReporter<T> createHttpReporter(@NonNull String from, @NonNull String deviceId) {
-        return new HttpDataReporter<>(String.format(Locale.CHINA,REQUEST_URL_ONLINE,deviceId),MDS.equals(from));
-    }
 
     public static IDataReporter<String> createLogReporter(boolean enabled) {
         return new LogReporter(enabled);

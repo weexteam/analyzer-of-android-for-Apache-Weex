@@ -3,8 +3,6 @@ package com.taobao.weex.analyzer.view;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
@@ -12,9 +10,6 @@ import android.widget.TextView;
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.Performance;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.DataReporterFactory;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,9 +29,6 @@ public class WXPerformanceAnalysisView extends PermissionAlertView {
 
     private List<Performance> mHistoryPerfList;
     private Performance mCurPerformance;
-
-    @Nullable
-    private IDataReporter<Performance> mDataReporter;
 
     private AtomicInteger mCounter = new AtomicInteger(0);
 
@@ -86,30 +78,12 @@ public class WXPerformanceAnalysisView extends PermissionAlertView {
 
             }
         });
-
-        String from = LaunchConfig.getFrom();
-        String deviceId = LaunchConfig.getDeviceId();
-
-        if (!TextUtils.isEmpty(from) && !TextUtils.isEmpty(deviceId)) {
-            mDataReporter = DataReporterFactory.createHttpReporter(from, deviceId);
-        }
     }
 
     @Override
     protected void onShown() {
         mPerfItemView.inflateData(mCurPerformance);
         mPerfHistoryItemView.inflateData(mHistoryPerfList);
-
-        if (mDataReporter != null && mCurPerformance != null && mDataReporter.isEnabled()) {
-            mDataReporter.report(new IDataReporter.ProcessedDataBuilder<Performance>()
-                    .sequenceId(mCounter.getAndIncrement())
-                    .data(mCurPerformance)
-                    .deviceId(LaunchConfig.getDeviceId())
-                    .type(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
-                    .build()
-
-            );
-        }
     }
 
     @Override

@@ -14,10 +14,8 @@ import android.widget.TextView;
 
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.FpsTaskEntity;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.ReportSupportLoopTask;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -120,7 +118,7 @@ public class FpsSampleView extends PermissionOverlayView {
     }
 
 
-    private static class SampleFPSTask extends ReportSupportLoopTask<Double> {
+    private static class SampleFPSTask extends AbstractLoopTask {
         private DynamicChartViewController mController;
         private int mAxisXValue = -1;
         private boolean isDebug;
@@ -152,13 +150,6 @@ public class FpsSampleView extends PermissionOverlayView {
                 if(isDebug) {
                     Log.d("weex-analyzer", "current fps : "+ fps);
                 }
-                reportIfNeeded(new IDataReporter.ProcessedDataBuilder<Double>()
-                        .sequenceId(generateSequenceId())
-                        .deviceId(LaunchConfig.getDeviceId())
-                        .type(Config.TYPE_FPS)
-                        .data((Math.round(fps*100)/100.0))
-                        .build()
-                );
                 runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
@@ -170,7 +161,6 @@ public class FpsSampleView extends PermissionOverlayView {
 
         @Override
         protected void onStop() {
-            super.onStop();
             mController = null;
             mEntity.onTaskStop();
         }

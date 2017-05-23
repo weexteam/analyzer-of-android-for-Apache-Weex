@@ -13,11 +13,9 @@ import android.widget.TextView;
 
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.MemorySampler;
 import com.taobao.weex.analyzer.core.MemoryTaskEntity;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.ReportSupportLoopTask;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.TimestampLabelFormatter;
@@ -122,7 +120,7 @@ public class MemorySampleView extends PermissionOverlayView {
         }
     }
 
-    private static class SampleMemoryTask extends ReportSupportLoopTask<Double> {
+    private static class SampleMemoryTask extends AbstractLoopTask {
 
         private DynamicChartViewController mController;
         private int mAxisXValue = -1;
@@ -155,14 +153,6 @@ public class MemorySampleView extends PermissionOverlayView {
                 Log.d("weex-analyzer", "memory usage : " + memoryUsed + "MB");
             }
 
-            reportIfNeeded(new IDataReporter.ProcessedDataBuilder<Double>()
-                    .sequenceId(generateSequenceId())
-                    .deviceId(LaunchConfig.getDeviceId())
-                    .type(Config.TYPE_MEMORY)
-                    .data((Math.round(memoryUsed*100)/100.0))
-                    .build()
-            );
-
             runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
@@ -181,7 +171,6 @@ public class MemorySampleView extends PermissionOverlayView {
 
         @Override
         protected void onStop() {
-            super.onStop();
             mEntity.onTaskStop();
             mController = null;
         }

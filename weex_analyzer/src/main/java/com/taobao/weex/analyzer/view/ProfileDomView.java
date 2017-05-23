@@ -11,10 +11,8 @@ import android.widget.TextView;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.DomTracker;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.ReportSupportLoopTask;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
 import com.taobao.weex.ui.component.WXComponent;
@@ -89,7 +87,7 @@ public class ProfileDomView extends PermissionOverlayView{
     }
 
 
-    private static class SampleTask extends ReportSupportLoopTask<HealthReport> implements DomTracker.OnTrackNodeListener{
+    private static class SampleTask extends AbstractLoopTask implements DomTracker.OnTrackNodeListener{
 
         WXSDKInstance instance;
         TextView resultTextView;
@@ -126,14 +124,6 @@ public class ProfileDomView extends PermissionOverlayView{
                 return;
             }
             final StringBuilder builder = new StringBuilder();
-
-            reportIfNeeded(new IDataReporter.ProcessedDataBuilder<HealthReport>()
-                    .sequenceId(generateSequenceId())
-                    .deviceId(LaunchConfig.getDeviceId())
-                    .type(Config.TYPE_RENDER_ANALYSIS)
-                    .data(report)
-                    .build()
-            );
 
             //////
             builder.append(convertResult(report.maxLayerOfRealDom<MAX_REAL_DOM_LAYER))
@@ -238,7 +228,6 @@ public class ProfileDomView extends PermissionOverlayView{
 
         @Override
         protected void onStop() {
-            super.onStop();
             instance = null;
             if(mViewHighlighter != null) {
                 mViewHighlighter.clearHighlight();

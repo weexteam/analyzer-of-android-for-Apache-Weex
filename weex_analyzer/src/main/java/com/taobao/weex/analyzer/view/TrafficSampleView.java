@@ -13,10 +13,8 @@ import android.widget.TextView;
 
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.TrafficTaskEntity;
-import com.taobao.weex.analyzer.core.reporter.IDataReporter;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
-import com.taobao.weex.analyzer.core.reporter.ReportSupportLoopTask;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.chart.ChartView;
@@ -131,7 +129,7 @@ public class TrafficSampleView extends PermissionOverlayView {
         }
     }
 
-    private static class SampleTrafficTask extends ReportSupportLoopTask<TrafficTaskEntity.TrafficInfo> {
+    private static class SampleTrafficTask extends AbstractLoopTask {
 
         private boolean isDebug;
         private DynamicChartViewController mController;
@@ -167,14 +165,6 @@ public class TrafficSampleView extends PermissionOverlayView {
                 Log.d("weex-analyzer", "network[tx:" + txSpeed + "kb/s,rx:" + rxSpeed + "kb/s]");
             }
 
-            reportIfNeeded(new IDataReporter.ProcessedDataBuilder<TrafficTaskEntity.TrafficInfo>()
-                    .sequenceId(generateSequenceId())
-                    .deviceId(LaunchConfig.getDeviceId())
-                    .type(Config.TYPE_TRAFFIC)
-                    .data(info)
-                    .build()
-            );
-
             mAxisXValue++;
 
             runOnUIThread(new Runnable() {
@@ -198,7 +188,6 @@ public class TrafficSampleView extends PermissionOverlayView {
 
         @Override
         protected void onStop() {
-            super.onStop();
             mEntity.onTaskStop();
         }
     }
