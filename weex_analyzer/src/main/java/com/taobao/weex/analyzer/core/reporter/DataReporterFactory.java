@@ -16,8 +16,6 @@ import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
 public class DataReporterFactory {
     private DataReporterFactory(){}
 
-    private static final String WS_SERVER = "ws://mds.alibaba-inc.com/api/device/%s/weexAnaylzerws";
-
     private static final String MDS = "mds";
 
 

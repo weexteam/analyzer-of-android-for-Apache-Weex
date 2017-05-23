@@ -126,8 +126,6 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         }
         mTask.start();
 
-
-
         return START_REDELIVER_INTENT;
     }
 
