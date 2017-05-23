@@ -1,16 +1,13 @@
 package com.taobao.weex.analyzer;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -91,8 +88,6 @@ public class WeexDevOptions implements IWXDevOptions {
     public static final String EXTRA_FROM = "from";
     public static final String EXTRA_DEVICE_ID = "deviceId";
     public static final String EXTRA_WS_URL = "wsUrl";
-
-    private LaunchUIReceiver mLaunchUIReceiver;
 
     private Config mConfig;
 
@@ -239,24 +234,6 @@ public class WeexDevOptions implements IWXDevOptions {
         },config);
 
         mVdomController = new VDomController(new PollingVDomMonitor(), new StandardVDomMonitor());
-
-        mLaunchUIReceiver = new LaunchUIReceiver(new OnLaunchListener() {
-            @Override
-            public void onLaunch(@NonNull String from, @Nullable String deviceId) {
-                LaunchConfig.setFrom(from);
-                LaunchConfig.setDeviceId(deviceId);
-                showDevOptions();
-            }
-        });
-    }
-
-    public static void launchByBroadcast(@NonNull Context context, @NonNull String from, @Nullable String deviceId) {
-        Intent intent = new Intent(ACTION_LAUNCH);
-        intent.putExtra(EXTRA_FROM,from);
-        if(!TextUtils.isEmpty(deviceId)) {
-            intent.putExtra(EXTRA_DEVICE_ID,deviceId);
-        }
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 
@@ -519,7 +496,6 @@ public class WeexDevOptions implements IWXDevOptions {
     @Override
     public void onResume() {
         mShakeDetector.start((SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE));
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(mLaunchUIReceiver,new IntentFilter(ACTION_LAUNCH));
 
         if (mDevOptionsConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.show();
@@ -589,7 +565,6 @@ public class WeexDevOptions implements IWXDevOptions {
     @Override
     public void onPause() {
         mShakeDetector.stop();
-        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mLaunchUIReceiver);
 
         if (mDevOptionsConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.dismiss();
@@ -735,27 +710,4 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         }
     }
-
-    static class LaunchUIReceiver extends BroadcastReceiver {
-        private OnLaunchListener listener;
-        public LaunchUIReceiver(@NonNull OnLaunchListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction() != null && ACTION_LAUNCH.equals(intent.getAction())) {
-                String from = intent.getStringExtra(EXTRA_FROM);
-                String deviceId = intent.getStringExtra(EXTRA_DEVICE_ID);
-                if(listener != null && !TextUtils.isEmpty(from)) {
-                    listener.onLaunch(from,deviceId);
-                }
-            }
-        }
-    }
-
-    interface OnLaunchListener {
-        void onLaunch(@NonNull String from,@Nullable String deviceId);
-    }
-
 }

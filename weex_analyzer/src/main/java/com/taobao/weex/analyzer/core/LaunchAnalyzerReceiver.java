@@ -114,7 +114,6 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
 
                 WXLogUtils.d(Constants.TAG,"from:"+from+",deviceId:"+deviceId+",wxurl:"+wsUrl);
 
-//                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
                 Map<String,String> extras = new HashMap<>();
                 extras.put(WeexDevOptions.EXTRA_DEVICE_ID, deviceId);
                 extras.put(WeexDevOptions.EXTRA_WS_URL,wsUrl);
