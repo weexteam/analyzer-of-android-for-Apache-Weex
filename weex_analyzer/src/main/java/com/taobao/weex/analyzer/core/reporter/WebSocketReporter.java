@@ -21,7 +21,6 @@ class WebSocketReporter implements IDataReporter {
 
     @Nullable
     private WebSocketClient mSocketClient = null;
-    private static final String TAG = "WebSocketReporter";
 
     WebSocketReporter(boolean enabled, IWebSocketBridge bridge) {
         this.isEnabled = enabled;

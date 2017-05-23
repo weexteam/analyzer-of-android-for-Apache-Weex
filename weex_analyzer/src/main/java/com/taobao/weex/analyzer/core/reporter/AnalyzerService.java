@@ -85,7 +85,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
             reporter = DataReporterFactory.createLogReporter(true);
         } else if (MDS.equals(from)) {
 
-            String id = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
+            final String id = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
             String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);
 
             if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(wsUrl)) {
@@ -109,7 +109,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
                             ((WebSocketReporter)reporter).report(new IDataReporter.ProcessedDataBuilder<NetworkEventInspector.MessageBean>()
 //                                    .sequenceId(mCounter.getAndIncrement())
                                     .data(msg)
-                                    .deviceId(LaunchConfig.getDeviceId())
+                                    .deviceId(id)
                                     .type(Config.TYPE_MTOP_INSPECTOR)
                                     .build()
                             );
