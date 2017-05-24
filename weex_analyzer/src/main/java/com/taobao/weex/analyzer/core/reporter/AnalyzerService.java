@@ -58,8 +58,6 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
 
     private NetworkEventInspector mInspector;
 
-    private String mDeviceId;
-
     public static final String ACTION_DISPATCH = "cmd.dispatch";
 
     @Nullable
@@ -88,7 +86,6 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         } else if (MDS.equals(from)) {
 
             final String id = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
-            this.mDeviceId = id;
             String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);
 
             if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(wsUrl)) {
@@ -222,9 +219,11 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
     }
 
     public static class LifecycleEvent {
+        public String type;//lifecycle
         public String status;
         public String pageName;
-        public LifecycleEvent(String status, String pageName) {
+        public LifecycleEvent(String type, String status, String pageName) {
+            this.type = type;
             this.status = status;
             this.pageName = pageName;
         }
@@ -274,7 +273,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
                 String status = intent.getStringExtra("status");
                 String pageName = intent.getStringExtra("pageName");//可能为null
                 if(!TextUtils.isEmpty(status)) {
-                    LifecycleEvent event = new LifecycleEvent(status,pageName);
+                    LifecycleEvent event = new LifecycleEvent(type,status,pageName);
                     reporter.report(new IDataReporter.ProcessedDataBuilder<LifecycleEvent>()
                             .deviceId(deviceId)
                             .data(event)
