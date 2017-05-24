@@ -559,6 +559,11 @@ public class WeexDevOptions implements IWXDevOptions {
         if (mScalpelViewController != null) {
             mScalpelViewController.resume();
         }
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "resume");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
@@ -608,6 +613,11 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onStop() {
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "stop");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
@@ -616,6 +626,11 @@ public class WeexDevOptions implements IWXDevOptions {
             mVdomController.destroy();
             mVdomController = null;
         }
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "destroy");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
 
@@ -631,6 +646,7 @@ public class WeexDevOptions implements IWXDevOptions {
             Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
             Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
             intent.putExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS, JSON.toJSONString(performance));
+            intent.putExtra("type",Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
         }
 

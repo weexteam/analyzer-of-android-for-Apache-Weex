@@ -58,6 +58,8 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
 
     private NetworkEventInspector mInspector;
 
+    private String mDeviceId;
+
     public static final String ACTION_DISPATCH = "cmd.dispatch";
 
     @Nullable
@@ -86,6 +88,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         } else if (MDS.equals(from)) {
 
             final String id = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
+            this.mDeviceId = id;
             String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);
 
             if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(wsUrl)) {
@@ -179,10 +182,12 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
                 return;
             }
 
-            List<String> switchers = wsMessage.switchers;
-            String action = wsMessage.action;
-            for (String switcher : switchers) {
-                updateConfig(config, switcher, "open".equals(action));
+            if("switcher".equals(wsMessage.type)) {
+                List<String> switchers = wsMessage.switchers;
+                String action = wsMessage.action;
+                for (String switcher : switchers) {
+                    updateConfig(config, switcher, "open".equals(action));
+                }
             }
         } catch (Exception e) {
             WXLogUtils.e(Constants.TAG, e.getMessage());
@@ -216,6 +221,15 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         public List<String> switchers;
     }
 
+    public static class LifecycleEvent {
+        public String status;
+        public String pageName;
+        public LifecycleEvent(String status, String pageName) {
+            this.status = status;
+            this.pageName = pageName;
+        }
+    }
+
     public static class WSConfig {
         boolean isCPUEnabled;
         boolean isMemoryEnabled;
@@ -243,15 +257,32 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
                 return;
             }
 
-            String weex_performance = intent.getStringExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
-            Performance performance = JSON.parseObject(weex_performance,Performance.class);
-            if(!TextUtils.isEmpty(weex_performance) && config.isPerformanceEnabled) {
-                reporter.report(new IDataReporter.ProcessedDataBuilder<Performance>()
-                                    .deviceId(deviceId)
-                                    .data(performance)
-                                    .type(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
-                                    .build()
-                );
+            String type = intent.getStringExtra("type");
+
+            if(Config.TYPE_WEEX_PERFORMANCE_STATISTICS.equals(type)) {
+                String weex_performance = intent.getStringExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
+                Performance performance = JSON.parseObject(weex_performance,Performance.class);
+                if(!TextUtils.isEmpty(weex_performance) && config.isPerformanceEnabled) {
+                    reporter.report(new IDataReporter.ProcessedDataBuilder<Performance>()
+                            .deviceId(deviceId)
+                            .data(performance)
+                            .type(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)
+                            .build()
+                    );
+                }
+            } else if("lifecycle".equals(type)) {
+                String status = intent.getStringExtra("status");
+                String pageName = intent.getStringExtra("pageName");//可能为null
+                if(!TextUtils.isEmpty(status)) {
+                    LifecycleEvent event = new LifecycleEvent(status,pageName);
+                    reporter.report(new IDataReporter.ProcessedDataBuilder<LifecycleEvent>()
+                            .deviceId(deviceId)
+                            .data(event)
+                            .type("lifecycle")
+                            .build()
+                    );
+                }
+
             }
 
         }
