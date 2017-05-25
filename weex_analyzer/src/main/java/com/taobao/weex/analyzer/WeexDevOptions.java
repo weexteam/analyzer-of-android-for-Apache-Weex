@@ -478,12 +478,20 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onCreate() {
-
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "create");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
     public void onStart() {
-
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "start");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
@@ -614,6 +622,12 @@ public class WeexDevOptions implements IWXDevOptions {
         if (mScalpelViewController != null) {
             mScalpelViewController.pause();
         }
+
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "pause");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
