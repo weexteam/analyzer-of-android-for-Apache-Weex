@@ -11,6 +11,7 @@ import com.taobao.weex.WXSDKInstance;
  */
 
 public interface IVDomMonitor {
-    public void monitor(@NonNull final WXSDKInstance instance);
-    public void destroy();
+    void monitor(@NonNull final WXSDKInstance instance);
+
+    void destroy();
 }

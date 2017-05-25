@@ -27,6 +27,7 @@ import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.utils.XiaomiOverlayViewPermissionHelper;
+import com.taobao.weex.analyzer.view.alert.AbstractAlertView;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.util.ArrayList;

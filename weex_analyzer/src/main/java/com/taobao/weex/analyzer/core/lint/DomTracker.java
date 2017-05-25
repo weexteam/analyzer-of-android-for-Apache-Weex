@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
-import com.taobao.weex.analyzer.core.ComponentHeightComputer;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;
@@ -33,7 +32,7 @@ import java.util.Locale;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class DomTracker {
+class DomTracker {
     private WXSDKInstance mWxInstance;
     private Deque<LayeredNode<WXComponent>> mLayeredQueue;
     private ObjectPool<LayeredNode<WXComponent>> mVDomObjectPool;
@@ -48,11 +47,11 @@ public class DomTracker {
 
 
 
-    public interface OnTrackNodeListener {
+    interface OnTrackNodeListener {
         void onTrackNode(@NonNull WXComponent component, int layer);
     }
 
-    public DomTracker(@NonNull WXSDKInstance instance) {
+    DomTracker(@NonNull WXSDKInstance instance) {
         this.mWxInstance = instance;
         mLayeredQueue = new ArrayDeque<>();
         mVDomObjectPool = new ObjectPool<LayeredNode<WXComponent>>(10) {
@@ -69,12 +68,12 @@ public class DomTracker {
         };
     }
 
-    public void setOnTrackNodeListener(OnTrackNodeListener listener) {
+    void setOnTrackNodeListener(OnTrackNodeListener listener) {
         this.mOnTrackNodeListener = listener;
     }
 
     @Nullable
-    public HealthReport traverse() {
+    HealthReport traverse() {
         long start = System.currentTimeMillis();
         if (SDKUtils.isInUiThread()) {
             WXLogUtils.e(TAG, "illegal thread...");
@@ -241,7 +240,7 @@ public class DomTracker {
         return viewNum;
     }
 
-    int getRealDomMaxLayer(@NonNull View rootView) {
+    private int getRealDomMaxLayer(@NonNull View rootView) {
         int maxLayer = 0;
         Deque<LayeredNode<View>> deque = new ArrayDeque<>();
         LayeredNode<View> rootNode = mRealDomObjectPool.obtain();

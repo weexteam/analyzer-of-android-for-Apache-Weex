@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.view.CompatibleAlertDialogBuilder;
+import com.taobao.weex.analyzer.view.alert.CompatibleAlertDialogBuilder;
 
 import java.util.Locale;
 

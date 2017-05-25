@@ -11,7 +11,7 @@ import com.taobao.weex.analyzer.core.Constants;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class LogReporter implements IDataReporter<String> {
+class LogReporter implements IDataReporter<String> {
 
     private boolean isEnabled;
 

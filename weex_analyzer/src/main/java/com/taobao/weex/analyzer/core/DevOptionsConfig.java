@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.taobao.weex.analyzer.view.IResizableView;
+import com.taobao.weex.analyzer.view.overlay.IResizableView;
 
 import java.util.Arrays;
 import java.util.List;

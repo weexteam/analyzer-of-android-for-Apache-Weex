@@ -22,7 +22,7 @@
                 android:text="{}"
                 android:layout_height="wrap_content"/>
 
-        <com.taobao.weex.analyzer.view.CSSBoxModelView
+        <com.taobao.weex.analyzer.core.inspector.view.CSSBoxModelView
                 android:id="@+id/box_model"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -2,6 +2,8 @@ package com.taobao.weex.analyzer.core;
 
 import android.net.TrafficStats;
 
+import com.taobao.weex.analyzer.core.traffic.TrafficSampler;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

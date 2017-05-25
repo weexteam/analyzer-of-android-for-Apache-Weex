@@ -16,7 +16,4 @@ public interface TaskEntity<T> {
     T onTaskRun();
 
     void onTaskStop();
-
-
-
 }

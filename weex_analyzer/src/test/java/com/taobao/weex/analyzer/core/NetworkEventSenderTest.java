@@ -3,6 +3,8 @@ package com.taobao.weex.analyzer.core;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.taobao.weex.analyzer.core.inspector.network.NetworkEventSender;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

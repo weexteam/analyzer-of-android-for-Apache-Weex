@@ -13,17 +13,17 @@ import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class DataReporterFactory {
+class DataReporterFactory {
     private DataReporterFactory(){}
 
     private static final String MDS = "mds";
 
 
-    public static IDataReporter<String> createLogReporter(boolean enabled) {
+    static IDataReporter<String> createLogReporter(boolean enabled) {
         return new LogReporter(enabled);
     }
 
-    public static IDataReporter createWSReporter(@NonNull String from, @NonNull String deviceId,@NonNull String server,WebSocketClient.Callback callback, IWebSocketBridge bridge) {
+    static IDataReporter createWSReporter(@NonNull String from, @NonNull String deviceId,@NonNull String server,WebSocketClient.Callback callback, IWebSocketBridge bridge) {
         WebSocketReporter reporter= new WebSocketReporter(MDS.equals(from), bridge);
         reporter.connect(server,callback);
         Log.d(Constants.TAG, "try connect server:"+server);

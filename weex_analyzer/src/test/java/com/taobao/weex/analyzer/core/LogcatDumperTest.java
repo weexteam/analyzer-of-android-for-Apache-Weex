@@ -3,6 +3,8 @@ package com.taobao.weex.analyzer.core;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.taobao.weex.analyzer.core.logcat.LogcatDumper;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

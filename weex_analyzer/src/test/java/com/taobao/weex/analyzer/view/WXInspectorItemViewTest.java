@@ -1,5 +1,7 @@
 package com.taobao.weex.analyzer.view;
 
+import com.taobao.weex.analyzer.core.inspector.view.WXInspectorItemView;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +26,7 @@ public class WXInspectorItemViewTest {
 
     @Test
     public void getPureValue() throws Exception {
-        assertEquals("13",WXInspectorItemView.getPureValue("12.78"));
+        assertEquals("13", WXInspectorItemView.getPureValue("12.78"));
         assertEquals("12",WXInspectorItemView.getPureValue("12."));
         assertEquals("-13",WXInspectorItemView.getPureValue("-12.78"));
         assertEquals("13",WXInspectorItemView.getPureValue("12.a78"));

@@ -1,5 +1,8 @@
 package com.taobao.weex.analyzer.core;
 
+import com.taobao.weex.analyzer.core.memory.MemorySampler;
+import com.taobao.weex.analyzer.core.memory.MemoryTaskEntity;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

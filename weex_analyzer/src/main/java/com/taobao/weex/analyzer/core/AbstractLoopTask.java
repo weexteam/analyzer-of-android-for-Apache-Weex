@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.taobao.weex.analyzer.view.IOverlayView;
+import com.taobao.weex.analyzer.view.overlay.IOverlayView;
 
 /**
  * Description:

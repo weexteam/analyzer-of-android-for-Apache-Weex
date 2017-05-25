@@ -13,7 +13,7 @@ import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.pojo.HealthReport;
-import com.taobao.weex.analyzer.view.PermissionOverlayView;
+import com.taobao.weex.analyzer.view.overlay.PermissionOverlayView;
 import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
 import com.taobao.weex.ui.component.WXComponent;
 

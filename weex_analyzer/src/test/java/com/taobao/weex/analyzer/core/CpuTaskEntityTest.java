@@ -2,6 +2,9 @@ package com.taobao.weex.analyzer.core;
 
 import android.text.TextUtils;
 
+import com.taobao.weex.analyzer.core.cpu.CpuSampler;
+import com.taobao.weex.analyzer.core.cpu.CpuTaskEntity;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

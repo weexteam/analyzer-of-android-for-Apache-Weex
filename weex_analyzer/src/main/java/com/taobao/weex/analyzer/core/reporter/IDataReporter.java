@@ -23,8 +23,6 @@ import static com.taobao.weex.analyzer.Config.TYPE_WEEX_PERFORMANCE_STATISTICS;
 
 public interface IDataReporter<T> {
 
-
-
     String API_VERSION = "1";
 
     void report(@NonNull ProcessedData<T> data);

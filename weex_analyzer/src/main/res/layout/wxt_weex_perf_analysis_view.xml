@@ -80,13 +80,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.taobao.weex.analyzer.view.WXPerfItemView
+            <com.taobao.weex.analyzer.core.weex.WXPerfItemView
                 android:id="@+id/panel_cur_perf"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
 
-            <com.taobao.weex.analyzer.view.WXPerfHistoryItemView
+            <com.taobao.weex.analyzer.core.weex.WXPerfHistoryItemView
                 android:id="@+id/panel_history_perf"
                 android:layout_width="match_parent"
                 android:visibility="gone"
