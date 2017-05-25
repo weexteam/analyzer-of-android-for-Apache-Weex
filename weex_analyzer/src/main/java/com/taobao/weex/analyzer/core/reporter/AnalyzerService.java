@@ -21,7 +21,7 @@ import com.taobao.weex.analyzer.core.cpu.CpuTaskEntity;
 import com.taobao.weex.analyzer.core.fps.FPSSampler;
 import com.taobao.weex.analyzer.core.fps.FpsTaskEntity;
 import com.taobao.weex.analyzer.core.memory.MemoryTaskEntity;
-import com.taobao.weex.analyzer.core.inspector.network.NetworkEventInspector;
+import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.weex.Performance;
 import com.taobao.weex.analyzer.core.TaskEntity;
 import com.taobao.weex.analyzer.core.traffic.TrafficTaskEntity;
