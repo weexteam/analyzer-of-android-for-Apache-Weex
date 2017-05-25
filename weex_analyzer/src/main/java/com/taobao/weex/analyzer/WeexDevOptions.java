@@ -22,6 +22,7 @@ import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.lint.PollingVDomMonitor;
 import com.taobao.weex.analyzer.core.ShakeDetector;
+import com.taobao.weex.analyzer.core.lint.RemoteVDomMonitor;
 import com.taobao.weex.analyzer.core.lint.StandardVDomMonitor;
 import com.taobao.weex.analyzer.core.lint.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
@@ -81,6 +82,8 @@ public class WeexDevOptions implements IWXDevOptions {
     private List<DevOption> mExtraOptions = null;
 
     private VDomController mVdomController;
+
+    private RemoteVDomMonitor mRemoteVDomMonitor;
 
     private WXSDKInstance mInstance;
 
@@ -231,6 +234,7 @@ public class WeexDevOptions implements IWXDevOptions {
         },config);
 
         mVdomController = new VDomController(new PollingVDomMonitor(), new StandardVDomMonitor());
+        mRemoteVDomMonitor = new RemoteVDomMonitor(context);
     }
 
 
@@ -627,6 +631,10 @@ public class WeexDevOptions implements IWXDevOptions {
             mVdomController.destroy();
             mVdomController = null;
         }
+        if(mRemoteVDomMonitor != null) {
+            mRemoteVDomMonitor.destroy();
+            mRemoteVDomMonitor = null;
+        }
         Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
         intent.putExtra("status", "destroy");
         intent.putExtra("type","lifecycle");
@@ -654,6 +662,10 @@ public class WeexDevOptions implements IWXDevOptions {
 
         if (mVdomController != null) {
             mVdomController.monitor(instance);
+        }
+
+        if(mRemoteVDomMonitor != null) {
+            mRemoteVDomMonitor.monitor(instance);
         }
 
         if (mProfileDomView != null) {

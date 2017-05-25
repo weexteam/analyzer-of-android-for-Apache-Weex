@@ -25,8 +25,10 @@ import com.taobao.weex.analyzer.core.NetworkEventInspector;
 import com.taobao.weex.analyzer.core.Performance;
 import com.taobao.weex.analyzer.core.TaskEntity;
 import com.taobao.weex.analyzer.core.TrafficTaskEntity;
+import com.taobao.weex.analyzer.core.lint.RemoteVDomMonitor;
 import com.taobao.weex.analyzer.core.reporter.ws.IWebSocketBridge;
 import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
+import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
 
@@ -204,8 +206,9 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
             config.isPerformanceEnabled = status;
         } else if (Config.TYPE_RENDER_ANALYSIS.equals(type)) {
             config.isRenderAnalysisEnabled = status;
-//            VDomController.isPollingMode = true;
-            //TODO not support yet
+            Intent intent = new Intent(RemoteVDomMonitor.ACTION_SHOULD_MONITOR);
+            intent.putExtra(RemoteVDomMonitor.EXTRA_MONITOR,config.isRenderAnalysisEnabled);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         } else if (Config.TYPE_MTOP_INSPECTOR.equals(type)) {
             config.isNetworkInspectorEnabled = status;
@@ -236,7 +239,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         boolean isTrafficEnabled;
         boolean isPerformanceEnabled;
         boolean isNetworkInspectorEnabled;
-        public boolean isRenderAnalysisEnabled;//ugly
+        boolean isRenderAnalysisEnabled;
     }
 
 
@@ -260,8 +263,8 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
 
             if(Config.TYPE_WEEX_PERFORMANCE_STATISTICS.equals(type)) {
                 String weex_performance = intent.getStringExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
-                Performance performance = JSON.parseObject(weex_performance,Performance.class);
                 if(!TextUtils.isEmpty(weex_performance) && config.isPerformanceEnabled) {
+                    Performance performance = JSON.parseObject(weex_performance,Performance.class);
                     reporter.report(new IDataReporter.ProcessedDataBuilder<Performance>()
                             .deviceId(deviceId)
                             .data(performance)
@@ -281,7 +284,17 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
                             .build()
                     );
                 }
-
+            } else if(Config.TYPE_RENDER_ANALYSIS.equals(type)) {
+                String healthReport = intent.getStringExtra(Config.TYPE_RENDER_ANALYSIS);
+                if(!TextUtils.isEmpty(healthReport) && config.isRenderAnalysisEnabled) {
+                    HealthReport report = JSON.parseObject(healthReport,HealthReport.class);
+                    reporter.report(new IDataReporter.ProcessedDataBuilder<HealthReport>()
+                            .deviceId(deviceId)
+                            .data(report)
+                            .type(Config.TYPE_RENDER_ANALYSIS)
+                            .build()
+                    );
+                }
             }
 
         }
