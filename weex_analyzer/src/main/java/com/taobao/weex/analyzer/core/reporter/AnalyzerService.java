@@ -194,6 +194,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
     }
 
     private void updateConfig(WSConfig config, String type, boolean status) {
+        WXLogUtils.d(Constants.TAG,"config>>>>type:"+type+",status:"+status);
         if (Config.TYPE_MEMORY.equals(type)) {
             config.isMemoryEnabled = status;
         } else if (Config.TYPE_CPU.equals(type)) {

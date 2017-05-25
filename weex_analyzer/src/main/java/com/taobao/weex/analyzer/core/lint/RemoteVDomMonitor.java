@@ -52,6 +52,8 @@ public class RemoteVDomMonitor implements IVDomMonitor {
     }
 
     private void tryStartTask() {
+        WXLogUtils.d(Constants.TAG,"tryStartTask--->>>"+ shouldMonitor);
+
         if(!shouldMonitor) {
             return;
         }
@@ -123,12 +125,12 @@ public class RemoteVDomMonitor implements IVDomMonitor {
                     String data = JSON.toJSONString(report);
 
                     Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
-                    intent.putExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS, data);
+                    intent.putExtra(Config.TYPE_RENDER_ANALYSIS, data);
                     intent.putExtra("type",Config.TYPE_RENDER_ANALYSIS);
                     LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                 }
             }catch (Exception e) {
-                WXLogUtils.e(e.getMessage());
+                WXLogUtils.e(Constants.TAG,e.getMessage());
             }
         }
 

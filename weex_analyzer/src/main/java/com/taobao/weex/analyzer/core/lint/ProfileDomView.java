@@ -167,9 +167,10 @@ public class ProfileDomView extends PermissionOverlayView {
                             .append(desc.ref)
                             .append("'的list,其cell个数为")
                             .append(desc.cellNum)
-                            .append(",预估高度为")
-                            .append(desc.totalHeight)
-                            .append("px\n");
+                            .append("\n");
+//                            .append(",预估高度为")
+//                            .append(desc.totalHeight)
+//                            .append("px\n");
                 }
 
                 builder.append(convertResult(!report.hasBigCell));
@@ -209,13 +210,13 @@ public class ProfileDomView extends PermissionOverlayView {
 
             }
 
-            builder.append(convertResult(true))
-                    .append("检测到当前内容高度约为")
-                    .append(report.estimateContentHeight)
-                    .append("px,约等于")
-                    .append(report.estimatePages)
-                    .append("屏")
-                    .append("\n");
+//            builder.append(convertResult(true))
+//                    .append("检测到当前内容高度约为")
+//                    .append(report.estimateContentHeight)
+//                    .append("px,约等于")
+//                    .append(report.estimatePages)
+//                    .append("屏")
+//                    .append("\n");
 
 
             runOnUIThread(new Runnable() {
