@@ -203,7 +203,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         } else if (Config.TYPE_WEEX_PERFORMANCE_STATISTICS.equals(type)) {
             config.isPerformanceEnabled = status;
         } else if (Config.TYPE_RENDER_ANALYSIS.equals(type)) {
-            WSConfig.isRenderAnalysisEnabled = status;
+            config.isRenderAnalysisEnabled = status;
 //            VDomController.isPollingMode = true;
             //TODO not support yet
 
@@ -236,7 +236,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
         boolean isTrafficEnabled;
         boolean isPerformanceEnabled;
         boolean isNetworkInspectorEnabled;
-        public static boolean isRenderAnalysisEnabled;//ugly
+        public boolean isRenderAnalysisEnabled;//ugly
     }
 
 

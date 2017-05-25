@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.core.lint;
 
 import android.support.annotation.NonNull;
 

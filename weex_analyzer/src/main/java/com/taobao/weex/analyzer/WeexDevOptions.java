@@ -20,10 +20,10 @@ import com.taobao.weex.analyzer.core.DevOptionsConfig;
 import com.taobao.weex.analyzer.core.FPSSampler;
 import com.taobao.weex.analyzer.core.JSExceptionCatcher;
 import com.taobao.weex.analyzer.core.Performance;
-import com.taobao.weex.analyzer.core.PollingVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.PollingVDomMonitor;
 import com.taobao.weex.analyzer.core.ShakeDetector;
-import com.taobao.weex.analyzer.core.StandardVDomMonitor;
-import com.taobao.weex.analyzer.core.VDomController;
+import com.taobao.weex.analyzer.core.lint.StandardVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.VDomController;
 import com.taobao.weex.analyzer.core.WXPerfStorage;
 import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
@@ -39,7 +39,7 @@ import com.taobao.weex.analyzer.view.LogView;
 import com.taobao.weex.analyzer.view.MemorySampleView;
 import com.taobao.weex.analyzer.view.NetworkInspectorView;
 import com.taobao.weex.analyzer.view.PerfSampleOverlayView;
-import com.taobao.weex.analyzer.view.ProfileDomView;
+import com.taobao.weex.analyzer.core.lint.ProfileDomView;
 import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
 import com.taobao.weex.analyzer.view.ScalpelViewController;
 import com.taobao.weex.analyzer.view.SettingsActivity;
@@ -51,9 +51,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description: <p> Created by rowandjj(chuyi)<br/> Date: 2016/11/5<br/> Time: 下午3:25<br/>
- */
-
+ *
+ * Weex-Analyzer入口
+ *
+ * */
 public class WeexDevOptions implements IWXDevOptions {
     private Context mContext;
 

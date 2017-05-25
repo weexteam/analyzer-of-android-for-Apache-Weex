@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.core.lint;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.core.ComponentHeightComputer;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.utils.ViewUtils;

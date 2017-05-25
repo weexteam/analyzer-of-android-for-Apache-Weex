@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.view;
+package com.taobao.weex.analyzer.core.lint;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,8 +12,8 @@ import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
-import com.taobao.weex.analyzer.core.DomTracker;
 import com.taobao.weex.analyzer.pojo.HealthReport;
+import com.taobao.weex.analyzer.view.PermissionOverlayView;
 import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
 import com.taobao.weex.ui.component.WXComponent;
 
@@ -26,7 +26,7 @@ import static com.taobao.weex.analyzer.R.id.close;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class ProfileDomView extends PermissionOverlayView{
+public class ProfileDomView extends PermissionOverlayView {
     private SampleTask mTask;
     private OnCloseListener mOnCloseListener;
 

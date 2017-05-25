@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.core.lint;
 
 import android.os.Build;
 import android.os.Handler;
@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.core.HandlerThreadWrapper;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.utils.WXLogUtils;
 

@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.taobao.weex.analyzer.WeexDevOptions;
 import com.taobao.weex.analyzer.core.debug.DebugTool;
+import com.taobao.weex.analyzer.core.lint.PollingVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.VDomController;
 import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -51,7 +53,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
     private static final String CMD_TRACKER_STANDARD = "d";
     private static final String CMD_TRACKER_POLLING = "f";
 
-    private static final String CMD_LAUNCH_UI = "launch";
+    private static final String CMD_LAUNCH = "launch";
 
     private static final String TRUE = "true";
 
@@ -72,8 +74,8 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         String cmd_tracker_standard = intent.getStringExtra(CMD_TRACKER_STANDARD);
         //vdom调优 轮询模式
         String cmd_tracker_polling = intent.getStringExtra(CMD_TRACKER_POLLING);
-        // 启动
-        String cmd_launch_ui = intent.getStringExtra(CMD_LAUNCH_UI);
+        // 启动服务
+        String cmd_launch = intent.getStringExtra(CMD_LAUNCH);
 
         String cmd_wx_server = intent.getStringExtra(CMD_WX_SERVER);
 
@@ -105,9 +107,8 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
             } else {
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f on] to start vdom tracker(polling mode)");
             }
-        } else if(!TextUtils.isEmpty(cmd_launch_ui)) {
-            if(TRUE.equals(cmd_launch_ui)) {
-                //启动主界面
+        } else if(!TextUtils.isEmpty(cmd_launch)) {
+            if(TRUE.equals(cmd_launch)) {
                 String from = intent.getStringExtra(WeexDevOptions.EXTRA_FROM);
                 String deviceId = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
                 String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);

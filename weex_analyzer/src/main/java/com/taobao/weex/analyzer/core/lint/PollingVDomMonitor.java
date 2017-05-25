@@ -1,8 +1,10 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.core.lint;
 
 import android.support.annotation.NonNull;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.core.AbstractLoopTask;
+import com.taobao.weex.analyzer.core.Constants;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
@@ -15,11 +17,12 @@ import java.lang.ref.WeakReference;
  * Created by rowandjj(chuyi)<br/>
  */
 
-public class PollingVDomMonitor implements IVDomMonitor{
+public class PollingVDomMonitor implements IVDomMonitor {
 
     private PollingTask mTask;
 
-    static boolean shouldStop;
+    //TODO we should remove it later
+    public static boolean shouldStop;
 
     @Override
     public void monitor(@NonNull WXSDKInstance instance) {

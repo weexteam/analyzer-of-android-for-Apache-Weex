@@ -1,6 +1,9 @@
 package com.taobao.weex.analyzer.core;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.core.lint.PollingVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.StandardVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.VDomController;
 
 import org.junit.After;
 import org.junit.Before;
