@@ -8,11 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.taobao.weex.analyzer.R;
+import com.taobao.weex.analyzer.utils.ViewUtils;
 import com.taobao.weex.analyzer.view.overlay.AbstractBizItemView;
 import com.taobao.weex.utils.WXViewUtils;
 
@@ -28,13 +30,7 @@ import java.util.List;
 
 public class WXPerfItemView extends AbstractBizItemView<Performance> {
 
-    private TextView jsfmVersionView;
-    private TextView sdkVersionView;
-    private TextView renderTimeView;
-    private TextView sdkInitTime;
-    private TextView networkTime;
-    private TextView pageNameView;
-    private TextView jsTemplateSizeView;
+
 
     private RecyclerView mPerformanceList;
 
@@ -52,13 +48,7 @@ public class WXPerfItemView extends AbstractBizItemView<Performance> {
 
     @Override
     protected void prepareView() {
-        jsfmVersionView = (TextView) findViewById(R.id.text_jsfm_version);
-        sdkVersionView = (TextView) findViewById(R.id.text_version_sdk);
-        renderTimeView = (TextView) findViewById(R.id.text_screen_render_time);
-        sdkInitTime = (TextView) findViewById(R.id.text_sdk_init_time);
-        networkTime = (TextView) findViewById(R.id.text_network_time);
-        pageNameView = (TextView) findViewById(R.id.page_name);
-        jsTemplateSizeView = (TextView) findViewById(R.id.text_template_size);
+
 
         mPerformanceList = (RecyclerView) findViewById(R.id.overlay_list);
         mPerformanceList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -71,13 +61,7 @@ public class WXPerfItemView extends AbstractBizItemView<Performance> {
 
     @Override
     public void inflateData(Performance data) {
-        pageNameView.setText("页面名称: " + data.pageName + "");
-        sdkVersionView.setText("Weex Sdk版本: " + data.WXSDKVersion + "");
-        sdkInitTime.setText("Weex SDK初始化时间 : " + data.sdkInitTime + "ms");
-        jsfmVersionView.setText("JSFramework版本 : " + data.JSLibVersion+"");
-        renderTimeView.setText("首屏时间 : " + data.screenRenderTime + "ms");
-        networkTime.setText("网络时间 : "+ data.networkTime + "ms");
-        jsTemplateSizeView.setText("jsBundle大小 : " + data.JSTemplateSize + "KB");
+
         PerformanceViewAdapter adapter = new PerformanceViewAdapter(getContext(), data);
         mPerformanceList.setAdapter(adapter);
     }
@@ -88,9 +72,11 @@ public class WXPerfItemView extends AbstractBizItemView<Performance> {
 
         private Context mContext;
         private List<String> mValues;
+        private Performance rawPerformance;
 
         PerformanceViewAdapter(@NonNull Context context, @NonNull Performance performance) {
             this.mContext = context;
+            this.rawPerformance = performance;
             mValues = transfer(performance);
         }
 
@@ -100,47 +86,100 @@ public class WXPerfItemView extends AbstractBizItemView<Performance> {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(createItemView(mContext));
+            return new ViewHolder(createItemView(mContext,parent,viewType),viewType);
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             if (holder instanceof ViewHolder) {
-                ((ViewHolder) holder).bind(mValues.get(position));
+                if(holder.getItemViewType() == ViewType.TYPE_ITEM) {
+                    ((ViewHolder) holder).bind(mValues.get(position-1));
+                } else {
+                    ((ViewHolder) holder).bindHeader(rawPerformance);
+                }
             }
         }
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return mValues.size()+1;
         }
 
-        View createItemView(Context context) {
-            TextView itemView = new TextView(context);
-            RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
+        @Override
+        public int getItemViewType(int position) {
+            if(position == 0) {
+                return ViewType.TYPE_HEADER;
+            } else {
+                return ViewType.TYPE_ITEM;
+            }
+        }
 
-            int margin = WXViewUtils.dip2px(5);
-            params.topMargin = params.bottomMargin = margin;
+        View createItemView(Context context,ViewGroup parent, int viewType) {
+            View itemView;
+            if(viewType == ViewType.TYPE_ITEM) {
+                itemView = new TextView(context);
+                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT);
 
-            itemView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-            itemView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            itemView.setLayoutParams(params);
-            itemView.setTextColor(Color.BLACK);
+                int margin = WXViewUtils.dip2px(5);
+                params.topMargin = params.bottomMargin = margin;
+                ((TextView)itemView).setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+                ((TextView)itemView).setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                itemView.setLayoutParams(params);
+                itemView.setPadding((int) ViewUtils.dp2px(context,15),0,0,0);
+                ((TextView)itemView).setTextColor(Color.BLACK);
+            } else {
+                itemView = LayoutInflater.from(context).inflate(R.layout.wxt_cur_perf_header,parent,false);
+            }
+
             return itemView;
         }
+    }
+
+    private static class ViewType {
+        static final int TYPE_HEADER = 100;
+        static final int TYPE_ITEM = 101;
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mValueText;
 
-        ViewHolder(View itemView) {
+        private TextView jsfmVersionView;
+        private TextView sdkVersionView;
+        private TextView renderTimeView;
+        private TextView sdkInitTime;
+        private TextView networkTime;
+        private TextView pageNameView;
+        private TextView jsTemplateSizeView;
+
+
+        ViewHolder(View itemView, int viewType) {
             super(itemView);
-            mValueText = (TextView) itemView;
+            if(viewType == ViewType.TYPE_ITEM) {
+                mValueText = (TextView) itemView;
+            } else {
+                jsfmVersionView = (TextView) itemView.findViewById(R.id.text_jsfm_version);
+                sdkVersionView = (TextView) itemView.findViewById(R.id.text_version_sdk);
+                renderTimeView = (TextView) itemView.findViewById(R.id.text_screen_render_time);
+                sdkInitTime = (TextView) itemView.findViewById(R.id.text_sdk_init_time);
+                networkTime = (TextView) itemView.findViewById(R.id.text_network_time);
+                pageNameView = (TextView) itemView.findViewById(R.id.page_name);
+                jsTemplateSizeView = (TextView) itemView.findViewById(R.id.text_template_size);
+            }
         }
 
         void bind(@NonNull String value) {
             mValueText.setText(value);
+        }
+
+        void bindHeader(Performance performance) {
+            pageNameView.setText("页面名称: " + performance.pageName + "");
+            sdkVersionView.setText("Weex Sdk版本: " + performance.WXSDKVersion + "");
+            sdkInitTime.setText("Weex SDK初始化时间 : " + performance.sdkInitTime + "ms");
+            jsfmVersionView.setText("JSFramework版本 : " + performance.JSLibVersion+"");
+            renderTimeView.setText("首屏时间 : " + performance.screenRenderTime + "ms");
+            networkTime.setText("网络时间 : "+ performance.networkTime + "ms");
+            jsTemplateSizeView.setText("jsBundle大小 : " + performance.JSTemplateSize + "KB");
         }
     }
 }
