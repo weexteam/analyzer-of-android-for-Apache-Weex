@@ -18,7 +18,7 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.analyzer.Config;
 import com.taobao.weex.analyzer.R;
-import com.taobao.weex.analyzer.core.NetworkEventInspector;
+import com.taobao.weex.analyzer.core.NetworkEventSender;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.analyzer.view.overlay.AbstractResizableOverlayView;
 

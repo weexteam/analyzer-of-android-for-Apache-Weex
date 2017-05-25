@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core.inspector.network;
+package com.taobao.weex.analyzer.core;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import java.util.Map;
  * Description:
  * 用于发送消息
  *
+ *  DO NOT MOVE ME
  * Created by rowandjj(chuyi)<br/>
  */
 

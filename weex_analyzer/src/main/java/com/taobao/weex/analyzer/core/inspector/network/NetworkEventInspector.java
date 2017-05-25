@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core;
+package com.taobao.weex.analyzer.core.inspector.network;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,7 +13,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.taobao.weex.analyzer.core.inspector.network.NetworkEventSender;
+import com.taobao.weex.analyzer.core.NetworkEventSender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,6 @@ import java.util.Map;
  *
  * 负责接受网络消息 并整理后发送给NetworkInspectorView
  *
- * DO NOT MOVE ME
  *
  * 1. 注册localbroadcastManager
  * 2. 接受消息
