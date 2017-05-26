@@ -161,8 +161,7 @@ public class AnalyzerService extends Service implements WebSocketClient.Callback
 
     @Override
     public void onFailure(Throwable cause) {
-        Log.d(Constants.TAG, "service is stopped because of bad webSocket");
-        stopSelf();
+        Log.d(Constants.TAG, this + " service is stopped because of bad webSocket:"+cause.getMessage());
     }
 
     @Override
