@@ -2,6 +2,8 @@ package com.taobao.weex.analyzer.core;
 
 import android.app.AlertDialog;
 
+import com.taobao.weex.analyzer.core.exception.JSExceptionCatcher;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

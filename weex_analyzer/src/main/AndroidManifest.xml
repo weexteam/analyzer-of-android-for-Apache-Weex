@@ -7,7 +7,7 @@
 
     <application>
         <activity
-                android:name=".view.SettingsActivity"
+                android:name=".core.settings.SettingsActivity"
                 android:screenOrientation="portrait"/>
         <receiver
                 android:name=".core.LaunchAnalyzerReceiver"
@@ -17,7 +17,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".core.AnalyzerService"
+        <service android:name=".core.reporter.AnalyzerService"
                 android:exported="false">
         </service>
     </application>

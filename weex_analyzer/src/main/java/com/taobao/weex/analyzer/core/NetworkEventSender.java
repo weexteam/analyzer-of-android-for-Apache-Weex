@@ -13,6 +13,7 @@ import java.util.Map;
  * Description:
  * 用于发送消息
  *
+ *  DO NOT MOVE ME
  * Created by rowandjj(chuyi)<br/>
  */
 

@@ -3,6 +3,9 @@ package com.taobao.weex.analyzer.core;
 import android.text.TextUtils;
 
 import com.taobao.weex.WXSDKInstance;
+import com.taobao.weex.analyzer.core.storage.WXPerfStorage;
+import com.taobao.weex.analyzer.core.weex.Performance;
+import com.taobao.weex.analyzer.core.weex.PerformanceMonitor;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,7 +23,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.taobao.weex.analyzer.core.PerformanceMonitor.monitor;
+import static com.taobao.weex.analyzer.core.weex.PerformanceMonitor.monitor;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 

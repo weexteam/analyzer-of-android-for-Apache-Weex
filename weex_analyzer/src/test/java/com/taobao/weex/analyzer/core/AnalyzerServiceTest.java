@@ -2,6 +2,8 @@ package com.taobao.weex.analyzer.core;
 
 import android.content.Intent;
 
+import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

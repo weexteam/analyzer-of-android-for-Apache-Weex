@@ -9,8 +9,14 @@ import android.util.Log;
 
 import com.taobao.weex.analyzer.WeexDevOptions;
 import com.taobao.weex.analyzer.core.debug.DebugTool;
+import com.taobao.weex.analyzer.core.lint.PollingVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.VDomController;
+import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
 import com.taobao.weex.analyzer.utils.SDKUtils;
 import com.taobao.weex.utils.WXLogUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Description:
@@ -47,7 +53,7 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
     private static final String CMD_TRACKER_STANDARD = "d";
     private static final String CMD_TRACKER_POLLING = "f";
 
-    private static final String CMD_LAUNCH_UI = "launch";
+    private static final String CMD_LAUNCH = "launch";
 
     private static final String TRUE = "true";
 
@@ -59,7 +65,6 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        WXLogUtils.e("CHUYI","called");
         if (!ACTION.equals(intent.getAction())) {
             return;
         }
@@ -69,14 +74,14 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
         String cmd_tracker_standard = intent.getStringExtra(CMD_TRACKER_STANDARD);
         //vdom调优 轮询模式
         String cmd_tracker_polling = intent.getStringExtra(CMD_TRACKER_POLLING);
-        // 启动
-        String cmd_launch_ui = intent.getStringExtra(CMD_LAUNCH_UI);
+        // 启动服务
+        String cmd_launch = intent.getStringExtra(CMD_LAUNCH);
 
         String cmd_wx_server = intent.getStringExtra(CMD_WX_SERVER);
 
         if(!TextUtils.isEmpty(cmd_performance)) {
             if(CMD_ON.equals(cmd_performance)) {
-                performStart(context);
+                performStart(context,AnalyzerService.ATS, null);
             } else if(CMD_OFF.equals(cmd_performance)) {
                 performStop(context);
             } else{
@@ -102,25 +107,39 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
             } else {
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f on] to start vdom tracker(polling mode)");
             }
-        } else if(!TextUtils.isEmpty(cmd_launch_ui)) {
-            if(TRUE.equals(cmd_launch_ui)) {
-                //启动主界面
+        } else if(!TextUtils.isEmpty(cmd_launch)) {
+            if(TRUE.equals(cmd_launch)) {
                 String from = intent.getStringExtra(WeexDevOptions.EXTRA_FROM);
                 String deviceId = intent.getStringExtra(WeexDevOptions.EXTRA_DEVICE_ID);
-                WeexDevOptions.launchByBroadcast(context,TextUtils.isEmpty(from) ? "NULL" : from,deviceId);
+                String wsUrl = intent.getStringExtra(WeexDevOptions.EXTRA_WS_URL);
+
+                WXLogUtils.d(Constants.TAG,"from:"+from+",deviceId:"+deviceId+",wxurl:"+wsUrl);
+
+                Map<String,String> extras = new HashMap<>();
+                extras.put(WeexDevOptions.EXTRA_DEVICE_ID, deviceId);
+                extras.put(WeexDevOptions.EXTRA_WS_URL,wsUrl);
+                performStart(context,from,extras);
+
             }
         } else if(!TextUtils.isEmpty(cmd_wx_server)) {
             DebugTool.startRemoteDebug(cmd_wx_server);
         }
     }
 
-    private void performStart(@NonNull Context context) {
+    private void performStart(@NonNull Context context, String from, Map<String,String> extras) {
         if(!SDKUtils.isHostRunning(context) || !SDKUtils.isInteractive(context)) {
             Log.d(Constants.TAG,"service start failed(host app is not in foreground,is your app running?)");
             return;
         }
         WXLogUtils.d(Constants.TAG,"analyzer service will start...");
         Intent intent = new Intent(context,AnalyzerService.class);
+        intent.putExtra("from",from);
+        if(extras != null) {
+            for(Map.Entry<String,String> me : extras.entrySet()) {
+                intent.putExtra(me.getKey(),me.getValue());
+            }
+        }
+
         context.startService(intent);
     }
 

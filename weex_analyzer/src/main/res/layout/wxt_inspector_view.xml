@@ -83,13 +83,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <com.taobao.weex.analyzer.view.WXInspectorItemView
+        <com.taobao.weex.analyzer.core.inspector.view.WXInspectorItemView
                 android:id="@+id/panel_virtual_dom"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
 
-        <com.taobao.weex.analyzer.view.WXInspectorItemView
+        <com.taobao.weex.analyzer.core.inspector.view.WXInspectorItemView
                 android:id="@+id/panel_native_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

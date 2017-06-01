@@ -1,5 +1,7 @@
 package com.taobao.weex.analyzer.core;
 
+import com.taobao.weex.analyzer.core.weex.Performance;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

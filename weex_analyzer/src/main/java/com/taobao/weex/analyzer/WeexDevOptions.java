@@ -1,61 +1,61 @@
 package com.taobao.weex.analyzer;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.core.DevOptionsConfig;
-import com.taobao.weex.analyzer.core.FPSSampler;
-import com.taobao.weex.analyzer.core.JSExceptionCatcher;
-import com.taobao.weex.analyzer.core.Performance;
-import com.taobao.weex.analyzer.core.PollingVDomMonitor;
-import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
 import com.taobao.weex.analyzer.core.ShakeDetector;
-import com.taobao.weex.analyzer.core.StandardVDomMonitor;
-import com.taobao.weex.analyzer.core.VDomController;
-import com.taobao.weex.analyzer.core.WXPerfStorage;
-import com.taobao.weex.analyzer.core.reporter.LaunchConfig;
+import com.taobao.weex.analyzer.core.cpu.CpuSampleView;
+import com.taobao.weex.analyzer.core.debug.RemoteDebugManager;
+import com.taobao.weex.analyzer.core.exception.JSExceptionCatcher;
+import com.taobao.weex.analyzer.core.fps.FPSSampler;
+import com.taobao.weex.analyzer.core.fps.FpsSampleView;
+import com.taobao.weex.analyzer.core.inspector.network.NetworkInspectorView;
+import com.taobao.weex.analyzer.core.inspector.view.InspectorView;
+import com.taobao.weex.analyzer.core.lint.PollingVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.ProfileDomView;
+import com.taobao.weex.analyzer.core.lint.RemoteVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.StandardVDomMonitor;
+import com.taobao.weex.analyzer.core.lint.VDomController;
+import com.taobao.weex.analyzer.core.logcat.LogView;
+import com.taobao.weex.analyzer.core.memory.MemorySampleView;
+import com.taobao.weex.analyzer.core.reporter.AnalyzerService;
+import com.taobao.weex.analyzer.core.scalpel.ScalpelFrameLayout;
+import com.taobao.weex.analyzer.core.scalpel.ScalpelViewController;
+import com.taobao.weex.analyzer.core.settings.SettingsActivity;
+import com.taobao.weex.analyzer.core.storage.StorageView;
+import com.taobao.weex.analyzer.core.storage.WXPerfStorage;
+import com.taobao.weex.analyzer.core.traffic.TrafficSampleView;
+import com.taobao.weex.analyzer.core.weex.PerfSampleOverlayView;
+import com.taobao.weex.analyzer.core.weex.Performance;
+import com.taobao.weex.analyzer.core.weex.WXPerformanceAnalysisView;
 import com.taobao.weex.analyzer.utils.SDKUtils;
-import com.taobao.weex.analyzer.view.CpuSampleView;
 import com.taobao.weex.analyzer.view.DevOption;
 import com.taobao.weex.analyzer.view.EntranceView;
-import com.taobao.weex.analyzer.view.FpsSampleView;
-import com.taobao.weex.analyzer.view.IOverlayView;
-import com.taobao.weex.analyzer.view.IResizableView;
-import com.taobao.weex.analyzer.view.InspectorView;
-import com.taobao.weex.analyzer.view.LogView;
-import com.taobao.weex.analyzer.view.MemorySampleView;
-import com.taobao.weex.analyzer.view.NetworkInspectorView;
-import com.taobao.weex.analyzer.view.PerfSampleOverlayView;
-import com.taobao.weex.analyzer.view.ProfileDomView;
-import com.taobao.weex.analyzer.view.ScalpelFrameLayout;
-import com.taobao.weex.analyzer.view.ScalpelViewController;
-import com.taobao.weex.analyzer.view.SettingsActivity;
-import com.taobao.weex.analyzer.view.StorageView;
-import com.taobao.weex.analyzer.view.TrafficSampleView;
-import com.taobao.weex.analyzer.view.WXPerformanceAnalysisView;
+import com.taobao.weex.analyzer.view.overlay.IOverlayView;
+import com.taobao.weex.analyzer.view.overlay.IResizableView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description: <p> Created by rowandjj(chuyi)<br/> Date: 2016/11/5<br/> Time: 下午3:25<br/>
- */
-
+ *
+ * Weex-Analyzer入口
+ *
+ * */
 public class WeexDevOptions implements IWXDevOptions {
     private Context mContext;
 
@@ -83,13 +83,13 @@ public class WeexDevOptions implements IWXDevOptions {
 
     private VDomController mVdomController;
 
+    private RemoteVDomMonitor mRemoteVDomMonitor;
+
     private WXSDKInstance mInstance;
 
-    private static final String ACTION_LAUNCH = "action_launch_analyzer";
     public static final String EXTRA_FROM = "from";
     public static final String EXTRA_DEVICE_ID = "deviceId";
-
-    private LaunchUIReceiver mLaunchUIReceiver;
+    public static final String EXTRA_WS_URL = "wsUrl";
 
     private Config mConfig;
 
@@ -229,31 +229,12 @@ public class WeexDevOptions implements IWXDevOptions {
         mShakeDetector = new ShakeDetector(new ShakeDetector.ShakeListener() {
             @Override
             public void onShake() {
-                LaunchConfig.setFrom(null);
-                LaunchConfig.setDeviceId(null);
                 showDevOptions();
             }
         },config);
 
         mVdomController = new VDomController(new PollingVDomMonitor(), new StandardVDomMonitor());
-
-        mLaunchUIReceiver = new LaunchUIReceiver(new OnLaunchListener() {
-            @Override
-            public void onLaunch(@NonNull String from, @Nullable String deviceId) {
-                LaunchConfig.setFrom(from);
-                LaunchConfig.setDeviceId(deviceId);
-                showDevOptions();
-            }
-        });
-    }
-
-    public static void launchByBroadcast(@NonNull Context context, @NonNull String from, @Nullable String deviceId) {
-        Intent intent = new Intent(ACTION_LAUNCH);
-        intent.putExtra(EXTRA_FROM,from);
-        if(!TextUtils.isEmpty(deviceId)) {
-            intent.putExtra(EXTRA_DEVICE_ID,deviceId);
-        }
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        mRemoteVDomMonitor = new RemoteVDomMonitor(context);
     }
 
 
@@ -280,6 +261,34 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         },false,!mConfig.getIgnoreOptions().contains(Config.TYPE_WEEX_PERFORMANCE_STATISTICS)));
 
+        options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mDevOptionsConfig.isVDomDepthEnabled()) {
+                    mDevOptionsConfig.setVdomDepthEnabled(false);
+                    mProfileDomView.dismiss();
+                } else {
+                    mDevOptionsConfig.setVdomDepthEnabled(true);
+                    mProfileDomView.show();
+                    mProfileDomView.bindInstance(mInstance);
+                }
+            }
+        }, true,mProfileDomView.isPermissionGranted(mConfig)));
+
+
+        options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
+            @Override
+            public void onOptionClick() {
+                if (mDevOptionsConfig.isPerfCommonEnabled()) {
+                    mDevOptionsConfig.setPerfCommonEnabled(false);
+                    mPerfMonitorOverlayView.dismiss();
+                } else {
+                    mDevOptionsConfig.setPerfCommonEnabled(true);
+                    mPerfMonitorOverlayView.show();
+                }
+            }
+        }, true,mPerfMonitorOverlayView.isPermissionGranted(mConfig)));
+
         options.add(new DevOption("视图审查", R.drawable.wxt_icon_view_inspector, new DevOption.OnOptionClickListener() {
             @Override
             public void onOptionClick() {
@@ -294,19 +303,6 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         },true,mInspectorView.isPermissionGranted(mConfig)));
 
-        options.add(new DevOption("渲染性能分析", R.drawable.wxt_icon_render_analysis, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mDevOptionsConfig.isVDomDepthEnabled()) {
-                    mDevOptionsConfig.setVdomDepthEnabled(false);
-                    mProfileDomView.dismiss();
-                } else {
-                    mDevOptionsConfig.setVdomDepthEnabled(true);
-                    mProfileDomView.show();
-                    mProfileDomView.bindInstance(mInstance);
-                }
-            }
-        }, true,mProfileDomView.isPermissionGranted(mConfig)));
 
         options.add(new DevOption("MTOP", R.drawable.wxt_icon_mtop, new DevOption.OnOptionClickListener() {
             @Override
@@ -407,18 +403,6 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         }, true, mTrafficSampleView.isPermissionGranted(mConfig)));
 
-        options.add(new DevOption("综合性能", R.drawable.wxt_icon_multi_performance, new DevOption.OnOptionClickListener() {
-            @Override
-            public void onOptionClick() {
-                if (mDevOptionsConfig.isPerfCommonEnabled()) {
-                    mDevOptionsConfig.setPerfCommonEnabled(false);
-                    mPerfMonitorOverlayView.dismiss();
-                } else {
-                    mDevOptionsConfig.setPerfCommonEnabled(true);
-                    mPerfMonitorOverlayView.show();
-                }
-            }
-        }, true,mPerfMonitorOverlayView.isPermissionGranted(mConfig)));
 
 
         options.add(new DevOption("js远程调试", R.drawable.wxt_icon_debug, new DevOption.OnOptionClickListener() {
@@ -494,12 +478,20 @@ public class WeexDevOptions implements IWXDevOptions {
 
     @Override
     public void onCreate() {
-
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "create");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
     public void onStart() {
-
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "start");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
@@ -516,7 +508,6 @@ public class WeexDevOptions implements IWXDevOptions {
     @Override
     public void onResume() {
         mShakeDetector.start((SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE));
-        LocalBroadcastManager.getInstance(mContext).registerReceiver(mLaunchUIReceiver,new IntentFilter(ACTION_LAUNCH));
 
         if (mDevOptionsConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.show();
@@ -581,12 +572,16 @@ public class WeexDevOptions implements IWXDevOptions {
         if (mScalpelViewController != null) {
             mScalpelViewController.resume();
         }
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "resume");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
     public void onPause() {
         mShakeDetector.stop();
-        LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mLaunchUIReceiver);
 
         if (mDevOptionsConfig.isPerfCommonEnabled()) {
             mPerfMonitorOverlayView.dismiss();
@@ -627,10 +622,21 @@ public class WeexDevOptions implements IWXDevOptions {
         if (mScalpelViewController != null) {
             mScalpelViewController.pause();
         }
+
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "pause");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
     public void onStop() {
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "stop");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
     @Override
@@ -639,6 +645,15 @@ public class WeexDevOptions implements IWXDevOptions {
             mVdomController.destroy();
             mVdomController = null;
         }
+        if(mRemoteVDomMonitor != null) {
+            mRemoteVDomMonitor.destroy();
+            mRemoteVDomMonitor = null;
+        }
+        Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+        intent.putExtra("status", "destroy");
+        intent.putExtra("type","lifecycle");
+        intent.putExtra("pageName",mCurPageName);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
 
@@ -650,8 +665,21 @@ public class WeexDevOptions implements IWXDevOptions {
         this.mInstance = instance;
         mCurPageName = WXPerfStorage.getInstance().savePerformance(instance);
 
+        if(mCurPageName != null) {
+            Intent intent = new Intent(AnalyzerService.ACTION_DISPATCH);
+            Performance performance = WXPerfStorage.getInstance().getLatestPerformance(mCurPageName);
+            intent.putExtra(Config.TYPE_WEEX_PERFORMANCE_STATISTICS, JSON.toJSONString(performance));
+            intent.putExtra("type",Config.TYPE_WEEX_PERFORMANCE_STATISTICS);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        }
+
+
         if (mVdomController != null) {
             mVdomController.monitor(instance);
+        }
+
+        if(mRemoteVDomMonitor != null) {
+            mRemoteVDomMonitor.monitor(instance);
         }
 
         if (mProfileDomView != null) {
@@ -705,8 +733,6 @@ public class WeexDevOptions implements IWXDevOptions {
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            LaunchConfig.setDeviceId(null);
-            LaunchConfig.setFrom(null);
             showDevOptions();
             return true;
         }
@@ -724,27 +750,4 @@ public class WeexDevOptions implements IWXDevOptions {
             }
         }
     }
-
-    static class LaunchUIReceiver extends BroadcastReceiver {
-        private OnLaunchListener listener;
-        public LaunchUIReceiver(@NonNull OnLaunchListener listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction() != null && ACTION_LAUNCH.equals(intent.getAction())) {
-                String from = intent.getStringExtra(EXTRA_FROM);
-                String deviceId = intent.getStringExtra(EXTRA_DEVICE_ID);
-                if(listener != null && !TextUtils.isEmpty(from)) {
-                    listener.onLaunch(from,deviceId);
-                }
-            }
-        }
-    }
-
-    interface OnLaunchListener {
-        void onLaunch(@NonNull String from,@Nullable String deviceId);
-    }
-
 }

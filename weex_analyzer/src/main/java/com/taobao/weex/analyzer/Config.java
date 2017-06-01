@@ -3,7 +3,7 @@ package com.taobao.weex.analyzer;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
-import com.taobao.weex.analyzer.view.LogConfig;
+import com.taobao.weex.analyzer.core.logcat.LogConfig;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

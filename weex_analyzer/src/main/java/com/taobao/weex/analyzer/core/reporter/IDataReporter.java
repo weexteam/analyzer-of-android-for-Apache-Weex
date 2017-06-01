@@ -23,8 +23,6 @@ import static com.taobao.weex.analyzer.Config.TYPE_WEEX_PERFORMANCE_STATISTICS;
 
 public interface IDataReporter<T> {
 
-
-
     String API_VERSION = "1";
 
     void report(@NonNull ProcessedData<T> data);
@@ -46,6 +44,8 @@ public interface IDataReporter<T> {
         @OptionType
         private String type;
         private T data;
+
+        ///TODO 当前页面
 
         public int getSequenceId() {
             return sequenceId;

@@ -74,6 +74,9 @@ public class HealthReport {
 
     private String bundleUrl;
 
+    public HealthReport() {
+    }
+
     public HealthReport(@NonNull String bundleUrl) {
         this.bundleUrl = bundleUrl;
     }

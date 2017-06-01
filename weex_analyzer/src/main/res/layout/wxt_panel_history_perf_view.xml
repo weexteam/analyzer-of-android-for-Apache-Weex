@@ -6,7 +6,7 @@
 
 
     <TextView
-        android:text="performance average"
+        android:text="性能平均值"
         android:textColor="#000"
         android:textSize="14sp"
         android:gravity="center_vertical"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"/>
 
     <TextView
-        android:text="report"
+        android:text="性能变化趋势"
         android:textColor="#000"
         android:textSize="14sp"
         android:gravity="center_vertical"
