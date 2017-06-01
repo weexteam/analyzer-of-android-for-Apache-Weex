@@ -1,12 +1,16 @@
 package com.taobao.weex.analyzer.core.lint;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.view.View;
 
 import com.taobao.weex.WXSDKInstance;
 import com.taobao.weex.analyzer.core.AbstractLoopTask;
 import com.taobao.weex.analyzer.core.Constants;
 import com.taobao.weex.analyzer.pojo.HealthReport;
 import com.taobao.weex.analyzer.utils.SDKUtils;
+import com.taobao.weex.analyzer.view.highlight.MutipleViewHighlighter;
+import com.taobao.weex.ui.component.WXComponent;
 import com.taobao.weex.utils.WXLogUtils;
 
 import java.lang.ref.WeakReference;
@@ -24,6 +28,8 @@ public class PollingVDomMonitor implements IVDomMonitor {
     //TODO we should remove it later
     public static boolean shouldStop;
 
+    public static boolean shouldHighlight = false;
+
     @Override
     public void monitor(@NonNull WXSDKInstance instance) {
         if(mTask != null) {
@@ -40,13 +46,21 @@ public class PollingVDomMonitor implements IVDomMonitor {
         }
     }
 
-    private static class PollingTask extends AbstractLoopTask {
+    private static class PollingTask extends AbstractLoopTask implements DomTracker.OnTrackNodeListener{
 
         private WeakReference<WXSDKInstance> instanceRef;
+        MutipleViewHighlighter mViewHighlighter;
+
+        static final int MAX_VDOM_LAYER = 14;
 
         PollingTask(WXSDKInstance instance) {
             super(false,1500);
             this.instanceRef = new WeakReference<>(instance);
+
+            if(shouldHighlight) {
+                mViewHighlighter = MutipleViewHighlighter.newInstance();
+                mViewHighlighter.setColor(Color.parseColor("#420000ff"));
+            }
         }
 
         @Override
@@ -74,6 +88,7 @@ public class PollingVDomMonitor implements IVDomMonitor {
 
             try {
                 DomTracker tracker = new DomTracker(instance);//todo 此处需优化
+                tracker.setOnTrackNodeListener(this);
                 HealthReport report = tracker.traverse();
                 if(report != null) {
                     report.writeToConsole();
@@ -85,6 +100,24 @@ public class PollingVDomMonitor implements IVDomMonitor {
 
         @Override
         protected void onStop() {
+            if(mViewHighlighter != null) {
+                mViewHighlighter.clearHighlight();
+            }
+        }
+
+        @Override
+        public void onTrackNode(@NonNull WXComponent component, int layer) {
+            if(layer < MAX_VDOM_LAYER) {
+                return;
+            }
+            View hostView = component.getHostView();
+            if(hostView == null) {
+                return;
+            }
+
+            if(mViewHighlighter != null) {
+                mViewHighlighter.addHighlightedView(hostView);
+            }
         }
     }
 }

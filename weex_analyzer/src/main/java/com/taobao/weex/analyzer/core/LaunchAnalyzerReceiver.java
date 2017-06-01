@@ -91,19 +91,23 @@ public class LaunchAnalyzerReceiver extends BroadcastReceiver {
             if(CMD_ON.equals(cmd_tracker_standard)) {
                 VDomController.isStandardMode = true;
                 VDomController.isPollingMode = false;
+                PollingVDomMonitor.shouldHighlight = false;
             } else if(CMD_OFF.equals(cmd_tracker_standard)) {
                 VDomController.isStandardMode = false;
             } else {
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e d on] to start vdom tracker");
             }
         } else if(!TextUtils.isEmpty(cmd_tracker_polling)) {
+            String highlightEnabled = intent.getStringExtra("h");
             if(CMD_ON.equals(cmd_tracker_polling)) {
                 VDomController.isPollingMode = true;
                 VDomController.isStandardMode = false;
                 PollingVDomMonitor.shouldStop = false;
+                PollingVDomMonitor.shouldHighlight = CMD_ON.equals(highlightEnabled);
             } else if(CMD_OFF.equals(cmd_tracker_polling)) {
                 VDomController.isPollingMode = false;
                 PollingVDomMonitor.shouldStop = true;
+                PollingVDomMonitor.shouldHighlight = false;
             } else {
                 Log.d(Constants.TAG,"illegal command. use [adb shell am broadcast -a com.taobao.weex.analyzer.LaunchService -e f on] to start vdom tracker(polling mode)");
             }
