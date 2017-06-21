@@ -1,4 +1,4 @@
-package com.taobao.weex.analyzer.core.reporter.ws;
+package com.taobao.weex.analyzer.core.ws;
 
 
 import android.support.annotation.NonNull;

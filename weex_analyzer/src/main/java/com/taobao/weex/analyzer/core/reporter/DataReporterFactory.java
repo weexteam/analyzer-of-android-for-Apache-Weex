@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.taobao.weex.analyzer.core.Constants;
-import com.taobao.weex.analyzer.core.reporter.ws.IWebSocketBridge;
-import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
+import com.taobao.weex.analyzer.core.ws.IWebSocketBridge;
+import com.taobao.weex.analyzer.core.ws.WebSocketClient;
 
 /**
  * Description:

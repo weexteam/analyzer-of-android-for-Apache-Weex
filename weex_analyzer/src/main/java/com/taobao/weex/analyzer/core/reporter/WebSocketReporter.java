@@ -5,9 +5,9 @@ import android.support.annotation.Nullable;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.weex.analyzer.core.Constants;
-import com.taobao.weex.analyzer.core.reporter.ws.IWebSocketBridge;
-import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClient;
-import com.taobao.weex.analyzer.core.reporter.ws.WebSocketClientFactory;
+import com.taobao.weex.analyzer.core.ws.IWebSocketBridge;
+import com.taobao.weex.analyzer.core.ws.WebSocketClient;
+import com.taobao.weex.analyzer.core.ws.WebSocketClientFactory;
 import com.taobao.weex.utils.WXLogUtils;
 
 /**

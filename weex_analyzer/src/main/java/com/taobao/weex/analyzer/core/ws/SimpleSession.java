@@ -7,7 +7,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-package com.taobao.weex.analyzer.core.reporter.ws;
+package com.taobao.weex.analyzer.core.ws;
 
 /**
  * Alternative to JSR-356's Session class but with a less insane J2EE-style API.
