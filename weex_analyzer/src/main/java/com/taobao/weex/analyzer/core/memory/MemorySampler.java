@@ -1,5 +1,7 @@
 package com.taobao.weex.analyzer.core.memory;
 
+import android.support.annotation.WorkerThread;
+
 /**
  * Description:
  * <p>
@@ -32,6 +34,27 @@ public class MemorySampler {
      * */
     public static double totalMemory() {
         return Runtime.getRuntime().totalMemory() / (double) 1048576;
+    }
+
+    @WorkerThread
+    public static void tryForceGC() {
+        // System.gc() does not garbage collect every time. Runtime.gc() is
+        // more likely to perfom a gc.
+        Runtime.getRuntime().gc();
+        enqueueReferences();
+        System.runFinalization();
+    }
+
+    private static void enqueueReferences() {
+        /*
+         * Hack. We don't have a programmatic way to wait for the reference queue
+         * daemon to move references to the appropriate queues.
+         */
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new AssertionError();
+        }
     }
 
 }
