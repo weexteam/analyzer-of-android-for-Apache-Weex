@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
     }
@@ -14,9 +14,9 @@ allprojects {
     repositories {
         jcenter()
 
-        maven {
-            url "http://mvnrepo.alibaba-inc.com/mvn/repository"
-        }
+       maven {
+           url "http://mvnrepo.alibaba-inc.com/mvn/repository"
+       }
     }
 }
 
@@ -25,12 +25,12 @@ apply plugin: 'com.android.library'
 apply from: 'jacoco.gradle'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.0'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 
@@ -58,9 +58,9 @@ android {
 
 dependencies {
     provided 'com.taobao.android:weex_sdk:0.9.5'
-    provided 'com.android.support:recyclerview-v7:25.3.0'
+    provided 'com.android.support:recyclerview-v7:26.1.0'
     provided 'com.alibaba:fastjson:1.1.46.android'
-    provided 'com.android.support:support-v4:25.3.0'
+    provided 'com.android.support:support-v4:26.1.0'
     testCompile 'junit:junit:4.12'
 
     testCompile 'org.mockito:mockito-core:1.9.5'
